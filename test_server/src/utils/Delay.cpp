@@ -54,12 +54,12 @@ void Delay::startDelay() {
 		throw Exception("Timer already running", "Delay::startDelay");
 	}
 
-	// Convert to nanoseconds
-	long int ns = itsMsec*1000000;
 	// Seconds
-	long int seconds = ns / 1000000000L;
+	long int seconds = itsMsec / 1000;
+	// milliseconds
+	long int ms = itsMsec % 1000;
 	// nanoseconds
-	long nst = ns % 1000000000L;
+	long nst = ms * 1000000;
 
 	// Start the timer
 	its.it_value.tv_sec = seconds;
