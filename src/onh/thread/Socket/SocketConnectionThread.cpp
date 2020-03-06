@@ -36,7 +36,7 @@ void* socketConnection_thread(void* data) {
 
 	// Create logger
 	std::stringstream s;
-	s << "connection_th_" << thDT->connDescriptor << " ";
+	s << "connection_th_" << thDT->connDescriptor << "_";
 	log = new Logger("parser", s.str());
 
 	try {
