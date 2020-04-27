@@ -16,19 +16,19 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_SHM_MODBUSTCPPROCESSDATACONTAINER_H_
-#define SRC_ONH_DRIVER_SHM_MODBUSTCPPROCESSDATACONTAINER_H_
+#ifndef SRC_ONH_DRIVER_SHM_MODBUSPROCESSDATACONTAINER_H_
+#define SRC_ONH_DRIVER_SHM_MODBUSPROCESSDATACONTAINER_H_
 
 #include "../../utils/MutexContainer.h"
-#include "ModbusTCPProcessData.h"
-#include "ModbusTCPProcessDataController.h"
+#include "ModbusProcessData.h"
+#include "ModbusProcessDataController.h"
 
 namespace onh {
 
 	/**
-	 * ModbusTCP process data container class
+	 * Modbus process data container class
 	 */
-	class ModbusTCPProcessDataContainer {
+	class ModbusProcessDataContainer {
 
 		public:
 
@@ -37,23 +37,23 @@ namespace onh {
 			 *
 			 * @param regCount Max number modbus registers to read
 			 */
-			ModbusTCPProcessDataContainer(WORD regCount);
+			ModbusProcessDataContainer(WORD regCount);
 
-			virtual ~ModbusTCPProcessDataContainer();
+			virtual ~ModbusProcessDataContainer();
 
 			/**
-			 * Get ModbusTCP process data container controller object
+			 * Get Modbus process data container controller object
 			 *
-			 * @return ModbusTCP process data container controller object
+			 * @return Modbus process data container controller object
 			 */
-			ModbusTCPProcessDataController getController();
+			ModbusProcessDataController getController();
 
 			/**
 			 * Update internal process data
 			 *
 			 * @param newDT New process data
 			 */
-			void update(const ModbusTCPProcessData& newDT);
+			void update(const ModbusProcessData& newDT);
 
 			/**
 			 * Clear process data
@@ -65,15 +65,15 @@ namespace onh {
 			/**
 			 * Copy constructor
 			 */
-			ModbusTCPProcessDataContainer(const ModbusTCPProcessDataContainer&) {};
+			ModbusProcessDataContainer(const ModbusProcessDataContainer&) {};
 
 			/**
 			 * Assign operator
 			 */
-			void operator=(const ModbusTCPProcessDataContainer&) {};
+			void operator=(const ModbusProcessDataContainer&) {};
 
 			/// Process data
-			ModbusTCPProcessData process;
+			ModbusProcessData process;
 
 			/// Mutex for protecting process data
 			MutexContainer processLock;
@@ -84,4 +84,4 @@ namespace onh {
 
 }
 
-#endif /* SRC_ONH_DRIVER_SHM_MODBUSTCPPROCESSDATACONTAINER_H_ */
+#endif /* SRC_ONH_DRIVER_SHM_MODBUSPROCESSDATACONTAINER_H_ */

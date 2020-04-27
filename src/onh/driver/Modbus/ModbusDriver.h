@@ -16,33 +16,31 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBUSTCP_H
-#define MODBUSTCP_H
+#ifndef MODBUSDRIVER_H
+#define MODBUSDRIVER_H
 
 #include "../Driver.h"
 #include "../../utils/MutexContainer.h"
-#include "modbustcpmaster.h"
-#include "ModbusTCPProcessReader.h"
-#include "ModbusTCPProcessDataContainer.h"
+#include "modbusmaster.h"
+#include "ModbusProcessReader.h"
+#include "ModbusProcessDataContainer.h"
 
 namespace onh {
 
     /**
-	 * Modbus TCP driver class
+	 * Modbus driver class
 	 */
-    class ModbusTCP: public Driver {
+    class ModbusDriver: public Driver {
 
         public:
             /**
-             * ModbusTCP Constructor
-             * @param addr Slave IP address
-             * @param registersCount Max number modbus registers to read
-             * @param slaveId Slave Identifier
-             * @param port Slave listen port (default 502)
+             * ModbusDriver Constructor
+             *
+             * @param cfg Modbus configuration structure
              */
-            ModbusTCP(const std::string& addr, WORD registersCount, BYTE slaveId, int port=502);
+            ModbusDriver(const modbusM::ModbusCfg& cfg);
 
-            virtual ~ModbusTCP();
+            virtual ~ModbusDriver();
 
             /**
              * Update process data (copy from load buffer)
@@ -139,14 +137,14 @@ namespace onh {
             unsigned int maxByteCount;
 
             // Modbus process data
-            ModbusTCPProcessDataContainer processDT;
+            ModbusProcessDataContainer processDT;
 
             // Modbus process data buffer
-            ModbusTCPProcessData buff;
+            ModbusProcessData buff;
             MutexContainer bufferLock;
 
-            /// Modbus TCP Master protocol
-            modbusTCP::ModbusTCPMaster *modbus;
+            /// Modbus Master protocol
+            modbusM::ModbusMaster *modbus;
             MutexContainer modbusLock;
 
             /**
@@ -165,4 +163,4 @@ namespace onh {
 
 }
 
-#endif // MODBUSTCP_H
+#endif // MODBUSDRIVER_H

@@ -16,15 +16,15 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBSTCPPROCESSDATA_INCLUDED
-#define MODBSTCPPROCESSDATA_INCLUDED
+#ifndef MODBSPROCESSDATA_INCLUDED
+#define MODBSPROCESSDATA_INCLUDED
 
 #include "../DriverRegisterTypes.h"
 
 namespace onh {
 
     /**
-	 * Modbus TCP process data structure
+	 * Modbus process data structure
 	 */
     typedef struct {
         /// Modbus holding registers
@@ -32,8 +32,8 @@ namespace onh {
 
         /// Modbus input registers
         WORD *inputReg;
-    } ModbusTCPProcessData;
+    } ModbusProcessData;
 
 }
 
-#endif // MODBSTCPPROCESSDATA_INCLUDED
+#endif // MODBSPROCESSDATA_INCLUDED

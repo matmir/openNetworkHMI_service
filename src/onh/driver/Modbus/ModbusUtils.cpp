@@ -16,42 +16,42 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ModbusTCPUtils.h"
+#include "ModbusUtils.h"
 #include "../DriverUtils.h"
 #include "../DriverException.h"
 
 using namespace onh;
 
-ModbusTCPUtils::ModbusTCPUtils() {
+ModbusUtils::ModbusUtils() {
 
 }
 
-ModbusTCPUtils::~ModbusTCPUtils() {
+ModbusUtils::~ModbusUtils() {
 }
 
-void ModbusTCPUtils::checkProcessAddress(processDataAddress addr, unsigned int maxByteCount, unsigned int byteFactor, bool writeOperation) {
+void ModbusUtils::checkProcessAddress(processDataAddress addr, unsigned int maxByteCount, unsigned int byteFactor, bool writeOperation) {
 
     // Check bit address
     DriverUtils::checkBitAddress(addr);
 
     // Check byte address
     if (addr.byteAddr >= (maxByteCount-byteFactor)) {
-    	throw DriverException("Byte address is out of range", "ModbusTCPUtils::checkProcessAddress");
+    	throw DriverException("Byte address is out of range", "ModbusUtils::checkProcessAddress");
     }
 
     // Check area
     if (addr.area == PDA_MEMORY) {
-    	throw DriverException("Memory area not allowed", "ModbusTCPUtils::checkProcessAddress");
+    	throw DriverException("Memory area not allowed", "ModbusUtils::checkProcessAddress");
     }
     if ((addr.area != PDA_INPUT) && (addr.area != PDA_OUTPUT)) {
-    	throw DriverException("Area out of range", "ModbusTCPUtils::checkProcessAddress");
+    	throw DriverException("Area out of range", "ModbusUtils::checkProcessAddress");
 	}
     if (writeOperation && addr.area == PDA_INPUT) {
-    	throw DriverException("Write to input area not allowed", "ModbusTCPUtils::checkProcessAddress");
+    	throw DriverException("Write to input area not allowed", "ModbusUtils::checkProcessAddress");
     }
 }
 
-WORD ModbusTCPUtils::getRegisterAddress(processDataAddress addr) {
+WORD ModbusUtils::getRegisterAddress(processDataAddress addr) {
 
     return addr.byteAddr/2;
 }

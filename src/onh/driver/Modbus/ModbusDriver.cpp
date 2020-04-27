@@ -16,24 +16,24 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ModbusTCP.h"
-#include "ModbusTCPUpdater.h"
-#include "ModbusTCPUtils.h"
+#include "ModbusDriver.h"
+#include "ModbusUpdater.h"
+#include "ModbusUtils.h"
 #include <iostream>
 
 using namespace onh;
 
-ModbusTCP::ModbusTCP(const std::string& addr, WORD registersCount, BYTE slaveId, int port):
-	Driver("modbus_"), regCount(registersCount), maxByteCount(0), processDT(registersCount)
+ModbusDriver::ModbusDriver(const modbusM::ModbusCfg& cfg):
+	Driver("modbus_"), regCount(cfg.registerCount), maxByteCount(0), processDT(cfg.registerCount)
 {
 	// Check registers count
 	if (regCount < 1) {
-		triggerError("Register count need to be greater than 0", "ModbusTCP::ModbusTCP");
+		triggerError("Register count need to be greater than 0", "ModbusDriver::ModbusDriver");
 	}
 
 	// Create Modbus protocol
-	modbus = new modbusTCP::ModbusTCPMaster(addr, slaveId, port);
-	getLog().write("ModbusTCP initialized");
+	modbus = new modbusM::ModbusMaster(cfg);
+	getLog().write("ModbusDriver initialized");
 
 	// Initialize registers
 	buff.holdingReg = new WORD[regCount];
@@ -43,7 +43,7 @@ ModbusTCP::ModbusTCP(const std::string& addr, WORD registersCount, BYTE slaveId,
 		buff.holdingReg[i] = 0;
 		buff.inputReg[i] = 0;
 	}
-	getLog().write("ModbusTCP::init: Process registers prepared");
+	getLog().write("ModbusDriver::init: Process registers prepared");
 
 	// Max Byte count
 	maxByteCount = regCount*2;
@@ -52,9 +52,9 @@ ModbusTCP::ModbusTCP(const std::string& addr, WORD registersCount, BYTE slaveId,
 	connect();
 }
 
-ModbusTCP::~ModbusTCP()
+ModbusDriver::~ModbusDriver()
 {
-	getLog().write("ModbusTCP driver closed");
+	getLog().write("ModbusDriver driver closed");
 
     if (modbus)
         delete modbus;
@@ -66,29 +66,29 @@ ModbusTCP::~ModbusTCP()
         delete [] buff.inputReg;
 }
 
-void ModbusTCP::triggerError(const std::string& msg, const std::string& fName) {
+void ModbusDriver::triggerError(const std::string& msg, const std::string& fName) {
 
     std::string s = fName + ": " + msg;
     getLog().write(s);
     throw DriverException(msg, fName);
 }
 
-void ModbusTCP::connect() {
+void ModbusDriver::connect() {
 
 	try {
 
 		// Connect to the controller
-		getLog().write("ModbusTCP::init: Connecting to the controller...");
+		getLog().write("ModbusDriver::init: Connecting to the controller...");
 		modbus->connect();
-		getLog().write("ModbusTCP::init: Connected");
+		getLog().write("ModbusDriver::init: Connected");
 
-	} catch (modbusTCP::ModbusTCPException &e) {
+	} catch (modbusM::ModbusException &e) {
 
-		triggerError(e.what(), "ModbusTCP::init:");
+		triggerError(e.what(), "ModbusDriver::init:");
 	}
 }
 
-void ModbusTCP::updateProcessData() {
+void ModbusDriver::updateProcessData() {
 
     bufferLock.lock();
 
@@ -98,13 +98,13 @@ void ModbusTCP::updateProcessData() {
     bufferLock.unlock();
 }
 
-void ModbusTCP::setBit(processDataAddress addr) {
+void ModbusDriver::setBit(processDataAddress addr) {
 
     // Check process address
-	ModbusTCPUtils::ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 0, true);
+	ModbusUtils::checkProcessAddress(addr, maxByteCount, 0, true);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Modbus register
     WORD reg = 0;
@@ -125,22 +125,22 @@ void ModbusTCP::setBit(processDataAddress addr) {
         // Write register
         modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
 
-    } catch (modbusTCP::ModbusTCPException &e) {
+    } catch (modbusM::ModbusException &e) {
         modbusLock.unlock();
 
-        triggerError(e.what(), "ModbusTCP::setBit");
+        triggerError(e.what(), "ModbusDriver::setBit");
     }
 
     modbusLock.unlock();
 }
 
-void ModbusTCP::resetBit(processDataAddress addr) {
+void ModbusDriver::resetBit(processDataAddress addr) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 0, true);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount, 0, true);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Modbus register
     WORD reg = 0;
@@ -161,22 +161,22 @@ void ModbusTCP::resetBit(processDataAddress addr) {
         // Write register
         modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
 
-    } catch (modbusTCP::ModbusTCPException &e) {
+    } catch (modbusM::ModbusException &e) {
         modbusLock.unlock();
 
-        triggerError(e.what(), "ModbusTCP::resetBit");
+        triggerError(e.what(), "ModbusDriver::resetBit");
     }
 
     modbusLock.unlock();
 }
 
-void ModbusTCP::invertBit(processDataAddress addr) {
+void ModbusDriver::invertBit(processDataAddress addr) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 0, true);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount, 0, true);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Modbus register
     WORD reg = 0;
@@ -197,16 +197,16 @@ void ModbusTCP::invertBit(processDataAddress addr) {
         // Write register
         modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
 
-    } catch (modbusTCP::ModbusTCPException &e) {
+    } catch (modbusM::ModbusException &e) {
         modbusLock.unlock();
 
-        triggerError(e.what(), "ModbusTCP::invertBit");
+        triggerError(e.what(), "ModbusDriver::invertBit");
     }
 
     modbusLock.unlock();
 }
 
-void ModbusTCP::setBits(std::vector<processDataAddress> addr) {
+void ModbusDriver::setBits(std::vector<processDataAddress> addr) {
 
     for (unsigned int i=0; i<addr.size(); ++i) {
 
@@ -215,13 +215,13 @@ void ModbusTCP::setBits(std::vector<processDataAddress> addr) {
     }
 }
 
-void ModbusTCP::writeByte(processDataAddress addr, BYTE val) {
+void ModbusDriver::writeByte(processDataAddress addr, BYTE val) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 0, true);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount, 0, true);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Modbus register
     WORD reg = 0;
@@ -253,22 +253,22 @@ void ModbusTCP::writeByte(processDataAddress addr, BYTE val) {
         // Write register
         modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
 
-    } catch (modbusTCP::ModbusTCPException &e) {
+    } catch (modbusM::ModbusException &e) {
         modbusLock.unlock();
 
-        triggerError(e.what(), "ModbusTCP::writeByte");
+        triggerError(e.what(), "ModbusDriver::writeByte");
     }
 
     modbusLock.unlock();
 }
 
-void ModbusTCP::writeWord(processDataAddress addr, WORD val) {
+void ModbusDriver::writeWord(processDataAddress addr, WORD val) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 1, true);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount, 1, true);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Modbus register
     WORD reg = 0;
@@ -286,22 +286,22 @@ void ModbusTCP::writeWord(processDataAddress addr, WORD val) {
         // Write register
         modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
 
-    } catch (modbusTCP::ModbusTCPException &e) {
+    } catch (modbusM::ModbusException &e) {
         modbusLock.unlock();
 
-        triggerError(e.what(), "ModbusTCP::writeWord");
+        triggerError(e.what(), "ModbusDriver::writeWord");
     }
 
     modbusLock.unlock();
 }
 
-void ModbusTCP::writeDWord(processDataAddress addr, DWORD val) {
+void ModbusDriver::writeDWord(processDataAddress addr, DWORD val) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 3, true);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount, 3, true);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Modbus registers
     WORD reg[2] = {0};
@@ -317,22 +317,22 @@ void ModbusTCP::writeDWord(processDataAddress addr, DWORD val) {
         // Write register
         modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
 
-    } catch (modbusTCP::ModbusTCPException &e) {
+    } catch (modbusM::ModbusException &e) {
         modbusLock.unlock();
 
-        triggerError(e.what(), "ModbusTCP::writeDWord");
+        triggerError(e.what(), "ModbusDriver::writeDWord");
     }
 
     modbusLock.unlock();
 }
 
-void ModbusTCP::writeInt(processDataAddress addr, int val) {
+void ModbusDriver::writeInt(processDataAddress addr, int val) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 3, true);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount, 3, true);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Modbus registers
     WORD reg[2] = {0};
@@ -352,22 +352,22 @@ void ModbusTCP::writeInt(processDataAddress addr, int val) {
         // Write registers
         modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
 
-    } catch (modbusTCP::ModbusTCPException &e) {
+    } catch (modbusM::ModbusException &e) {
         modbusLock.unlock();
 
-        triggerError(e.what(), "ModbusTCP::writeInt");
+        triggerError(e.what(), "ModbusDriver::writeInt");
     }
 
     modbusLock.unlock();
 }
 
-void ModbusTCP::writeReal(processDataAddress addr, float val) {
+void ModbusDriver::writeReal(processDataAddress addr, float val) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 3, true);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount, 3, true);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Modbus registers
     WORD reg[2] = {0};
@@ -387,18 +387,18 @@ void ModbusTCP::writeReal(processDataAddress addr, float val) {
         // Write registers
         modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
 
-    } catch (modbusTCP::ModbusTCPException &e) {
+    } catch (modbusM::ModbusException &e) {
         modbusLock.unlock();
 
-        triggerError(e.what(), "ModbusTCP::writeReal");
+        triggerError(e.what(), "ModbusDriver::writeReal");
     }
 
     modbusLock.unlock();
 }
 
-DriverBuffer* ModbusTCP::getBuffer() {
+DriverBuffer* ModbusDriver::getBuffer() {
 
-    return new ModbusTCPUpdater(
+    return new ModbusUpdater(
                     modbus,
                     buff,
                     regCount,
@@ -408,7 +408,7 @@ DriverBuffer* ModbusTCP::getBuffer() {
 
 }
 
-DriverProcessReader* ModbusTCP::getReader() {
+DriverProcessReader* ModbusDriver::getReader() {
 
-	return new ModbusTCPProcessReader(processDT.getController());
+	return new ModbusProcessReader(processDT.getController());
 }

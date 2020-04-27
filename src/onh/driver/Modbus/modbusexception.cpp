@@ -16,32 +16,32 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "modbustcpexception.h"
+#include "modbusexception.h"
 
-using namespace modbusTCP;
+using namespace modbusM;
 
-ModbusTCPException::ModbusTCPException():
+ModbusException::ModbusException():
     errorMessage(""), functionName(""), allMessage("none")
 {
 }
 
-ModbusTCPException::ModbusTCPException(const std::string& exceptionMSG):
+ModbusException::ModbusException(const std::string& exceptionMSG):
     errorMessage(exceptionMSG), functionName(""), allMessage(exceptionMSG)
 {
 }
 
-ModbusTCPException::ModbusTCPException(const std::string& exceptionMSG, const std::string& funcName):
+ModbusException::ModbusException(const std::string& exceptionMSG, const std::string& funcName):
     errorMessage(exceptionMSG), functionName(funcName)
 {
 	allMessage = functionName + ": ";
 	allMessage += errorMessage;
 }
 
-ModbusTCPException::~ModbusTCPException() throw()
+ModbusException::~ModbusException() throw()
 {
 }
 
-const char* ModbusTCPException::what() const throw() {
+const char* ModbusException::what() const throw() {
 
     return allMessage.c_str();
 }

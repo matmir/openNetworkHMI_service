@@ -16,30 +16,30 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBUSTCPUPDATER_H
-#define MODBUSTCPUPDATER_H
+#ifndef MODBUSUPDATER_H
+#define MODBUSUPDATER_H
 
 #include "../DriverBuffer.h"
 #include "../DriverException.h"
-#include "modbustcpmaster.h"
-#include "ModbusTCPProcessData.h"
+#include "modbusmaster.h"
+#include "ModbusProcessData.h"
 #include "../../utils/MutexAccess.h"
 
 namespace onh {
 
     /// Forward declaration
-	class ModbusTCP;
+	class ModbusDriver;
 
     /**
-	 * Modbus TCP updater class
+	 * Modbus updater class
 	 */
-    class ModbusTCPUpdater: public DriverBuffer {
+    class ModbusUpdater: public DriverBuffer {
 
         public:
 
-            friend class ModbusTCP;
+            friend class ModbusDriver;
 
-            virtual ~ModbusTCPUpdater();
+            virtual ~ModbusUpdater();
 
             /**
              * Update driver buffer (Get data from controller)
@@ -48,19 +48,19 @@ namespace onh {
 
         private:
             /**
-             * Default constructor (allowed only from ModbusTCP)
+             * Default constructor (allowed only from Modbus)
              */
-            ModbusTCPUpdater();
+            ModbusUpdater();
 
             /**
-             * Copy constructor (allowed only from ModbusTCP)
+             * Copy constructor (allowed only from Modbus)
              *
-             * @param mtu ModbusTCPUpdater object
+             * @param mtu ModbusUpdater object
              */
-            ModbusTCPUpdater(const ModbusTCPUpdater &mtu);
+            ModbusUpdater(const ModbusUpdater &mtu);
 
             /**
-             * Constructor with parameters (allowed only from ModbusTCP)
+             * Constructor with parameters (allowed only from Modbus)
              *
              * @param drv Driver instance
              * @param buffH Buffer structure
@@ -68,18 +68,18 @@ namespace onh {
              * @param driverL Driver Mutex locking structure
              * @param buffL Buffer Mutex locking structure
              */
-            ModbusTCPUpdater(modbusTCP::ModbusTCPMaster* drv,
-                             ModbusTCPProcessData buffH,
+            ModbusUpdater(modbusM::ModbusMaster* drv,
+                             ModbusProcessData buffH,
                              WORD cnt,
                              const MutexAccess &malDriver,
                              const MutexAccess &malBuff);
 
             /**
-             * Assign operator (allowed only from ModbusTCP)
+             * Assign operator (allowed only from Modbus)
              *
-             * @param mtu ModbusTCPUpdater object
+             * @param mtu ModbusUpdater object
              */
-            ModbusTCPUpdater& operator=(const ModbusTCPUpdater &mtu);
+            ModbusUpdater& operator=(const ModbusUpdater &mtu);
 
             /**
              * Clear temporary registers
@@ -92,19 +92,19 @@ namespace onh {
             void copyTempRegistersToBuffer();
 
             /// Driver instance
-            modbusTCP::ModbusTCPMaster* driver;
+            modbusM::ModbusMaster* driver;
             MutexAccess driverLock;
 
             /// Modbus process data buffer structure
-            ModbusTCPProcessData buff;
+            ModbusProcessData buff;
             MutexAccess bufferLock;
 
             /// Modbus process data temporary buffer structure
-            ModbusTCPProcessData tempBuff;
+            ModbusProcessData tempBuff;
 
             /// Register count to update
             WORD regCount;
     };
 
 }
-#endif // MODBUSTCPUPDATER_H
+#endif // MODBUSUPDATER_H

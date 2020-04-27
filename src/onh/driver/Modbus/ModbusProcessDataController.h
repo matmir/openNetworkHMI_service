@@ -16,46 +16,46 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_SHM_MODBUSTCPPROCESSDATACONTROLLER_H_
-#define SRC_ONH_DRIVER_SHM_MODBUSTCPPROCESSDATACONTROLLER_H_
+#ifndef SRC_ONH_DRIVER_SHM_MODBUSPROCESSDATACONTROLLER_H_
+#define SRC_ONH_DRIVER_SHM_MODBUSPROCESSDATACONTROLLER_H_
 
 #include "../../utils/MutexAccess.h"
-#include "ModbusTCPProcessData.h"
+#include "ModbusProcessData.h"
 
 namespace onh {
 
 	/// Forward declaration
-	class ModbusTCPProcessDataContainer;
+	class ModbusProcessDataContainer;
 
 	/**
-	 * ModbusTCP process data controller class
+	 * Modbus process data controller class
 	 */
-	class ModbusTCPProcessDataController {
+	class ModbusProcessDataController {
 
 		public:
 
-			friend class ModbusTCPProcessDataContainer;
+			friend class ModbusProcessDataContainer;
 
 			/**
 			 * Default constructor
 			 */
-			ModbusTCPProcessDataController();
+			ModbusProcessDataController();
 
 			/**
 			 * Copy constructor
 			 *
 			 * @param spdc Shm process data controller object to copy
 			 */
-			ModbusTCPProcessDataController(const ModbusTCPProcessDataController& spdc);
+			ModbusProcessDataController(const ModbusProcessDataController& spdc);
 
-			virtual ~ModbusTCPProcessDataController();
+			virtual ~ModbusProcessDataController();
 
 			/**
 			 * Get copy of the driver process data
 			 *
 			 * @param dest Destination process data
 			 */
-			void getProcessDataCopy(ModbusTCPProcessData *dest);
+			void getProcessDataCopy(ModbusProcessData *dest);
 
 			/**
 			 * Get registers count
@@ -67,21 +67,21 @@ namespace onh {
 		private:
 
 			/**
-			 * Constructor (allowed only from ModbusTCPProcessDataContainer)
+			 * Constructor (allowed only from ModbusProcessDataContainer)
 			 *
 			 * @param pdLock MutexAccess object for protecting process data
 			 * @param procDT Pointer to process data
 			 * @param registersCount Max number modbus registers to read
 			 */
-			ModbusTCPProcessDataController(const MutexAccess &pdLock, ModbusTCPProcessData *procDT, WORD regCount);
+			ModbusProcessDataController(const MutexAccess &pdLock, ModbusProcessData *procDT, WORD regCount);
 
 			/**
 			 * Assign operator
 			 */
-			void operator=(const ModbusTCPProcessDataController&) {};
+			void operator=(const ModbusProcessDataController&) {};
 
 			/// Pointer to the process data
-			ModbusTCPProcessData *process;
+			ModbusProcessData *process;
 
 			/// Mutex for protecting process data
 			MutexAccess processLock;
@@ -92,4 +92,4 @@ namespace onh {
 
 }
 
-#endif /* SRC_ONH_DRIVER_SHM_MODBUSTCPPROCESSDATACONTROLLER_H_ */
+#endif /* SRC_ONH_DRIVER_SHM_MODBUSPROCESSDATACONTROLLER_H_ */

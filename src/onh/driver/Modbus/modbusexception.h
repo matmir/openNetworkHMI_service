@@ -16,30 +16,30 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBUSTCPEXCEPTION_H
-#define MODBUSTCPEXCEPTION_H
+#ifndef MODBUSEXCEPTION_H
+#define MODBUSEXCEPTION_H
 
 #include <string>
 
-namespace modbusTCP {
+namespace modbusM {
 
 	/**
-     * The ModbusTCPException class
+     * The ModbusException class
      */
-    class ModbusTCPException: public std::exception {
+    class ModbusException: public std::exception {
 
         public:
 
-    		ModbusTCPException();
+    		ModbusException();
 
-            virtual ~ModbusTCPException() throw();
+            virtual ~ModbusException() throw();
 
             /**
              * Exception constructor with message
              *
              * @param exceptionMSG Exception additional info
              */
-            ModbusTCPException(const std::string& exceptionMSG);
+            ModbusException(const std::string& exceptionMSG);
 
             /**
              * Exception constructor with message and function name
@@ -47,7 +47,7 @@ namespace modbusTCP {
              * @param exceptionMSG Exception additional info
              * @param funcName Function from which exception was throwed
              */
-            ModbusTCPException(const std::string& exceptionMSG, const std::string& funcName);
+            ModbusException(const std::string& exceptionMSG, const std::string& funcName);
 
             /**
              * Get exception message
@@ -69,4 +69,4 @@ namespace modbusTCP {
 
 }
 
-#endif // MODBUSTCPEXCEPTION_H
+#endif // MODBUSEXCEPTION_H

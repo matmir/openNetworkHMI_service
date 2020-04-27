@@ -16,29 +16,29 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_MODBUS_MODBUSTCPPROCESSREADER_H_
-#define SRC_ONH_DRIVER_MODBUS_MODBUSTCPPROCESSREADER_H_
+#ifndef SRC_ONH_DRIVER_MODBUS_MODBUSPROCESSREADER_H_
+#define SRC_ONH_DRIVER_MODBUS_MODBUSPROCESSREADER_H_
 
 #include "../DriverProcessReader.h"
-#include "ModbusTCPProcessData.h"
+#include "ModbusProcessData.h"
 #include "../../utils/MutexAccess.h"
-#include "ModbusTCPProcessDataController.h"
+#include "ModbusProcessDataController.h"
 
 namespace onh {
 
 	/// Forward declaration
-	class ModbusTCP;
+	class ModbusDriver;
 
 	/**
-	 * ModbusTCP driver process data reader class
+	 * Modbus driver process data reader class
 	 */
-	class ModbusTCPProcessReader: public DriverProcessReader {
+	class ModbusProcessReader: public DriverProcessReader {
 
 		public:
 
-			friend class ModbusTCP;
+			friend class ModbusDriver;
 
-			virtual ~ModbusTCPProcessReader();
+			virtual ~ModbusProcessReader();
 
 			/**
 			 * Get bit value from process data
@@ -118,25 +118,25 @@ namespace onh {
 		private:
 
 			/**
-			 * Constructor (allowed only from ModbusTCP)
+			 * Constructor (allowed only from Modbus)
 			 */
-			ModbusTCPProcessReader();
+			ModbusProcessReader();
 
 			/**
-			 * Constructor (allowed only from ModbusTCP)
+			 * Constructor (allowed only from Modbus)
 			 *
-			 * @param spdc ModbusTCP process data controller
+			 * @param spdc Modbus process data controller
 			 */
-			ModbusTCPProcessReader(const ModbusTCPProcessDataController& spdc);
+			ModbusProcessReader(const ModbusProcessDataController& spdc);
 
 			/// Maximum Byte address
 			unsigned int maxByteCount;
 
 			/// Copy of the driver process data
-			ModbusTCPProcessData process;
+			ModbusProcessData process;
 
 			/// Driver process data controller
-			ModbusTCPProcessDataController driverProcess;
+			ModbusProcessDataController driverProcess;
 
 			/**
 			 * Trigger error
@@ -149,4 +149,4 @@ namespace onh {
 
 }
 
-#endif /* SRC_ONH_DRIVER_MODBUS_MODBUSTCPPROCESSREADER_H_ */
+#endif /* SRC_ONH_DRIVER_MODBUS_MODBUSPROCESSREADER_H_ */

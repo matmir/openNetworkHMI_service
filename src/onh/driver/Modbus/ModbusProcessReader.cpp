@@ -16,21 +16,21 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ModbusTCPProcessReader.h"
-#include "ModbusTCPUtils.h"
+#include "ModbusProcessReader.h"
+#include "ModbusUtils.h"
 #include "../DriverException.h"
 #include <string.h>
 
 using namespace onh;
 
-ModbusTCPProcessReader::ModbusTCPProcessReader():
+ModbusProcessReader::ModbusProcessReader():
 	DriverProcessReader(), maxByteCount(0), driverProcess()
 {
 	process.holdingReg = 0;
 	process.inputReg = 0;
 }
 
-ModbusTCPProcessReader::ModbusTCPProcessReader(const ModbusTCPProcessDataController& spdc):
+ModbusProcessReader::ModbusProcessReader(const ModbusProcessDataController& spdc):
 	driverProcess(spdc)
 {
 	process.holdingReg = new WORD[driverProcess.getRegistersCount()];
@@ -44,7 +44,7 @@ ModbusTCPProcessReader::ModbusTCPProcessReader(const ModbusTCPProcessDataControl
 	maxByteCount = driverProcess.getRegistersCount()*2;
 }
 
-ModbusTCPProcessReader::~ModbusTCPProcessReader() {
+ModbusProcessReader::~ModbusProcessReader() {
 
 	if (process.holdingReg) {
 		delete process.holdingReg;
@@ -54,18 +54,18 @@ ModbusTCPProcessReader::~ModbusTCPProcessReader() {
 	}
 }
 
-void ModbusTCPProcessReader::triggerError(const std::string& msg, const std::string& fName) {
+void ModbusProcessReader::triggerError(const std::string& msg, const std::string& fName) {
 
     throw DriverException(msg, fName);
 }
 
-bool ModbusTCPProcessReader::getBitValue(processDataAddress addr) {
+bool ModbusProcessReader::getBitValue(processDataAddress addr) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Modbus register
     WORD reg = 0;
@@ -89,7 +89,7 @@ bool ModbusTCPProcessReader::getBitValue(processDataAddress addr) {
 
 }
 
-std::vector<bool> ModbusTCPProcessReader::getBitsValue(std::vector<processDataAddress> addr) {
+std::vector<bool> ModbusProcessReader::getBitsValue(std::vector<processDataAddress> addr) {
 
     std::vector<bool> retV;
 
@@ -104,13 +104,13 @@ std::vector<bool> ModbusTCPProcessReader::getBitsValue(std::vector<processDataAd
 
 }
 
-BYTE ModbusTCPProcessReader::getByte(processDataAddress addr) {
+BYTE ModbusProcessReader::getByte(processDataAddress addr) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Modbus register
     WORD reg = 0;
@@ -131,13 +131,13 @@ BYTE ModbusTCPProcessReader::getByte(processDataAddress addr) {
     return b;
 }
 
-WORD ModbusTCPProcessReader::getWord(processDataAddress addr) {
+WORD ModbusProcessReader::getWord(processDataAddress addr) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 1);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount, 1);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Modbus register
     WORD reg = 0;
@@ -151,13 +151,13 @@ WORD ModbusTCPProcessReader::getWord(processDataAddress addr) {
 
 }
 
-DWORD ModbusTCPProcessReader::getDWord(processDataAddress addr) {
+DWORD ModbusProcessReader::getDWord(processDataAddress addr) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 3);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount, 3);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     DWORD reg = 0;
 
@@ -188,13 +188,13 @@ DWORD ModbusTCPProcessReader::getDWord(processDataAddress addr) {
 
 }
 
-int ModbusTCPProcessReader::getInt(processDataAddress addr) {
+int ModbusProcessReader::getInt(processDataAddress addr) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 3);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount, 3);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Get int
     int* v = 0;
@@ -211,13 +211,13 @@ int ModbusTCPProcessReader::getInt(processDataAddress addr) {
 
 }
 
-float ModbusTCPProcessReader::getReal(processDataAddress addr) {
+float ModbusProcessReader::getReal(processDataAddress addr) {
 
     // Check process address
-    ModbusTCPUtils::checkProcessAddress(addr, maxByteCount, 3);
+    ModbusUtils::checkProcessAddress(addr, maxByteCount, 3);
 
     // Reg address
-    WORD regAddr = ModbusTCPUtils::getRegisterAddress(addr);
+    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
     // Get float
     float v = 0;
@@ -234,12 +234,12 @@ float ModbusTCPProcessReader::getReal(processDataAddress addr) {
 
 }
 
-void ModbusTCPProcessReader::updateProcessData() {
+void ModbusProcessReader::updateProcessData() {
 
 	driverProcess.getProcessDataCopy(&process);
 }
 
-DriverProcessReader* ModbusTCPProcessReader::createNew() {
+DriverProcessReader* ModbusProcessReader::createNew() {
 
-	return new ModbusTCPProcessReader(driverProcess);
+	return new ModbusProcessReader(driverProcess);
 }

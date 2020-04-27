@@ -370,14 +370,38 @@ void Application::initDriver() {
     std::string driverName = cfg->getStringValue("connectionDriver");
 
     // Create driver
-    if (driverName == "ModbusTCP") {
-        std::string modbusIP = cfg->getStringValue("modbusIP");
-        WORD regCount = cfg->getIntValue("modbusRegCount");
-        BYTE modbusSlaveID = cfg->getIntValue("modbusSlaveID");
-        int modbusPort = cfg->getIntValue("modbusPort");
+    if (driverName == "Modbus") {
+
+    	modbusM::ModbusCfg modbusCfg;
+    	std::string modbusMode = cfg->getStringValue("modbusMode");
+
+    	if (modbusMode == "TCP") {
+
+    		modbusCfg.mode = modbusM::MM_TCP;
+			modbusCfg.registerCount = cfg->getIntValue("modbusRegCount");
+			modbusCfg.slaveID = cfg->getIntValue("modbusSlaveID");
+
+			modbusCfg.TCP_addr = cfg->getStringValue("modbusTCP_addr");
+			modbusCfg.TCP_port = cfg->getIntValue("modbusTCP_port");
+
+    	} else if (modbusMode == "RTU") {
+
+    		modbusCfg.mode = modbusM::MM_RTU;
+			modbusCfg.registerCount = cfg->getIntValue("modbusRegCount");
+			modbusCfg.slaveID = cfg->getIntValue("modbusSlaveID");
+
+			modbusCfg.RTU_port = cfg->getStringValue("modbusRTU_port");
+			modbusCfg.RTU_baud = cfg->getIntValue("modbusRTU_baud");
+			modbusCfg.RTU_parity = cfg->getStringValue("modbusRTU_parity")[0];
+			modbusCfg.RTU_dataBit = cfg->getIntValue("modbusRTU_dataBit");
+			modbusCfg.RTU_stopBit = cfg->getIntValue("modbusRTU_stopBit");
+
+    	} else {
+    		throw Exception("Unknown modbus mode selected", "Application::initDriver");
+    	}
 
         // Driver
-        drv = new ModbusTCP(modbusIP, regCount, modbusSlaveID, modbusPort);
+        drv = new ModbusDriver(modbusCfg);
 
     } else if (driverName == "SHM") {
 

@@ -16,34 +16,69 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBUSTCPMASTER_H
-#define MODBUSTCPMASTER_H
+#ifndef MODBUSMASTER_H
+#define MODBUSMASTER_H
 
 #include <string.h>
 #include <sys/types.h>
 #include <modbus.h>
 
-#include "modbustcpexception.h"
+#include "modbusexception.h"
 #include "../DriverRegisterTypes.h"
 
-namespace modbusTCP {
+namespace modbusM {
+
+	/**
+	 * Modbus driver mode (TCP/RTU)
+	 */
+	typedef enum {
+		MM_TCP,
+		MM_RTU
+	} ModbusMode;
+
+	/**
+	 * Modbus configuration structure
+	 */
+	typedef struct {
+
+		/**
+		 * Common modbus configuration
+		 */
+		ModbusMode mode;
+		BYTE slaveID;
+		WORD registerCount;
+
+		/**
+		 * Modbus TCP configuration
+		 */
+		std::string TCP_addr;
+		int TCP_port;
+
+		/**
+		 * Modbus RTU configuration
+		 */
+		std::string RTU_port;
+		int RTU_baud;
+		char RTU_parity;
+		int RTU_dataBit;
+		int RTU_stopBit;
+
+	} ModbusCfg;
 
     /**
-     * ModbusTCPMaster class
+     * ModbusMaster class
      */
-    class ModbusTCPMaster {
+    class ModbusMaster {
 
         public:
     		/**
     		 * Constructor
     		 *
-    		 * @param addr Slave IP address
-    		 * @param slaveId Slave identifier
-    		 * @param port Slave listen port
+    		 * @param cfg Modbus configuration structure
     		 */
-            ModbusTCPMaster(const std::string& addr, BYTE slaveId, int port=502);
+            ModbusMaster(const ModbusCfg& cfg);
 
-            ~ModbusTCPMaster();
+            ~ModbusMaster();
 
             /**
              * Connect to the slave
@@ -97,14 +132,10 @@ namespace modbusTCP {
             /// Modbus communication structure
             modbus_t *mb;
 
-            /// Modbus slave IP address
-            std::string slaveIP;
-            /// Modbus port
-            int slavePort;
-
-            BYTE slaveID;
+            /// Modbus configuration structure
+            ModbusCfg config;
     };
 
 }
 
-#endif // MODBUSTCPMASTER_H
+#endif // MODBUSMASTER_H

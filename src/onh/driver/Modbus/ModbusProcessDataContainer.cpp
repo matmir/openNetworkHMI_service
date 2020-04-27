@@ -16,11 +16,11 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ModbusTCPProcessDataContainer.h"
+#include "ModbusProcessDataContainer.h"
 
 using namespace onh;
 
-ModbusTCPProcessDataContainer::ModbusTCPProcessDataContainer(WORD regCount):
+ModbusProcessDataContainer::ModbusProcessDataContainer(WORD regCount):
 	registersCount(regCount)
 {
 	// Initialize registers
@@ -33,7 +33,7 @@ ModbusTCPProcessDataContainer::ModbusTCPProcessDataContainer(WORD regCount):
 	}
 }
 
-ModbusTCPProcessDataContainer::~ModbusTCPProcessDataContainer() {
+ModbusProcessDataContainer::~ModbusProcessDataContainer() {
 
 	if (process.holdingReg) {
 		delete process.holdingReg;
@@ -43,19 +43,19 @@ ModbusTCPProcessDataContainer::~ModbusTCPProcessDataContainer() {
 	}
 }
 
-ModbusTCPProcessDataController ModbusTCPProcessDataContainer::getController() {
+ModbusProcessDataController ModbusProcessDataContainer::getController() {
 
-	return ModbusTCPProcessDataController(processLock.getAccess(), &process, registersCount);
+	return ModbusProcessDataController(processLock.getAccess(), &process, registersCount);
 }
 
-void ModbusTCPProcessDataContainer::update(const ModbusTCPProcessData& newDT) {
+void ModbusProcessDataContainer::update(const ModbusProcessData& newDT) {
 
 	// Check registers
 	if (!process.holdingReg) {
-		throw Exception("Missing holding register instance", "ModbusTCPProcessDataContainer::update");
+		throw Exception("Missing holding register instance", "ModbusProcessDataContainer::update");
 	}
 	if (!process.inputReg) {
-		throw Exception("Missing input register instance", "ModbusTCPProcessDataContainer::update");
+		throw Exception("Missing input register instance", "ModbusProcessDataContainer::update");
 	}
 
 	// Lock access to the process data
@@ -71,7 +71,7 @@ void ModbusTCPProcessDataContainer::update(const ModbusTCPProcessData& newDT) {
 	processLock.unlock();
 }
 
-void ModbusTCPProcessDataContainer::clear() {
+void ModbusProcessDataContainer::clear() {
 
 	// Lock access to the process data
 	processLock.lock();

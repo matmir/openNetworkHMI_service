@@ -16,32 +16,32 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ModbusTCPProcessDataController.h"
+#include "ModbusProcessDataController.h"
 
 using namespace onh;
 
-ModbusTCPProcessDataController::ModbusTCPProcessDataController():
+ModbusProcessDataController::ModbusProcessDataController():
 	process(0), processLock(), registersCount(0)
 {
 }
 
-ModbusTCPProcessDataController::ModbusTCPProcessDataController(const ModbusTCPProcessDataController& spdc):
+ModbusProcessDataController::ModbusProcessDataController(const ModbusProcessDataController& spdc):
 	process(spdc.process), processLock(spdc.processLock), registersCount(spdc.registersCount)
 {
 }
 
-ModbusTCPProcessDataController::ModbusTCPProcessDataController(const MutexAccess &pdLock, ModbusTCPProcessData *procDT, WORD regCount):
+ModbusProcessDataController::ModbusProcessDataController(const MutexAccess &pdLock, ModbusProcessData *procDT, WORD regCount):
 	process(procDT), processLock(pdLock), registersCount(regCount)
 {
 }
 
-ModbusTCPProcessDataController::~ModbusTCPProcessDataController() {
+ModbusProcessDataController::~ModbusProcessDataController() {
 }
 
-void ModbusTCPProcessDataController::getProcessDataCopy(ModbusTCPProcessData *dest) {
+void ModbusProcessDataController::getProcessDataCopy(ModbusProcessData *dest) {
 
 	if (!process)
-		throw Exception("Process data handle not initialized", "ModbusTCPProcessDataController::getProcessDataCopy");
+		throw Exception("Process data handle not initialized", "ModbusProcessDataController::getProcessDataCopy");
 
 	// Lock access to the process data
 	processLock.lock();
@@ -56,7 +56,7 @@ void ModbusTCPProcessDataController::getProcessDataCopy(ModbusTCPProcessData *de
 	processLock.unlock();
 }
 
-WORD ModbusTCPProcessDataController::getRegistersCount() const {
+WORD ModbusProcessDataController::getRegistersCount() const {
 
 	return registersCount;
 }

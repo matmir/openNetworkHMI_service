@@ -16,12 +16,12 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ModbusTCPUpdater.h"
+#include "ModbusUpdater.h"
 #include <iostream>
 
 using namespace onh;
 
-ModbusTCPUpdater::ModbusTCPUpdater():
+ModbusUpdater::ModbusUpdater():
     driver(0), regCount(0)
 {
     buff.holdingReg = 0;
@@ -31,7 +31,7 @@ ModbusTCPUpdater::ModbusTCPUpdater():
     tempBuff.inputReg = 0;
 }
 
-ModbusTCPUpdater::ModbusTCPUpdater(const ModbusTCPUpdater &mtu) {
+ModbusUpdater::ModbusUpdater(const ModbusUpdater &mtu) {
 
     driver = mtu.driver;
     regCount = mtu.regCount;
@@ -49,8 +49,8 @@ ModbusTCPUpdater::ModbusTCPUpdater(const ModbusTCPUpdater &mtu) {
     bufferLock = mtu.bufferLock;
 }
 
-ModbusTCPUpdater::ModbusTCPUpdater(modbusTCP::ModbusTCPMaster* drv,
-                                   ModbusTCPProcessData buffH,
+ModbusUpdater::ModbusUpdater(modbusM::ModbusMaster* drv,
+                                   ModbusProcessData buffH,
                                    WORD cnt,
                                    const MutexAccess &malDriver,
                                    const MutexAccess &malBuff)
@@ -71,7 +71,7 @@ ModbusTCPUpdater::ModbusTCPUpdater(modbusTCP::ModbusTCPMaster* drv,
     bufferLock = malBuff;
 }
 
-ModbusTCPUpdater::~ModbusTCPUpdater()
+ModbusUpdater::~ModbusUpdater()
 {
     if (tempBuff.holdingReg)
         delete [] tempBuff.holdingReg;
@@ -80,7 +80,7 @@ ModbusTCPUpdater::~ModbusTCPUpdater()
         delete [] tempBuff.inputReg;
 }
 
-ModbusTCPUpdater& ModbusTCPUpdater::operator=(const ModbusTCPUpdater &mtu) {
+ModbusUpdater& ModbusUpdater::operator=(const ModbusUpdater &mtu) {
 
     driver = mtu.driver;
     regCount = mtu.regCount;
@@ -106,7 +106,7 @@ ModbusTCPUpdater& ModbusTCPUpdater::operator=(const ModbusTCPUpdater &mtu) {
     return *this;
 }
 
-void ModbusTCPUpdater::updateBuffer() {
+void ModbusUpdater::updateBuffer() {
 
     // Clear load buffers
     clearTempRegisters();
@@ -121,11 +121,11 @@ void ModbusTCPUpdater::updateBuffer() {
         // Read holding registers
         driver->READ_HOLDING_REGISTERS(0x00, regCount, tempBuff.holdingReg);
 
-    } catch (modbusTCP::ModbusTCPException &e) {
+    } catch (modbusM::ModbusException &e) {
 
         driverLock.unlock();
 
-        throw DriverException(e.what(), "ModbusTCPUpdater::updateBuffer");
+        throw DriverException(e.what(), "ModbusUpdater::updateBuffer");
 
     }
 
@@ -136,7 +136,7 @@ void ModbusTCPUpdater::updateBuffer() {
 
 }
 
-void ModbusTCPUpdater::clearTempRegisters() {
+void ModbusUpdater::clearTempRegisters() {
 
     // Clear registers
     for (int i=0; i<regCount; ++i) {
@@ -145,16 +145,16 @@ void ModbusTCPUpdater::clearTempRegisters() {
     }
 }
 
-void ModbusTCPUpdater::copyTempRegistersToBuffer() {
+void ModbusUpdater::copyTempRegistersToBuffer() {
 
     bufferLock.lock();
 
     // Check buffers
     if (!buff.holdingReg) {
-        throw DriverException("Buffers for holding registers not initialized", "ModbusTCPUpdater::copyTempRegistersToBuffer");
+        throw DriverException("Buffers for holding registers not initialized", "ModbusUpdater::copyTempRegistersToBuffer");
     }
     if (!buff.inputReg) {
-        throw DriverException("Buffers for input registers not initialized", "ModbusTCPUpdater::copyTempRegistersToBuffer");
+        throw DriverException("Buffers for input registers not initialized", "ModbusUpdater::copyTempRegistersToBuffer");
     }
 
     // Copy data from load registers to the buffer

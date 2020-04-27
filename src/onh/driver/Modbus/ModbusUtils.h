@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_MODBUS_MODBUSTCPUTILS_H_
-#define SRC_ONH_DRIVER_MODBUS_MODBUSTCPUTILS_H_
+#ifndef SRC_ONH_DRIVER_MODBUS_MODBUSUTILS_H_
+#define SRC_ONH_DRIVER_MODBUS_MODBUSUTILS_H_
 
 #include "../ProcessDataTypes.h"
 #include "../DriverRegisterTypes.h"
@@ -25,14 +25,14 @@
 namespace onh {
 
 	/**
-	 * ModbusTCP utils class
+	 * Modbus utils class
 	 */
-	class ModbusTCPUtils {
+	class ModbusUtils {
 
 		public:
 
-			ModbusTCPUtils();
-			virtual ~ModbusTCPUtils();
+			ModbusUtils();
+			virtual ~ModbusUtils();
 
 			/**
 			 * Check process data address
@@ -56,4 +56,4 @@ namespace onh {
 
 }
 
-#endif /* SRC_ONH_DRIVER_MODBUS_MODBUSTCPUTILS_H_ */
+#endif /* SRC_ONH_DRIVER_MODBUS_MODBUSUTILS_H_ */
