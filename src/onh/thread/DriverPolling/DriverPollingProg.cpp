@@ -25,14 +25,17 @@
 
 using namespace onh;
 
-DriverPollingProg::DriverPollingProg(const DriverPollingThreadData &thData):
-    ThreadProgram(thData.thController, "driver", "polling_")
+DriverPollingProg::DriverPollingProg(const DriverBufferUpdater& dbu,
+										unsigned int updateInterval,
+										const ThreadExitController &thEC,
+										const ThreadCycleContainerController &thCCC):
+    ThreadProgram(thEC, thCCC, "driver", "polling_")
 {
     // Driver updater
-    drvUpdater = new DriverBufferUpdater(thData.driverUpdater);
+    drvUpdater = new DriverBufferUpdater(dbu);
 
     // Create delay
-    itsDelay = new Delay(thData.updateInterval);
+    itsDelay = new Delay(updateInterval);
 }
 
 DriverPollingProg::~DriverPollingProg()
@@ -45,7 +48,7 @@ DriverPollingProg::~DriverPollingProg()
 }
 
 
-void DriverPollingProg::run() {
+void DriverPollingProg::operator()() {
 
     try {
 
@@ -54,7 +57,7 @@ void DriverPollingProg::run() {
         if (!drvUpdater)
             throw Exception("No driver updater object");
 
-        while(!getThreadController().getExitController().exitThread()) {
+        while(!isExitFlag()) {
 
             // Start thread cycle time measure
             startCycleMeasure();
@@ -67,9 +70,6 @@ void DriverPollingProg::run() {
 
             // Stop thread cycle time measure
             stopCycleMeasure();
-
-            // Send cycle time to thread manager
-            getThreadController().getCycleController().setCycleTime(getCycleTime());
         }
 
     } catch (Exception &e) {
@@ -77,6 +77,6 @@ void DriverPollingProg::run() {
     	getLogger().write(e.what());
 
         // Exit application
-    	getThreadController().getExitController().exit("Driver polling");
+    	exit("Driver polling");
     }
 }

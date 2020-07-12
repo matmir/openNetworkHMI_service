@@ -20,27 +20,25 @@
 #define THREADMANAGER_H
 
 #include <string>
-#include <pthread.h>
-#include "ThreadController.h"
+#include <thread>
+#include <vector>
+#include "ThreadProgram.h"
+#include "ThreadSocket.h"
 #include "ThreadCycleContainerController.h"
 #include "ThreadExit.h"
 #include "ThreadCycleContainer.h"
+#include "../driver/DriverBufferUpdater.h"
+#include "../driver/ProcessUpdater.h"
+#include "../driver/ProcessReader.h"
+#include "../driver/ProcessWriter.h"
+#include "TagLogger/TagLoggerBufferController.h"
+#include "../db/AlarmingDB.h"
+#include "../db/TagLoggerDB.h"
+#include "../db/ScriptDB.h"
+#include "../db/DBCredentials.h"
 #include "../utils/Exception.h"
 
 namespace onh {
-
-    /**
-	 * Thread controller types
-	 */
-    typedef enum {
-        TCT_PROCESS_UPDATER,
-        TCT_TAG_LOGGER,
-		TCT_TAG_LOGGER_WRITER,
-        TCT_ALARMING,
-        TCT_SCRIPT,
-        TCT_DRIVER_POLLING,
-        TCT_DEFAULT
-    } ThreadControllerType;
 
     /**
 	 * Thread manager class
@@ -49,27 +47,115 @@ namespace onh {
 
         public:
 
+    		/**
+    		 * Constructor
+    		 */
             ThreadManager();
 
+            /**
+             * Copy constructor - inactive
+             */
+            ThreadManager(const ThreadManager&) = delete;
+
+            /**
+             * Destructor
+             */
             virtual ~ThreadManager();
 
             /**
-             * Get thread controller object
-             *
-             * @param tct Thread controller type
-             *
-             * @return Thread controller object
+             * Assignment operator - inactive
              */
-            ThreadController getController(ThreadControllerType tct=TCT_DEFAULT);
+            ThreadManager& operator=(const ThreadManager&) = delete;
 
             /**
-             * Get thread cycle time container controller object
+			 * Initialize Process updater thread
+			 *
+			 * @param pu Process updater
+			 * @param updateInterval Thread update interval (milliseconds)
+			 */
+			void initProcessUpdater(const ProcessUpdater& pu, unsigned int updateInterval);
+
+            /**
+             * Initialize driver buffer thread
              *
-             * @param tct Thread controller type
-             *
-             * @return Thread cycle time cycle time container controller object
+             * @param dbu Driver buffer updater
+             * @param updateInterval Thread update interval (milliseconds)
              */
-            ThreadCycleContainerController getCycleTimeReader(ThreadControllerType tct);
+            void initDriverPolling(const DriverBufferUpdater& dbu, unsigned int updateInterval);
+
+            /**
+             * Initialize Alarming thread
+             *
+             * @param pr Process reader
+             * @param pw Process writer
+             * @param adb Alarming DB
+             * @param updateInterval Thread update interval (milliseconds)
+             */
+            void initAlarmingThread(const ProcessReader& pr,
+									const ProcessWriter& pw,
+									const AlarmingDB& adb,
+									unsigned int updateInterval);
+
+            /**
+             * Initialize Tag logger thread
+             *
+             * @param pr Process reader
+             * @param tldb Tag logger DB
+             * @param tlbc Tag logger buffer controller
+             * @param updateInterval Thread update interval (milliseconds)
+             */
+            void initTagLoggerThread(const ProcessReader& pr,
+            							const TagLoggerDB& tldb,
+										const TagLoggerBufferController& tlbc,
+										unsigned int updateInterval);
+
+            /**
+             * Initialize Tag logger writer thread
+             *
+             * @param tldb Tag logger DB
+             * @param tlbc Tag logger buffer controller
+             * @param updateInterval Thread update interval (milliseconds)
+             */
+            void initTagLoggerWriterThread(const TagLoggerDB& tldb,
+											const TagLoggerBufferController& tlbc,
+											unsigned int updateInterval);
+
+            /**
+             * Initialize Script system thread
+             *
+             * @param pr Process reader
+             * @param pw Process writer
+             * @param sdb Script DB
+             * @param updateInterval Thread update interval (milliseconds)
+             * @param executeScript Full path to the main execute script
+             * @param testEnv Test environment flag
+             */
+            void initScriptThread(const ProcessReader& pr,
+            						const ProcessWriter& pw,
+									const ScriptDB& sdb,
+									unsigned int updateInterval,
+									const std::string& executeScript,
+									bool testEnv);
+
+            /**
+             * Initialize Socket thread
+             *
+             * @param pr Process reader
+             * @param pw Process writer
+             * @param dbc DB credentials
+             * @param port Socket port
+             * @param maxConn Socket maximum connected clients
+             */
+            void initSocketThread(const ProcessReader& pr,
+            						const ProcessWriter& pw,
+									const DBCredentials& dbc,
+									int port,
+									int maxConn);
+
+            /**
+             * Run threads
+             */
+            void run();
 
             /**
              * Trigger exit
@@ -89,26 +175,46 @@ namespace onh {
             void shutdownSocket();
 
         private:
+
+            /**
+             * Thread program data structure
+             */
+            typedef struct {
+            	/// Cycle time container
+            	ThreadCycleContainer cycleContainer;
+            	/// Thread program
+            	ThreadProgram *thProgram;
+			} threadProgramData;
+
             /// Thread exit
             ThreadExit tmExit;
 
-            /// Cycle time of the Process Updater
-            ThreadCycleContainer cycleProcessUpdater;
+            /// Thread data for Process Updater
+            threadProgramData thProcessUpdater;
 
-            /// Cycle time of the Driver polling
-            ThreadCycleContainer cycleDriverPolling;
+            /// Thread data for Driver polling
+            threadProgramData thDriverPolling;
 
-            /// Cycle time of the Alarming system
-            ThreadCycleContainer cycleAlarming;
+            /// Thread data for Alarming system
+            threadProgramData thAlarming;
 
-            /// Cycle time of the Tag logger system
-            ThreadCycleContainer cycleLogger;
+            /// Thread data for Tag logger system
+            threadProgramData thLogger;
 
-            /// Cycle time of the Tag logger writer system
-			ThreadCycleContainer cycleLoggerWriter;
+            /// Thread data for Tag logger writer system
+            threadProgramData thLoggerWriter;
 
-            /// Cycle time of the Script system
-            ThreadCycleContainer cycleScript;
+            /// Thread data for Script system
+            threadProgramData thScript;
+
+            /// Thread data for Socket
+			ThreadSocket *thSocket;
+
+			/// Socket thread
+			std::thread *threadSocket;
+
+			/// Program threads
+			std::vector<std::thread*> threadProgs;
     };
 
 }

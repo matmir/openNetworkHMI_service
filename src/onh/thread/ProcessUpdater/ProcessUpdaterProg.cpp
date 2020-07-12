@@ -24,14 +24,17 @@
 
 using namespace onh;
 
-ProcessUpdaterProg::ProcessUpdaterProg(const ProcessUpdaterThreadData &thData):
-    ThreadProgram(thData.thController, "process", "procUpd_")
+ProcessUpdaterProg::ProcessUpdaterProg(const ProcessUpdater& pru,
+										unsigned int updateInterval,
+										const ThreadExitController &thEC,
+										const ThreadCycleContainerController &thCCC):
+	ThreadProgram(thEC, thCCC, "process", "procUpd_")
 {
     // Process updater
-    prUpdater = new ProcessUpdater(thData.prUpdater);
+    prUpdater = new ProcessUpdater(pru);
 
     // Create delay
-    itsDelay = new Delay(thData.updateInterval);
+    itsDelay = new Delay(updateInterval);
 }
 
 ProcessUpdaterProg::~ProcessUpdaterProg()
@@ -43,8 +46,8 @@ ProcessUpdaterProg::~ProcessUpdaterProg()
         delete itsDelay;
 }
 
-void ProcessUpdaterProg::run()
-{
+void ProcessUpdaterProg::operator()() {
+
     try {
 
     	getLogger().write("Start main loop");
@@ -52,7 +55,7 @@ void ProcessUpdaterProg::run()
         if (!prUpdater)
             throw DriverException("No updater object!");
 
-        while(!getThreadController().getExitController().exitThread()) {
+        while(!isExitFlag()) {
 
             // Start thread cycle time measure
             startCycleMeasure();
@@ -65,9 +68,6 @@ void ProcessUpdaterProg::run()
 
             // Stop thread cycle time measure
             stopCycleMeasure();
-
-            // Send cycle time to thread manager
-            getThreadController().getCycleController().setCycleTime(getCycleTime());
         }
 
     } catch (Exception &e) {
@@ -75,7 +75,7 @@ void ProcessUpdaterProg::run()
     	getLogger().write(e.what());
 
         // Exit application
-        getThreadController().getExitController().exit("Process Updater");
+        exit("Process Updater");
 
     }
 }

@@ -20,17 +20,21 @@
 
 using namespace onh;
 
-TagLoggerWriterProg::TagLoggerWriterProg(const TagLoggerWriterThreadData &thData):
-	ThreadProgram(thData.thController, "taglogger", "tagLogWriter_")
+TagLoggerWriterProg::TagLoggerWriterProg(const TagLoggerDB& tldb,
+											const TagLoggerBufferController& tlbc,
+											unsigned int updateInterval,
+											const ThreadExitController &thEC,
+											const ThreadCycleContainerController &thCCC):
+	ThreadProgram(thEC, thCCC, "taglogger", "tagLogWriter_")
 {
 	// Create delay
-	itsDelay = new Delay(thData.updateInterval);
+	itsDelay = new Delay(updateInterval);
 
 	// Create DB access
-	db = new TagLoggerDB(thData.db);
+	db = new TagLoggerDB(tldb);
 
 	// Create tag logger buffer controller
-	tagLoggerBuffer = new TagLoggerBufferController(thData.loggerBufferController);
+	tagLoggerBuffer = new TagLoggerBufferController(tlbc);
 }
 
 TagLoggerWriterProg::~TagLoggerWriterProg() {
@@ -47,7 +51,7 @@ TagLoggerWriterProg::~TagLoggerWriterProg() {
 		delete itsDelay;
 }
 
-void TagLoggerWriterProg::run() {
+void TagLoggerWriterProg::operator()() {
 
     try {
 
@@ -73,9 +77,6 @@ void TagLoggerWriterProg::run() {
 
             // Stop thread cycle time measure
             stopCycleMeasure();
-
-            // Send cycle time to thread manager
-            getThreadController().getCycleController().setCycleTime(getCycleTime());
         }
 
     } catch (Exception &e) {
@@ -83,7 +84,7 @@ void TagLoggerWriterProg::run() {
     	getLogger().write(e.what());
 
         // Exit application
-    	getThreadController().getExitController().exit("Tag logger writer");
+    	exit("Tag logger writer");
     }
 }
 
@@ -92,7 +93,7 @@ bool TagLoggerWriterProg::exitWriterProg() {
 	bool ret = false;
 
 	// Check exit thread flag
-	if (getThreadController().getExitController().exitThread()) {
+	if (isExitFlag()) {
 
 		// Check tag logger finish flag and data count
 		if (tagLoggerBuffer->isFinished() && tagLoggerBuffer->isEmpty()) {

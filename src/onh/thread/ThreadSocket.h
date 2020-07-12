@@ -16,44 +16,41 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef THREADPROGRAM_H
-#define THREADPROGRAM_H
+#ifndef THREADSOCKET_H
+#define THREADSOCKET_H
 
 #include "ThreadExitController.h"
-#include "ThreadCycleContainerController.h"
 #include "../utils/Logger.h"
-#include "../utils/CycleTime.h"
 
 namespace onh {
 
 	/**
-	 * Thread program base class
+	 * Thread socket base class
 	 */
-    class ThreadProgram {
+    class ThreadSocket {
 
         public:
+
             /**
              * Constructor
              *
              * @param thEC Thread exit controller
-             * @param thCCC Thread cycle time controller
              * @param dirName Name of the directory where to write log files
              * @param fPrefix Log file name prefix
              */
-            ThreadProgram(const ThreadExitController &thEC,
-            		const ThreadCycleContainerController &thCCC,
+    		ThreadSocket(const ThreadExitController &thEC,
             		const std::string& dirName,
 					const std::string& fPrefix = "");
 
             /**
              * Copy constructor - inactive
              */
-            ThreadProgram(const ThreadProgram&) = delete;
+    		ThreadSocket(const ThreadSocket&) = delete;
 
             /**
              * Destructor
              */
-            virtual ~ThreadProgram();
+            virtual ~ThreadSocket();
 
             /**
              * Thread program function
@@ -63,32 +60,17 @@ namespace onh {
             /**
              * Assignment operator - inactive
              */
-            ThreadProgram& operator=(const ThreadProgram&) = delete;
+            ThreadSocket& operator=(const ThreadSocket&) = delete;
 
         private:
-            /// Thread program cycle time
-            CycleTime* thCycle;
 
 			/// Thread exit controller
 			ThreadExitController *thExitControll;
-
-			/// Thread cycle time container controller
-			ThreadCycleContainerController *thCycleTimeControll;
 
 			/// Logger object
 			Logger* log;
 
         protected:
-
-            /**
-             * Start measure cycle time of the thread
-             */
-            void startCycleMeasure();
-
-            /**
-             * Stop measure cycle time of the thread
-             */
-            void stopCycleMeasure();
 
             /**
              * Check if thread need to be closed
@@ -105,6 +87,13 @@ namespace onh {
             void exit(const std::string& info);
 
             /**
+			 * Set Socket file descriptor
+			 *
+			 * @param sockFD Socket file descriptor
+			 */
+            void setSocketFD(int sockFD);
+
+            /**
 			 * Get logger instance
 			 *
 			 * @return Logger instance
@@ -114,4 +103,4 @@ namespace onh {
 
 }
 
-#endif // THREADPROGRAM_H
+#endif // THREADSOCKET_H

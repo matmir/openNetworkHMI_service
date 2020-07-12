@@ -19,7 +19,8 @@
 #ifndef ALARMINGPROG_H
 #define ALARMINGPROG_H
 
-#include "AlarmingThreadData.h"
+#include "../../driver/ProcessReader.h"
+#include "../../driver/ProcessWriter.h"
 #include "../../utils/Delay.h"
 #include "../../db/objs/AlarmDefinitionItem.h"
 #include "../../db/AlarmingDB.h"
@@ -30,19 +31,40 @@ namespace onh {
     class AlarmingProg: public ThreadProgram {
 
         public:
+
             /**
              * Constructor
              *
-             * @param thData Driver polling thread data structure
+             * @param pr Process reader
+             * @param pw Process writer
+             * @param adb Alarming DB
+             * @param updateInterval Alarm update interval (milliseconds)
+             * @param thEC Thread exit controller
+             * @param thCCC Thread cycle time controller
              */
-            AlarmingProg(const AlarminThreadData &thData);
+            AlarmingProg(const ProcessReader& pr,
+							const ProcessWriter& pw,
+							const AlarmingDB& adb,
+							unsigned int updateInterval,
+							const ThreadExitController &thEC,
+							const ThreadCycleContainerController &thCCC);
+
+            /**
+			 * Copy constructor - inactive
+			 */
+            AlarmingProg(const AlarmingProg&) = delete;
 
             virtual ~AlarmingProg();
 
             /**
-             * Run Alarm system
-             */
-            void run();
+			 * Thread program function
+			 */
+			virtual void operator()();
+
+			/**
+			 * Assignment operator - inactive
+			 */
+			AlarmingProg& operator=(const AlarmingProg&) = delete;
 
         private:
 

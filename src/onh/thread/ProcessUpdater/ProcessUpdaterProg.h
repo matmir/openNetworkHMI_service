@@ -19,7 +19,7 @@
 #ifndef PROCESSUPDATERPROG_H
 #define PROCESSUPDATERPROG_H
 
-#include "ProcessUpdaterThreadData.h"
+#include "../../driver/ProcessUpdater.h"
 #include "../../utils/Delay.h"
 #include "../ThreadProgram.h"
 
@@ -31,19 +31,36 @@ namespace onh {
     class ProcessUpdaterProg: public ThreadProgram {
 
         public:
+
             /**
              * Constructor
              *
-             * @param thData Process updater thread data structure
+             * @param pru Process updater
+             * @param updateInterval Process update interval (milliseconds)
+             * @param thEC Thread exit controller
+             * @param thCCC Thread cycle time controller
              */
-            ProcessUpdaterProg(const ProcessUpdaterThreadData &thData);
+            ProcessUpdaterProg(const ProcessUpdater& pru,
+            					unsigned int updateInterval,
+								const ThreadExitController &thEC,
+								const ThreadCycleContainerController &thCCC);
+
+            /**
+             * Copy constructor - inactive
+             */
+            ProcessUpdaterProg(const ProcessUpdaterProg&) = delete;
 
             virtual ~ProcessUpdaterProg();
 
             /**
-             * Run process updater
-             */
-            void run();
+			 * Thread program function
+			 */
+			virtual void operator()();
+
+			/**
+			 * Assignment operator - inactive
+			 */
+			ProcessUpdaterProg& operator=(const ProcessUpdaterProg&) = delete;
 
         private:
 

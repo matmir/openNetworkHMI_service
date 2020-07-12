@@ -19,7 +19,6 @@
 #ifndef DRIVERPOLLINGPROG_H
 #define DRIVERPOLLINGPROG_H
 
-#include "DriverPollingThreadData.h"
 #include "../../driver/DriverBufferUpdater.h"
 #include "../../utils/Delay.h"
 #include "../ThreadProgram.h"
@@ -32,19 +31,36 @@ namespace onh {
     class DriverPollingProg: public ThreadProgram {
 
         public:
+
             /**
              * Constructor
              *
-             * @param thData Driver polling thread data structure
+             * @param dbu Driver buffer updater
+             * @param updateInterval Thread update interval (milliseconds)
+             * @param thEC Thread exit controller
+             * @param thCCC Thread cycle time controller
              */
-            DriverPollingProg(const DriverPollingThreadData &thData);
+            DriverPollingProg(const DriverBufferUpdater& dbu,
+            					unsigned int updateInterval,
+								const ThreadExitController &thEC,
+								const ThreadCycleContainerController &thCCC);
+
+            /**
+			 * Copy constructor - inactive
+			 */
+			DriverPollingProg(const DriverPollingProg&) = delete;
 
             virtual ~DriverPollingProg();
 
             /**
-             * Run driver polling
-             */
-            void run();
+			 * Thread program function
+			 */
+			virtual void operator()();
+
+			/**
+			 * Assignment operator - inactive
+			 */
+			DriverPollingProg& operator=(const DriverPollingProg&) = delete;
 
         private:
 

@@ -19,11 +19,12 @@
 #ifndef SRC_ONH_THREAD_TAGLOGGER_TAGLOGGERWRITERPROG_H_
 #define SRC_ONH_THREAD_TAGLOGGER_TAGLOGGERWRITERPROG_H_
 
-#include "TagLoggerWriterThreadData.h"
+#include "../../driver/ProcessReader.h"
 #include "../../utils/Delay.h"
 #include "../../db/objs/TagLoggerItem.h"
 #include "../../db/TagLoggerDB.h"
 #include "../ThreadProgram.h"
+#include "TagLoggerBufferController.h"
 
 namespace onh {
 
@@ -37,16 +38,34 @@ namespace onh {
 			/**
 			 * Constructor
 			 *
-			 * @param thData Tag logger writer thread data structure
+			 * @param tldb Tag logger DB
+			 * @param tlbc Tag logger buffer controller
+			 * @param updateInterval Logger update interval (milliseconds)
+			 * @param thEC Thread exit controller
+             * @param thCCC Thread cycle time controller
 			 */
-			TagLoggerWriterProg(const TagLoggerWriterThreadData &thData);
+			TagLoggerWriterProg(const TagLoggerDB& tldb,
+								const TagLoggerBufferController& tlbc,
+								unsigned int updateInterval,
+								const ThreadExitController &thEC,
+								const ThreadCycleContainerController &thCCC);
+
+			/**
+			 * Copy constructor - inactive
+			 */
+			TagLoggerWriterProg(const TagLoggerWriterProg&) = delete;
 
 			virtual ~TagLoggerWriterProg();
 
 			/**
-			 * Run tag logger writer
+			 * Thread program function
 			 */
-			void run();
+			virtual void operator()();
+
+			/**
+			 * Assignment operator - inactive
+			 */
+			TagLoggerWriterProg& operator=(const TagLoggerWriterProg&) = delete;
 
 		private:
 

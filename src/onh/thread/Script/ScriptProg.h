@@ -19,7 +19,8 @@
 #ifndef SCRIPTPROG_H
 #define SCRIPTPROG_H
 
-#include "ScriptThreadData.h"
+#include "../../driver/ProcessReader.h"
+#include "../../driver/ProcessWriter.h"
 #include "../../utils/Delay.h"
 #include "../ThreadProgram.h"
 #include "../../db/ScriptDB.h"
@@ -32,19 +33,44 @@ namespace onh {
     class ScriptProg: public ThreadProgram {
 
         public:
+
             /**
              * Constructor
              *
-             * @param thData Script system thread data structure
+             * @param pr Process reader
+             * @param pw Proces writer
+             * @param sdb Script DB
+             * @param updateInterval Script system update interval (milliseconds)
+             * @param execScript Full path to the main execute script
+             * @param tstEnv Test environment flag
+             * @param thEC Thread exit controller
+             * @param thCCC Thread cycle time controller
              */
-            ScriptProg(const ScriptThreadData &thData);
-
-            virtual ~ScriptProg();
+            ScriptProg(const ProcessReader& pr,
+						const ProcessWriter& pw,
+						const ScriptDB& sdb,
+						unsigned int updateInterval,
+						const std::string& execScript,
+						bool tstEnv,
+						const ThreadExitController &thEC,
+						const ThreadCycleContainerController &thCCC);
 
             /**
-             * Run Script system
-             */
-            void run();
+			 * Copy constructor - inactive
+			 */
+            ScriptProg(const ScriptProg&) = delete;
+
+			virtual ~ScriptProg();
+
+			/**
+			 * Thread program function
+			 */
+			virtual void operator()();
+
+			/**
+			 * Assignment operator - inactive
+			 */
+			ScriptProg& operator=(const ScriptProg&) = delete;
 
         private:
 

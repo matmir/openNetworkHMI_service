@@ -24,20 +24,25 @@
 
 using namespace onh;
 
-AlarmingProg::AlarmingProg(const AlarminThreadData &thData):
-    ThreadProgram(thData.thController, "alarming", "alarmLog_")
+AlarmingProg::AlarmingProg(const ProcessReader& pr,
+							const ProcessWriter& pw,
+							const AlarmingDB& adb,
+							unsigned int updateInterval,
+							const ThreadExitController &thEC,
+							const ThreadCycleContainerController &thCCC):
+    ThreadProgram(thEC, thCCC, "alarming", "alarmLog_")
 {
     // Process Reader
-    prReader = new ProcessReader(thData.prReader);
+    prReader = new ProcessReader(pr);
 
     // Process Writer
-    prWriter = new ProcessWriter(thData.prWriter);
+    prWriter = new ProcessWriter(pw);
 
     // Create delay
-    itsDelay = new Delay(thData.updateInterval);
+    itsDelay = new Delay(updateInterval);
 
     // Create Alarming DB
-    db = new AlarmingDB(thData.db);
+    db = new AlarmingDB(adb);
 }
 
 AlarmingProg::~AlarmingProg()
@@ -55,7 +60,7 @@ AlarmingProg::~AlarmingProg()
         delete itsDelay;
 }
 
-void AlarmingProg::run() {
+void AlarmingProg::operator()() {
 
     try {
 
@@ -67,7 +72,7 @@ void AlarmingProg::run() {
         if (!prWriter)
             throw Exception("No writer object");
 
-        while(!getThreadController().getExitController().exitThread()) {
+        while(!isExitFlag()) {
 
             // Start thread cycle time measure
             startCycleMeasure();
@@ -83,9 +88,6 @@ void AlarmingProg::run() {
 
             // Stop thread cycle time measure
             stopCycleMeasure();
-
-            // Send cycle time to thread manager
-            getThreadController().getCycleController().setCycleTime(getCycleTime());
         }
 
     } catch (Exception &e) {
@@ -95,7 +97,7 @@ void AlarmingProg::run() {
         getLogger().write(s.str());
 
         // Exit application
-        getThreadController().getExitController().exit("Alarming system");
+        exit("Alarming system");
     }
 }
 

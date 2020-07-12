@@ -26,20 +26,25 @@
 
 using namespace onh;
 
-TagLoggerProg::TagLoggerProg(const TagLoggerThreadData &thData):
-    ThreadProgram(thData.thController, "taglogger", "tagLog_")
+TagLoggerProg::TagLoggerProg(const ProcessReader& pr,
+								const TagLoggerDB& tldb,
+								const TagLoggerBufferController& tlbc,
+								unsigned int updateInterval,
+								const ThreadExitController &thEC,
+								const ThreadCycleContainerController &thCCC):
+    ThreadProgram(thEC, thCCC, "taglogger", "tagLog_")
 {
     // Process reader
-    prReader = new ProcessReader(thData.prReader);
+    prReader = new ProcessReader(pr);
 
     // Create delay
-    itsDelay = new Delay(thData.updateInterval);
+    itsDelay = new Delay(updateInterval);
 
     // Create DB access
-    db = new TagLoggerDB(thData.db);
+    db = new TagLoggerDB(tldb);
 
     // Create tag logger buffer controller
-    tagLoggerBuffer = new TagLoggerBufferController(thData.loggerBufferController);
+    tagLoggerBuffer = new TagLoggerBufferController(tlbc);
 }
 
 TagLoggerProg::~TagLoggerProg()
@@ -59,7 +64,7 @@ TagLoggerProg::~TagLoggerProg()
         delete itsDelay;
 }
 
-void TagLoggerProg::run() {
+void TagLoggerProg::operator()() {
 
     try {
 
@@ -74,7 +79,7 @@ void TagLoggerProg::run() {
         if (!tagLoggerBuffer)
 			throw Exception("No buffer object");
 
-        while(!getThreadController().getExitController().exitThread()) {
+        while(!isExitFlag()) {
 
         	// Start delay
         	itsDelay->startDelay();
@@ -93,9 +98,6 @@ void TagLoggerProg::run() {
 
             // Stop thread cycle time measure
             stopCycleMeasure();
-
-            // Send cycle time to thread manager
-            getThreadController().getCycleController().setCycleTime(getCycleTime());
         }
 
         // Inform writing thread that we are finished putting data to the buffer
@@ -106,7 +108,7 @@ void TagLoggerProg::run() {
     	getLogger().write(e.what());
 
         // Exit application
-    	getThreadController().getExitController().exit("Tag logger");
+    	exit("Tag logger");
 
     	tagLoggerBuffer->setFinished();
     }

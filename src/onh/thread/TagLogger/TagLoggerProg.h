@@ -20,11 +20,12 @@
 #define TAGLOGGERPROG_H
 
 #include <map>
-#include "TagLoggerThreadData.h"
+#include "../../driver/ProcessReader.h"
 #include "../../utils/Delay.h"
 #include "../../db/objs/TagLoggerItem.h"
 #include "../../db/TagLoggerDB.h"
 #include "../ThreadProgram.h"
+#include "TagLoggerBufferController.h"
 
 namespace onh {
 
@@ -34,19 +35,40 @@ namespace onh {
     class TagLoggerProg: public ThreadProgram {
 
         public:
+
             /**
              * Constructor
              *
-             * @param thData Tag logger thread data structure
+             * @param pr Process reader
+             * @param tldb Tag logger DB
+             * @param tlbc Tag logger buffer controller
+             * @param updateInterval Logger update interval (milliseconds)
+             * @param thEC Thread exit controller
+             * @param thCCC Thread cycle time controller
              */
-            TagLoggerProg(const TagLoggerThreadData &thData);
-
-            virtual ~TagLoggerProg();
+            TagLoggerProg(const ProcessReader& pr,
+							const TagLoggerDB& tldb,
+							const TagLoggerBufferController& tlbc,
+							unsigned int updateInterval,
+							const ThreadExitController &thEC,
+							const ThreadCycleContainerController &thCCC);
 
             /**
-             * Run tag logger
-             */
-            void run();
+			 * Copy constructor - inactive
+			 */
+            TagLoggerProg(const TagLoggerProg&) = delete;
+
+			virtual ~TagLoggerProg();
+
+			/**
+			 * Thread program function
+			 */
+			virtual void operator()();
+
+			/**
+			 * Assignment operator - inactive
+			 */
+			TagLoggerProg& operator=(const TagLoggerProg&) = delete;
 
         private:
 

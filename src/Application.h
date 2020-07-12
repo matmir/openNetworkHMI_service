@@ -22,19 +22,11 @@
 #include "onh/driver/ProcessManager.h"
 #include "onh/driver/SHM/ShmDriver.h"
 #include "onh/driver/Modbus/ModbusDriver.h"
-#include "onh/thread/ThreadProgram.h"
 #include "onh/thread/ThreadManager.h"
 #include "onh/utils/Logger.h"
 #include "onh/db/DBManager.h"
 #include "onh/db/Config.h"
-#include "onh/thread/Socket/SocketThreadData.h"
-#include "onh/thread/DriverPolling/DriverPollingThreadData.h"
-#include "onh/thread/ProcessUpdater/ProcessUpdaterThreadData.h"
-#include "onh/thread/TagLogger/TagLoggerThreadData.h"
-#include "onh/thread/TagLogger/TagLoggerWriterThreadData.h"
 #include "onh/thread/TagLogger/TagLoggerBufferContainer.h"
-#include "onh/thread/Alarming/AlarmingThreadData.h"
-#include "onh/thread/Script/ScriptThreadData.h"
 
 namespace onh {
 
@@ -86,55 +78,6 @@ namespace onh {
              * Initialize Thread manager
              */
             void initThreadManager();
-
-            /**
-             * Initialize Driver buffer updater thread data
-             *
-             * @return Driver buffer thread data
-             */
-            DriverPollingThreadData initDriverPollingThreadData();
-
-            /**
-             * Initialize Process updater thread data
-             *
-             * @return Process updater thread data
-             */
-            ProcessUpdaterThreadData initProcessUpdaterThreadData();
-
-            /**
-             * Initialize Socket thread data
-             *
-             * @return Socket thread data
-             */
-            SocketThreadData initSocketThreadData();
-
-            /**
-             * Initialize Tag logger thread data
-             *
-             * @return Tag logger thread data
-             */
-            TagLoggerThreadData initTagLoggerThreadData();
-
-            /**
-			 * Initialize Tag logger writer thread data
-			 *
-			 * @return Tag logger writer thread data
-			 */
-			TagLoggerWriterThreadData initTagLoggerWriterThreadData();
-
-            /**
-             * Initialize Alarming thread data
-             *
-             * @return Alarming thread data
-             */
-            AlarminThreadData initAlarmingThreadData();
-
-            /**
-             * Initialize Script system thread data
-             *
-             * @return Script system thread data
-             */
-            ScriptThreadData initScriptThreadData();
 
             /**
              * Run all threads

@@ -21,10 +21,16 @@
 
 using namespace onh;
 
-ThreadProgram::ThreadProgram(const ThreadController &thContrl, const std::string& dirName, const std::string& fPrefix)
+ThreadProgram::ThreadProgram(const ThreadExitController &thEC,
+		const ThreadCycleContainerController & thCCC,
+		const std::string& dirName,
+		const std::string& fPrefix)
 {
-    // Thread controller
-    thControll = new ThreadController(thContrl);
+    // Thread exit controller
+	thExitControll = new ThreadExitController(thEC);
+
+	// Thread cycle time controller
+	thCycleTimeControll = new ThreadCycleContainerController(thCCC);
 
     // Create logger
     log = new Logger(dirName, fPrefix);
@@ -36,8 +42,11 @@ ThreadProgram::ThreadProgram(const ThreadController &thContrl, const std::string
 
 ThreadProgram::~ThreadProgram()
 {
-    if (thControll)
-        delete thControll;
+    if (thExitControll)
+        delete thExitControll;
+
+    if (thCycleTimeControll)
+    	delete thCycleTimeControll;
 
     if (thCycle)
         delete thCycle;
@@ -62,23 +71,30 @@ void ThreadProgram::stopCycleMeasure() {
     if (!thCycle)
         throw Exception("Cycle time object does not exist", "ThreadProgram::stopCycleMeasure");
 
+    if (!thCycleTimeControll)
+		throw Exception("Thread cycle time controller object does not exist", "ThreadProgram::stopCycleMeasure");
+
     thCycle->stop();
+
+    // Pass counted value to the cycle time controller
+    thCycleTimeControll->setCycleTime(thCycle->getCycle());
 }
 
-CycleTimeData ThreadProgram::getCycleTime() {
+bool ThreadProgram::isExitFlag() const {
 
-    if (!thCycle)
-        throw Exception("Cycle time object does not exist", "ThreadProgram::getCycleTime");
+	if (!thExitControll)
+		throw Exception("Thread exit controller object does not exist", "ThreadProgram::isExitFlag");
 
-    return thCycle->getCycle();
+	return thExitControll->exitThread();
 }
 
-ThreadController& ThreadProgram::getThreadController() {
+void ThreadProgram::exit(const std::string& info) {
 
-	if (!thControll)
-		throw Exception("Thread controller object does not exist", "ThreadProgram::getThreadController");
+	if (!thExitControll)
+		throw Exception("Thread exit controller object does not exist", "ThreadProgram::exit");
 
-	return *thControll;
+	// Trigger application exit
+	thExitControll->exit(info);
 }
 
 Logger& ThreadProgram::getLogger() {

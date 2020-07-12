@@ -21,11 +21,15 @@
 
 #include <string>
 #include <vector>
-#include "../SocketConnectionThreadData.h"
+#include "../../../driver/ProcessReader.h"
+#include "../../../driver/ProcessWriter.h"
+#include "../../ThreadCycleControllers.h"
 #include "CommandList.h"
 #include "../../../utils/Logger.h"
 #include "CommandParserException.h"
 #include "../../../db/ParserDB.h"
+#include "../../../db/DBCredentials.h"
+#include "../../ThreadExitController.h"
 
 namespace onh {
 
@@ -35,14 +39,35 @@ namespace onh {
     class CommandParser {
 
         public:
+
             /**
              * Parser constructor
              *
-             * @param thData Socket thread data structure
+             * @param pr Process reader
+             * @param pw Process writer
+             * @param dbc DB data
+             * @param cc Thread cycle controllers
+             * @param thEC Thread exit controller
+             * @param connDescriptor Socket connection descriptor
              */
-            CommandParser(const SocketConnectionThreadData &thData);
+            CommandParser(const ProcessReader& pr,
+							const ProcessWriter& pw,
+							const DBCredentials& dbc,
+							const ThreadCycleControllers& cc,
+							const ThreadExitController &thEC,
+							int connDescriptor);
+
+            /**
+             * Copy constructor - inactive
+             */
+            CommandParser(const CommandParser&) = delete;
 
             virtual ~CommandParser();
+
+            /**
+			 * Assignment operator - inactive
+			 */
+            CommandParser& operator=(const CommandParser&) = delete;
 
             /**
              * Get string reply for a given query
@@ -59,24 +84,14 @@ namespace onh {
             /// Process data writer
             ProcessWriter *prWriter;
 
-            /// Thread controller
-            ThreadController *thController;
+            /// Thread exit controller
+            ThreadExitController *thExitController;
+
+            /// Thread cycle controllers
+            ThreadCycleControllers cycleController;
 
             /// DB access
             ParserDB *db;
-
-            /// Cycle time reader Process updater
-            ThreadCycleContainerController *pCycleTimeUpdater;
-            /// Cycle time reader Process updater
-            ThreadCycleContainerController *pCycleTimeAlarming;
-            /// Cycle time reader Logger
-            ThreadCycleContainerController *pCycleTimeLogger;
-            /// Cycle time reader Logger writer
-			ThreadCycleContainerController *pCycleTimeLoggerWriter;
-            /// Cycle time reader Script system
-            ThreadCycleContainerController *pCycleTimeScript;
-            /// Cycle time reader Driver polling
-            ThreadCycleContainerController *pCycleTimeDriverPolling;
 
             /// Logger object
             Logger* log;

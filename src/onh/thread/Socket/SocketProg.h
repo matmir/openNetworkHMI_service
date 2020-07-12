@@ -21,42 +21,73 @@
 
 #define THREADS_POOL 20
 
-#include <pthread.h>
+#include <thread>
+#include <vector>
 #include "Socket.h"
-#include "../ThreadProgram.h"
+#include "../ThreadSocket.h"
+#include "../ThreadCycleControllers.h"
 
 namespace onh {
 
     /**
 	 * Socket program class
 	 */
-    class SocketProgram: public ThreadProgram {
+    class SocketProgram: public ThreadSocket {
 
         public:
+
             /**
              * Constructor
              *
-             * @param thData Socket thread data structure
+             * @param pr Process reader
+             * @param pw Process writer
+             * @param dbc DB data
+             * @param port Socket port
+             * @param maxConn Socket max connection number
+             * @param cc Thread cycle controllers
+             * @param thEC Thread exit controller
              */
-    		SocketProgram(const SocketThreadData &thData);
+    		SocketProgram(const ProcessReader& pr,
+							const ProcessWriter& pw,
+							const DBCredentials& dbc,
+							int port,
+							int maxConn,
+							const ThreadCycleControllers& cc,
+							const ThreadExitController &thEC);
 
-            virtual ~SocketProgram();
+    		/**
+			 * Copy constructor - inactive
+			 */
+    		SocketProgram(const SocketProgram&) = delete;
 
-            /**
-             * Run socket program
-             */
-            void run();
+			virtual ~SocketProgram();
+
+			/**
+			 * Thread program function
+			 */
+			virtual void operator()();
+
+			/**
+			 * Assignment operator - inactive
+			 */
+			SocketProgram& operator=(const SocketProgram&) = delete;
 
         private:
 
             /// Socket thread data
-            SocketThreadData socketThData;
+			ProcessReader *pReader;
+			ProcessWriter *pWriter;
+			DBCredentials dbCredentials;
+			ThreadExitController *thExit;
+			ThreadCycleControllers cycleController;
+			int sPort;
+			int sMaxConn;
 
             /// Socket object
             Socket *sock;
 
             /// Connection threads pool
-            pthread_t tConn[THREADS_POOL];
+            std::vector<std::thread*> tConn;
 
             /// Connection threads counter
             int thCounter;

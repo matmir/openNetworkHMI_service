@@ -17,39 +17,63 @@
  */
 
 #include "SocketProg.h"
-#include "SocketConnectionThread.h"
+#include "ConnectionProg.h"
 #include <stdlib.h>
 #include <sstream>
 
 using namespace onh;
 
-SocketProgram::SocketProgram(const SocketThreadData &thData):
-    ThreadProgram(thData.thController, "socket", "serv_"), socketThData(thData), thCounter(0)
+SocketProgram::SocketProgram(const ProcessReader& pr,
+								const ProcessWriter& pw,
+								const DBCredentials& dbc,
+								int port,
+								int maxConn,
+								const ThreadCycleControllers& cc,
+								const ThreadExitController &thEC):
+	ThreadSocket(thEC, "socket", "serv_"), dbCredentials(dbc), cycleController(cc), sPort(port), sMaxConn(maxConn), thCounter(0)
 {
+	// Process reader
+	pReader = new ProcessReader(pr);
+
+	// Process writer
+	pWriter = new ProcessWriter(pw);
+
+	// Thread exit controller
+	thExit = new ThreadExitController(thEC);
+
     // Socket
-    sock = new Socket(thData.port, thData.maxConn);
+    sock = new Socket(port, maxConn);
 }
 
 SocketProgram::~SocketProgram()
 {
+	if (pReader)
+		delete pReader;
+
+	if (pWriter)
+		delete pWriter;
+
+	if (thExit)
+		delete thExit;
+
     if (sock) {
     	getLogger().write("Close socket");
         delete sock;
     }
 }
 
-void SocketProgram::run() {
+void SocketProgram::operator()() {
 
     try {
         // Initialize socket
         sock->init();
 
         // Attach socket file descriptor to exit controller (for shutdown from application)
-        getThreadController().getExitController().setSocketFD(sock->getSocketDescriptor());
+        setSocketFD(sock->getSocketDescriptor());
 
         int conn = 0;
 
-        while (!getThreadController().getExitController().exitThread()) {
+        while (!isExitFlag()) {
 
         	// Wait on connection
         	conn = sock->waitOnConnection();
@@ -61,64 +85,64 @@ void SocketProgram::run() {
     } catch (SocketException &e) {
 
     	// Log error when socket exception (not caused by shutdown command)
-    	if (!getThreadController().getExitController().exitThread()) {
+    	if (!isExitFlag()) {
 
     		getLogger().write(e.what());
 
 			// Exit application
-			getThreadController().getExitController().exit("Socket Thread");
+			exit("Socket Thread");
     	}
     } catch (Exception &e) {
 
     	getLogger().write(e.what());
 
         // Exit application
-    	getThreadController().getExitController().exit("Socket Thread");
+    	exit("Socket Thread");
     }
 
     // Wait on clients
     waitOnThreads();
 
     // Remove file descriptor from exit controller (socket will be closed by socket program)
-	getThreadController().getExitController().setSocketFD(0);
+	setSocketFD(0);
 }
 
 void SocketProgram::createConnectionThread(int connFD) {
 
-	// Prepare data for new thread
-	SocketConnectionThreadData *thData = new SocketConnectionThreadData{
-		connFD,
-		socketThData
-	};
-
 	// Start thread
-	if (pthread_create(&tConn[thCounter++], NULL, &socketConnection_thread, (void*)thData)) {
-		throw Exception("Socket connection thread creation failed");
-	}
+	std::thread* newThread = new std::thread((ConnectionProgram(connFD,
+																*pReader,
+																*pWriter,
+																cycleController,
+																dbCredentials,
+																*thExit)));
 
-	// Check counter
-	if (thCounter == (THREADS_POOL-1)) {
+	// Check connection vector
+	if (tConn.size() >= (THREADS_POOL-1)) {
 
 		// Check old threads
-		for (int i=0; i<THREADS_POOL-1; ++i) {
+		for (unsigned int i=0; i<tConn.size(); ++i) {
 
-			pthread_join(tConn[i], NULL);
+			tConn[i]->join();
+			delete tConn[i];
 		}
 
-		// Move last thread on the first place
-		pthread_t last = tConn[THREADS_POOL-1];
-		tConn[0] = last;
-
-		// Change counter value
-		thCounter = 1;
+		// Clear connection vector
+		tConn.clear();
 	}
+
+	// Add connection thread to the vector
+	tConn.push_back(newThread);
 }
 
 void SocketProgram::waitOnThreads() {
 
 	// Check threads finished
-	for (int i=0; i<thCounter; ++i) {
+	for (unsigned int i=0; i<tConn.size(); ++i) {
 
-		pthread_join(tConn[i], NULL);
+		tConn[i]->join();
+		delete tConn[i];
 	}
+
+	tConn.clear();
 }

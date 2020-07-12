@@ -1,5 +1,5 @@
 CC		:= g++
-CFLAGS	:= -Wall -std=c++14
+CFLAGS	:= -Wall -std=c++17
 LDFLAGS	:= -lpthread -lrt -lmodbus `mariadb_config --cflags --libs`
 INCLUDE	:= -I/usr/include/mariadb -I/usr/local/include/modbus
 

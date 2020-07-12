@@ -28,28 +28,29 @@
 
 using namespace onh;
 
-ScriptProg::ScriptProg(const ScriptThreadData &thData):
-    ThreadProgram(thData.thController,"script", "scriptLog_")
+ScriptProg::ScriptProg(const ProcessReader& pr,
+						const ProcessWriter& pw,
+						const ScriptDB& sdb,
+						unsigned int updateInterval,
+						const std::string& execScript,
+						bool tstEnv,
+						const ThreadExitController &thEC,
+						const ThreadCycleContainerController &thCCC):
+    ThreadProgram(thEC, thCCC,"script", "scriptLog_"), executeScript(execScript), testEnv(tstEnv)
 {
     // Process reader
-    prReader = new ProcessReader(thData.prReader);
+    prReader = new ProcessReader(pr);
 
     // Process writer
-    prWriter = new ProcessWriter(thData.prWriter);
-
-    // Execute script
-    executeScript = thData.executeScript;
+    prWriter = new ProcessWriter(pw);
 
     // Create delay
-    itsDelay = new Delay(thData.updateInterval);
+    itsDelay = new Delay(updateInterval);
 
     // Script DB access
-    db = new ScriptDB(thData.db);
+    db = new ScriptDB(sdb);
 
     dirReady = false;
-
-    // Test environment flag
-    testEnv = thData.testEnv;
 
     // Create script redirected output directory log
     if (mkdir("logs/scriptOutput", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
@@ -76,7 +77,7 @@ ScriptProg::~ScriptProg()
         delete itsDelay;
 }
 
-void ScriptProg::run() {
+void ScriptProg::operator()() {
 
     try {
 
@@ -93,7 +94,7 @@ void ScriptProg::run() {
         if (!dirReady)
             throw Exception("Log directory for script output does not exist");
 
-        while(!getThreadController().getExitController().exitThread()) {
+        while(!isExitFlag()) {
 
             // Start thread cycle time measure
             startCycleMeasure();
@@ -109,9 +110,6 @@ void ScriptProg::run() {
 
             // Stop thread cycle time measure
             stopCycleMeasure();
-
-            // Send cycle time to thread manager
-            getThreadController().getCycleController().setCycleTime(getCycleTime());
         }
 
     } catch (Exception &e) {
@@ -119,7 +117,7 @@ void ScriptProg::run() {
     	getLogger().write(e.what());
 
         // Exit application
-    	getThreadController().getExitController().exit("Script system");
+    	exit("Script system");
     }
 }
 

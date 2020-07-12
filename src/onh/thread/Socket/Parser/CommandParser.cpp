@@ -23,30 +23,29 @@
 
 using namespace onh;
 
-CommandParser::CommandParser(const SocketConnectionThreadData &thData)
+CommandParser::CommandParser(const ProcessReader& pr,
+								const ProcessWriter& pw,
+								const DBCredentials& dbc,
+								const ThreadCycleControllers& cc,
+								const ThreadExitController &thEC,
+								int connDescriptor):
+	cycleController(cc)
 {
     // Process reader
-    prReader = new ProcessReader(thData.sockThDT.prReader);
+    prReader = new ProcessReader(pr);
 
     // Process writer
-    prWriter = new ProcessWriter(thData.sockThDT.prWriter);
+    prWriter = new ProcessWriter(pw);
 
     // Thread controller
-    thController = new ThreadController(thData.sockThDT.thController);
+    thExitController = new ThreadExitController(thEC);
 
     // DB access
-    db = new ParserDB(thData.sockThDT.db);
-
-    pCycleTimeUpdater = new ThreadCycleContainerController(thData.sockThDT.pCycleTimeUpdater);
-    pCycleTimeAlarming = new ThreadCycleContainerController(thData.sockThDT.pCycleTimeAlarming);
-    pCycleTimeLogger = new ThreadCycleContainerController(thData.sockThDT.pCycleTimeLogger);
-    pCycleTimeLoggerWriter = new ThreadCycleContainerController(thData.sockThDT.pCycleTimeLoggerWriter);
-    pCycleTimeScript = new ThreadCycleContainerController(thData.sockThDT.pCycleTimeScript);
-    pCycleTimeDriverPolling = new ThreadCycleContainerController(thData.sockThDT.pCycleTimeDriverPolling);
+    db = new ParserDB(dbc);
 
     // Create logger
     std::stringstream s;
-    s << "parser_th_" << thData.connDescriptor << " ";
+    s << "parser_th_" << connDescriptor << " ";
     log = new Logger("parser", s.str());
 }
 
@@ -56,22 +55,10 @@ CommandParser::~CommandParser()
         delete prReader;
     if (prWriter)
         delete prWriter;
-    if (thController)
-        delete thController;
+    if (thExitController)
+        delete thExitController;
     if (db)
         delete db;
-    if (pCycleTimeUpdater)
-        delete pCycleTimeUpdater;
-    if (pCycleTimeAlarming)
-        delete pCycleTimeAlarming;
-    if (pCycleTimeLogger)
-        delete pCycleTimeLogger;
-    if (pCycleTimeLoggerWriter)
-		delete pCycleTimeLoggerWriter;
-    if (pCycleTimeScript)
-        delete pCycleTimeScript;
-    if (pCycleTimeDriverPolling)
-        delete pCycleTimeDriverPolling;
 
     if (log) {
         delete log;
@@ -773,12 +760,12 @@ std::string CommandParser::CMD_GET_THREAD_CYCLE_TIME(std::string data) {
     CycleTimeData UpdaterCT, LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, PollingCT;
 
     // Get cycle times
-    UpdaterCT = pCycleTimeUpdater->getCycleTime();
-    LoggerCT = pCycleTimeLogger->getCycleTime();
-    LoggerWriterCT = pCycleTimeLoggerWriter->getCycleTime();
-    AlarmingCT = pCycleTimeAlarming->getCycleTime();
-    ScriptCT = pCycleTimeScript->getCycleTime();
-    PollingCT = pCycleTimeDriverPolling->getCycleTime();
+    UpdaterCT = cycleController.cUpdater.getCycleTime();
+    LoggerCT = cycleController.cLogger.getCycleTime();
+    LoggerWriterCT = cycleController.cLoggerWriter.getCycleTime();
+    AlarmingCT = cycleController.cAlarming.getCycleTime();
+    ScriptCT = cycleController.cScript.getCycleTime();
+    PollingCT = cycleController.cDriverPolling.getCycleTime();
 
     return replyOK(UpdaterCT, LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, PollingCT);
 }
@@ -793,7 +780,7 @@ std::string CommandParser::CMD_EXIT_APP(std::string data) {
         throw CommandParserException(CommandParserException::WRONG_DATA, "Wrong data", "CommandParser::CMD_EXIT_APP");
 
     // Exit application
-    thController->getExitController().exit("CMD_EXIT_APP from socket client");
+    thExitController->exit("CMD_EXIT_APP from socket client");
 
     return replyOK(EXIT_APP);
 }

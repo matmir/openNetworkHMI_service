@@ -16,42 +16,28 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCRIPTTHREADDATA_H_INCLUDED
-#define SCRIPTTHREADDATA_H_INCLUDED
+#ifndef SRC_ONH_THREAD_THREADCYCLECONTROLLERS_H_
+#define SRC_ONH_THREAD_THREADCYCLECONTROLLERS_H_
 
-#include "../../driver/ProcessReader.h"
-#include "../../driver/ProcessWriter.h"
-#include "../ThreadController.h"
-#include "../../db/ScriptDB.h"
+#include "ThreadCycleContainerController.h"
 
 namespace onh {
 
-    /**
-	 * Script system thread data structure
-	 */
 	typedef struct {
-	    /// Process data reader
-		ProcessReader prReader;
-
-		/// Process data writer
-		ProcessWriter prWriter;
-
-        /// Thread controller
-		ThreadController thController;
-
-		/// Script DB access
-		ScriptDB db;
-
-		/// Script system update interval (milliseconds)
-		unsigned int updateInterval;
-
-		/// Full path to the main execute script
-		std::string executeScript;
-
-		/// Test environment flag
-		bool testEnv;
-	} ScriptThreadData;
+		/// Cycle time controller Process updater
+		ThreadCycleContainerController cUpdater;
+		/// Cycle time controller Process updater
+		ThreadCycleContainerController cAlarming;
+		/// Cycle time controller Logger
+		ThreadCycleContainerController cLogger;
+		/// Cycle time controller Logger writer
+		ThreadCycleContainerController cLoggerWriter;
+		/// Cycle time controller Script system
+		ThreadCycleContainerController cScript;
+		/// Cycle time controller Driver polling
+		ThreadCycleContainerController cDriverPolling;
+	} ThreadCycleControllers;
 
 }
 
-#endif // SCRIPTTHREADDATA_H_INCLUDED
+#endif /* SRC_ONH_THREAD_THREADCYCLECONTROLLERS_H_ */
