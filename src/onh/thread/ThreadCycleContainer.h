@@ -32,9 +32,22 @@ namespace onh {
 
         public:
 
+    		/**
+    		 * Constructor
+    		 */
             ThreadCycleContainer();
 
+            /**
+			 * Copy constructor - inactive
+			 */
+			ThreadCycleContainer(const ThreadCycleContainer&) = delete;
+
             virtual ~ThreadCycleContainer();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            ThreadCycleContainer& operator=(const ThreadCycleContainer&) = delete;
 
             /**
              * Get cycle time container controller object
@@ -46,15 +59,6 @@ namespace onh {
             ThreadCycleContainerController getController(bool readOnly = false);
 
         private:
-            /**
-             * Copy constructor
-             */
-            ThreadCycleContainer(const ThreadCycleContainer&) {};
-
-            /**
-             * Assign operator
-             */
-            void operator=(const ThreadCycleContainer&) {};
 
             /// Mutex for protecting data
             MutexContainer tccLock;

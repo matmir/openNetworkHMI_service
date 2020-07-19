@@ -20,11 +20,6 @@
 
 using namespace onh;
 
-ThreadCycleContainerController::ThreadCycleContainerController():
-    maLock(), pCycle(0), readOnly(false)
-{
-}
-
 ThreadCycleContainerController::ThreadCycleContainerController(const ThreadCycleContainerController& tccc):
     maLock(tccc.maLock), pCycle(tccc.pCycle), readOnly(tccc.readOnly)
 {

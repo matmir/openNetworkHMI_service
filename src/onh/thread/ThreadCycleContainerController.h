@@ -46,6 +46,11 @@ namespace onh {
             virtual ~ThreadCycleContainerController();
 
             /**
+			 * Assign operator - inactive
+			 */
+            ThreadCycleContainerController& operator=(const ThreadCycleContainerController&) = delete;
+
+            /**
              * Set thread cycle time
              *
              * @param cycleData Cycle time data structure
@@ -62,11 +67,6 @@ namespace onh {
         private:
 
             /**
-             * Default constructor (allowed only from ThreadCycleContainer)
-             */
-            ThreadCycleContainerController();
-
-            /**
              * Constructor (allowed only from ThreadCycleContainer)
              *
              * @param mal MutexAccess object
@@ -74,11 +74,6 @@ namespace onh {
              * @param pThCycleData Thread cycle time data handle
              */
             ThreadCycleContainerController(const MutexAccess &mal, CycleTimeData *pThCycleData, bool readOnlyFlag = false);
-
-            /**
-             * Assign operator
-             */
-            void operator=(const ThreadCycleContainerController&) {};
 
             /// Mutex for protecting data
             MutexAccess maLock;
