@@ -19,10 +19,7 @@
 #include "Logger.h"
 #include <sys/stat.h>
 #include <errno.h>
-#include <ctime>
 #include <sstream>
-#include <syslog.h>
-#include <stdlib.h>
 #include "DateUtils.h"
 
 using namespace onh;

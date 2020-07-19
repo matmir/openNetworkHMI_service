@@ -39,7 +39,17 @@ namespace onh {
              */
             Logger(const std::string& dirName, const std::string& fPrefix = "");
 
+            /**
+			 * Copy constructor - inactive
+			 */
+            Logger(const Logger&) = delete;
+
             virtual ~Logger();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            Logger& operator=(const Logger&) = delete;
 
             /**
              * Write to the log file
