@@ -20,11 +20,6 @@
 
 using namespace onh;
 
-ThreadExitController::ThreadExitController():
-    maLock(), exitFromMain(0), exitFromThread(0), additionalInfo(0), socketFD(0)
-{
-}
-
 ThreadExitController::ThreadExitController(const ThreadExitController& tec):
     maLock(tec.maLock), exitFromMain(tec.exitFromMain), exitFromThread(tec.exitFromThread), additionalInfo(tec.additionalInfo), socketFD(tec.socketFD)
 {

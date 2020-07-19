@@ -69,10 +69,6 @@ namespace onh {
             void setSocketFD(int sockFD);
 
         private:
-            /**
-             * Default constructor (allowed only from ThreadExit)
-             */
-            ThreadExitController();
 
             /**
              * Constructor (allowed only from ThreadExit)
