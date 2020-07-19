@@ -33,9 +33,22 @@ namespace onh {
 
 		public:
 
+			/**
+			 * Constructor
+			 */
 			TagLoggerBufferContainer();
 
+			/**
+			 * Copy constructor - inactive
+			 */
+			TagLoggerBufferContainer(const TagLoggerBufferContainer&) = delete;
+
 			virtual ~TagLoggerBufferContainer();
+
+			/**
+			 * Assign operator - inactive
+			 */
+			TagLoggerBufferContainer& operator=(const TagLoggerBufferContainer&) = delete;
 
 			/**
 			 * Get tag logger buffer container controller object
@@ -47,15 +60,6 @@ namespace onh {
 			TagLoggerBufferController getController(bool readOnly = false);
 
 		private:
-			/**
-			 * Copy constructor
-			 */
-			TagLoggerBufferContainer(const TagLoggerBufferContainer&) {};
-
-			/**
-			 * Assign operator
-			 */
-			void operator=(const TagLoggerBufferContainer&) {};
 
 			/// Mutex for protecting buffer
 			MutexContainer buffLock;

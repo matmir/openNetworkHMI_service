@@ -47,6 +47,11 @@ namespace onh {
 			virtual ~TagLoggerBufferController();
 
 			/**
+			 * Assign operator - inactive
+			 */
+			TagLoggerBufferController& operator=(const TagLoggerBufferController&) = delete;
+
+			/**
 			 * Insert new data into the buffer
 			 *
 			 * @param data Data to insert
@@ -82,11 +87,6 @@ namespace onh {
 		private:
 
 			/**
-			 * Default constructor (allowed only from TagLoggerBufferContainer)
-			 */
-			TagLoggerBufferController();
-
-			/**
 			 * Constructor (allowed only from TagLoggerBufferContainer)
 			 *
 			 * @param bLock MutexAccess object for protecting buffer
@@ -96,11 +96,6 @@ namespace onh {
 			 * @param readOnlyFlag Read only flag
 			 */
 			TagLoggerBufferController(const MutexAccess &bLock, std::vector<TagLoggerItem> *b, const MutexAccess &fLock, bool *finishFlag, bool readOnlyFlag = false);
-
-			/**
-			 * Assign operator
-			 */
-			void operator=(const TagLoggerBufferController&) {};
 
 			/// Mutex for protecting buffer
 			MutexAccess buffLock;

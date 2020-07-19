@@ -20,11 +20,6 @@
 
 using namespace onh;
 
-TagLoggerBufferController::TagLoggerBufferController():
-	buffLock(), buff(0), finishLock(), controllerInsertFinished(0), readOnly(false)
-{
-}
-
 TagLoggerBufferController::TagLoggerBufferController(const TagLoggerBufferController& tlbc):
 	buffLock(tlbc.buffLock), buff(tlbc.buff), finishLock(tlbc.finishLock), controllerInsertFinished(tlbc.controllerInsertFinished), readOnly(tlbc.readOnly)
 {
