@@ -41,8 +41,23 @@ namespace onh {
     class CycleTime {
 
         public:
+
+    		/**
+    		 * Constructor
+    		 */
             CycleTime();
+
+            /**
+             * Copy constructor - inactive
+             */
+            CycleTime(const CycleTime&) = delete;
+
             virtual ~CycleTime();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            CycleTime& operator=(const CycleTime&) = delete;
 
             /**
              * Start measuring cycle time

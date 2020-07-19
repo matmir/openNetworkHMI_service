@@ -44,7 +44,7 @@ namespace onh {
             /**
 			 * Assign operator - inactive
 			 */
-			void operator=(const MutexContainer&) = delete;
+            MutexContainer& operator=(const MutexContainer&) = delete;
 
             /**
              * Lock mutex
