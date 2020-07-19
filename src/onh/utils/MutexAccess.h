@@ -19,7 +19,7 @@
 #ifndef SRC_UTILS_MUTEXACCESS_H
 #define SRC_UTILS_MUTEXACCESS_H
 
-#include <pthread.h>
+#include <mutex>
 #include "Exception.h"
 
 namespace onh {
@@ -80,10 +80,10 @@ namespace onh {
              *
              * @param mcLock Mutex handle
              */
-            MutexAccess(pthread_mutex_t* mcLock);
+            MutexAccess(std::mutex* mcLock);
 
             /// Handle for mutex
-            pthread_mutex_t* itsLock;
+            std::mutex* itsLock;
     };
 
 }

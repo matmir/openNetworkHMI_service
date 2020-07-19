@@ -19,7 +19,7 @@
 #ifndef ONH_UTILS_MUTEXCONTAINER_H
 #define ONH_UTILS_MUTEXCONTAINER_H
 
-#include <pthread.h>
+#include <mutex>
 #include "Exception.h"
 #include "MutexAccess.h"
 
@@ -34,7 +34,17 @@ namespace onh {
 
             MutexContainer();
 
+            /**
+			 * Copy constructor - inactive
+			 */
+			MutexContainer(const MutexContainer&) = delete;
+
             virtual ~MutexContainer();
+
+            /**
+			 * Assign operator - inactive
+			 */
+			void operator=(const MutexContainer&) = delete;
 
             /**
              * Lock mutex
@@ -61,18 +71,9 @@ namespace onh {
             MutexAccess getAccess();
 
         private:
-            /**
-             * Copy constructor
-             */
-            MutexContainer(const MutexContainer&) {};
-
-            /**
-             * Assign operator
-             */
-            void operator=(const MutexContainer&) {};
 
             /// Mutex
-            pthread_mutex_t itsLock;
+            std::mutex itsLock;
     };
 
 }

@@ -17,42 +17,44 @@
  */
 
 #include "MutexContainer.h"
+#include <system_error>
+#include <sstream>
 
 using namespace onh;
 
 MutexContainer::MutexContainer() {
 
-	// Initialize mutex
-	if (pthread_mutex_init(&itsLock, NULL)) {
-		throw Exception("Initialize mutex error", "MutexContainer::init");
-	}
 }
 
 MutexContainer::~MutexContainer() {
 
-	pthread_mutex_destroy(&itsLock);
 }
 
 void MutexContainer::lock() {
 
     // Lock access to the data
-	if (pthread_mutex_lock(&itsLock) !=0) {
-		throw Exception("Lock mutex error", "MutexContainer::lock");
-	}
+    try {
+
+    	itsLock.lock();
+
+    } catch (const std::system_error& e) {
+    	std::stringstream s;
+    	s << "Lock mutex error code: " << e.code() << ", msg: " << e.what();
+
+    	throw Exception(s.str(), "MutexContainer::lock");
+    }
 }
 
 bool MutexContainer::tryLock() {
 
     // Try lock access to the data
-	return (pthread_mutex_trylock(&itsLock)==0)?(true):(false);
+	return itsLock.try_lock();
 }
 
 void MutexContainer::unlock() {
 
-    // Lock access to the data
-	if (pthread_mutex_unlock(&itsLock) !=0) {
-		throw Exception("Unlock mutex error", "MutexContainer::unlock");
-	}
+    // Unlock access to the data
+	itsLock.unlock();
 }
 
 MutexAccess MutexContainer::getAccess() {
