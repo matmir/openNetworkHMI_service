@@ -67,8 +67,8 @@ ThreadManager::~ThreadManager()
 	if (threadSocket)
 		delete threadSocket;
 
-	for (unsigned int i=0; i<threadProgs.size(); ++i) {
-		delete threadProgs[i];
+	for (auto thProg : threadProgs) {
+		delete thProg;
 	}
 }
 
@@ -226,8 +226,8 @@ void ThreadManager::run() {
 	threadSocket = new std::thread(std::ref(*thSocket));
 
 	// Join threads
-	for (unsigned int i=0; i<threadProgs.size(); ++i) {
-		threadProgs[i]->join();
+	for (auto thProg : threadProgs) {
+		thProg->join();
 	}
 
 	// Close socket

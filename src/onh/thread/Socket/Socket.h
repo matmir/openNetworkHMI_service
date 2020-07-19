@@ -16,15 +16,14 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef K_SOCKET
-#define K_SOCKET
+#ifndef ONH_SOCKET
+#define ONH_SOCKET
 
 /// Maximal buffer size (bytes)
 #define MAX_BUFF_SIZE 10000
 
 #include <netinet/in.h>
 #include "Parser/CommandParser.h"
-#include "../ThreadController.h"
 #include "SocketException.h"
 
 namespace onh {

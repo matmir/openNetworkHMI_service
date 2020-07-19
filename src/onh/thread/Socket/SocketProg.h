@@ -89,9 +89,6 @@ namespace onh {
             /// Connection threads pool
             std::vector<std::thread*> tConn;
 
-            /// Connection threads counter
-            int thCounter;
-
             /**
              * Create connection thread
              *

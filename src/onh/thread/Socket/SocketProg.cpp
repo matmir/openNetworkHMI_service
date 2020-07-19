@@ -30,7 +30,7 @@ SocketProgram::SocketProgram(const ProcessReader& pr,
 								int maxConn,
 								const ThreadCycleControllers& cc,
 								const ThreadExitController &thEC):
-	ThreadSocket(thEC, "socket", "serv_"), dbCredentials(dbc), cycleController(cc), sPort(port), sMaxConn(maxConn), thCounter(0)
+	ThreadSocket(thEC, "socket", "serv_"), dbCredentials(dbc), cycleController(cc), sPort(port), sMaxConn(maxConn)
 {
 	// Process reader
 	pReader = new ProcessReader(pr);
@@ -121,10 +121,10 @@ void SocketProgram::createConnectionThread(int connFD) {
 	if (tConn.size() >= (THREADS_POOL-1)) {
 
 		// Check old threads
-		for (unsigned int i=0; i<tConn.size(); ++i) {
+		for (auto thConn : tConn) {
 
-			tConn[i]->join();
-			delete tConn[i];
+			thConn->join();
+			delete thConn;
 		}
 
 		// Clear connection vector
@@ -138,10 +138,10 @@ void SocketProgram::createConnectionThread(int connFD) {
 void SocketProgram::waitOnThreads() {
 
 	// Check threads finished
-	for (unsigned int i=0; i<tConn.size(); ++i) {
+	for (auto thConn : tConn) {
 
-		tConn[i]->join();
-		delete tConn[i];
+		thConn->join();
+		delete thConn;
 	}
 
 	tConn.clear();
