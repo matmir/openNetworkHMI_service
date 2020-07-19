@@ -32,8 +32,22 @@ namespace onh {
 
         public:
 
+    		/**
+    		 * Constructor
+    		 */
             ThreadExit();
+
+            /**
+			 * Copy constructor - inactive
+			 */
+			ThreadExit(const ThreadExit&) = delete;
+
             virtual ~ThreadExit();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            ThreadExit& operator=(const ThreadExit&) = delete;
 
             /**
              * Trigger exit
@@ -62,15 +76,6 @@ namespace onh {
             int getSocketFD();
 
         private:
-            /**
-             * Copy constructor
-             */
-            ThreadExit(const ThreadExit&) {};
-
-            /**
-             * Assign operator
-             */
-            void operator=(const ThreadExit&) {};
 
             /// Mutex for protecting data
             MutexContainer teLock;

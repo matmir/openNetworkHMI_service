@@ -45,6 +45,11 @@ namespace onh {
             virtual ~ThreadExitController();
 
             /**
+			 * Assign operator - inactive
+			 */
+            ThreadExitController& operator=(const ThreadExitController&) = delete;
+
+            /**
              * Check if thread need to be closed
              */
             bool exitThread();
@@ -79,11 +84,6 @@ namespace onh {
              * @param sockFD Socket file descriptor handle
              */
             ThreadExitController(const MutexAccess &mal, bool *exFromMain, bool *exFromThread, std::string *adInfo, int *sockFD);
-
-            /**
-             * @brief	Assign operator
-             */
-            void operator=(const ThreadExitController&) {};
 
             /// Mutex for protecting data
             MutexAccess maLock;
