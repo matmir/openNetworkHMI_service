@@ -42,7 +42,17 @@ namespace onh {
              */
             Socket(int port, int maxConn);
 
+            /**
+			 * Copy constructor - inactive
+			 */
+            Socket(const Socket&) = delete;
+
             ~Socket();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            Socket& operator=(const Socket&) = delete;
 
             /**
              * Initialize socket
