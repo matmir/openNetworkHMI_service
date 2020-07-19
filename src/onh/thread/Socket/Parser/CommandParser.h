@@ -75,7 +75,7 @@ namespace onh {
              * @param query String with query from socket client
              * @return String with reply
              */
-            std::string getReply(std::string query);
+            std::string getReply(const std::string& query);
 
         private:
             /// Process data reader
@@ -112,7 +112,7 @@ namespace onh {
              *
              * @return parserCMD value
              */
-            parserCMD parseCMD(std::string cmd);
+            parserCMD parseCMD(const std::string& cmd);
 
             /**
              * Check if command number exist
@@ -131,7 +131,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string replyOK(parserCMD cmd, std::string data="");
+            std::string replyOK(parserCMD cmd, const std::string& data="");
 
             /**
              * Prepare reply - OK
@@ -141,7 +141,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string replyOK(parserCMD cmd, std::vector<bool> data);
+            std::string replyOK(parserCMD cmd, const std::vector<bool>& data);
 
             /**
              * Prepare reply - OK
@@ -233,7 +233,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string parseCommand(parserCMD cmd, std::string data);
+            std::string parseCommand(parserCMD cmd, const std::string& data);
 
             /**
              * Command: GET_BIT
@@ -242,7 +242,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_GET_BIT(std::string data);
+            std::string CMD_GET_BIT(const std::string& data);
 
             /**
              * Command: SET_BIT
@@ -251,7 +251,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_SET_BIT(std::string data);
+            std::string CMD_SET_BIT(const std::string& data);
 
             /**
              * Command: RESET_BIT
@@ -260,7 +260,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_RESET_BIT(std::string data);
+            std::string CMD_RESET_BIT(const std::string& data);
 
             /**
              * Command: INVERT_BIT
@@ -269,7 +269,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_INVERT_BIT(std::string data);
+            std::string CMD_INVERT_BIT(const std::string& data);
 
             /**
              * Command: GET_BITS
@@ -278,7 +278,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_GET_BITS(std::string data);
+            std::string CMD_GET_BITS(const std::string& data);
 
             /**
              * Command: SET_BITS
@@ -286,7 +286,7 @@ namespace onh {
              * @param data Command additional data (tags names)
              * @return String with reply
              */
-            std::string CMD_SET_BITS(std::string data);
+            std::string CMD_SET_BITS(const std::string& data);
 
             /**
              * Command: GET_BYTE
@@ -295,7 +295,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_GET_BYTE(std::string data);
+            std::string CMD_GET_BYTE(const std::string& data);
 
             /**
              * Command: WRITE_BYTE
@@ -304,7 +304,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_WRITE_BYTE(std::string data);
+            std::string CMD_WRITE_BYTE(const std::string& data);
 
             /**
              * Command: GET_WORD
@@ -313,7 +313,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_GET_WORD(std::string data);
+            std::string CMD_GET_WORD(const std::string& data);
 
             /**
              * Command: WRITE_WORD
@@ -322,7 +322,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_WRITE_WORD(std::string data);
+            std::string CMD_WRITE_WORD(const std::string& data);
 
             /**
              * Command: GET_DWORD
@@ -331,7 +331,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_GET_DWORD(std::string data);
+            std::string CMD_GET_DWORD(const std::string& data);
 
             /**
              * Command: WRITE_DWORD
@@ -340,7 +340,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_WRITE_DWORD(std::string data);
+            std::string CMD_WRITE_DWORD(const std::string& data);
 
             /**
              * Command: GET_INT
@@ -349,7 +349,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_GET_INT(std::string data);
+            std::string CMD_GET_INT(const std::string& data);
 
             /**
              * Command: WRITE_INT
@@ -358,7 +358,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_WRITE_INT(std::string data);
+            std::string CMD_WRITE_INT(const std::string& data);
 
             /**
              * Command: GET_REAL
@@ -367,7 +367,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_GET_REAL(std::string data);
+            std::string CMD_GET_REAL(const std::string& data);
 
             /**
              * Command: WRITE_REAL
@@ -376,7 +376,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_WRITE_REAL(std::string data);
+            std::string CMD_WRITE_REAL(const std::string& data);
 
             /**
              * Command: MULTI_CMD
@@ -385,7 +385,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_MULTI_CMD(std::string data);
+            std::string CMD_MULTI_CMD(const std::string& data);
 
             /**
              * Command: ACK_ALARM
@@ -394,7 +394,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_ACK_ALARM(std::string data);
+            std::string CMD_ACK_ALARM(const std::string& data);
 
             /**
              * Command: GET_THREAD_CYCLE_TIME
@@ -403,7 +403,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_GET_THREAD_CYCLE_TIME(std::string data);
+            std::string CMD_GET_THREAD_CYCLE_TIME(const std::string& data);
 
             /**
              * Command: EXIT_APP
@@ -412,7 +412,7 @@ namespace onh {
              *
              * @return String with reply
              */
-            std::string CMD_EXIT_APP(std::string data);
+            std::string CMD_EXIT_APP(const std::string& data);
     };
 
 }

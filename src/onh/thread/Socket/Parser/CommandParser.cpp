@@ -65,7 +65,7 @@ CommandParser::~CommandParser()
     }
 }
 
-std::string CommandParser::getReply(std::string query) {
+std::string CommandParser::getReply(const std::string& query) {
 
     std::string s;
     std::vector<std::string> v;
@@ -169,7 +169,7 @@ bool CommandParser::checkCMD(int cmdNr) {
     return ret;
 }
 
-parserCMD CommandParser::parseCMD(std::string str) {
+parserCMD CommandParser::parseCMD(const std::string& str) {
 
     if (str.length() == 0)
         throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::parseCMD");
@@ -186,7 +186,7 @@ parserCMD CommandParser::parseCMD(std::string str) {
     return (parserCMD)val;
 }
 
-std::string CommandParser::replyOK(parserCMD cmd, std::string data) {
+std::string CommandParser::replyOK(parserCMD cmd, const std::string& data) {
 
     std::stringstream s;
 
@@ -202,7 +202,7 @@ std::string CommandParser::replyOK(parserCMD cmd, std::string data) {
     return s.str();
 }
 
-std::string CommandParser::replyOK(parserCMD cmd, std::vector<bool> data) {
+std::string CommandParser::replyOK(parserCMD cmd, const std::vector<bool>& data) {
 
     std::stringstream s;
 
@@ -325,7 +325,7 @@ std::string CommandParser::replyError(parserReply rp) {
     return s.str();
 }
 
-std::string CommandParser::CMD_GET_BIT(std::string data) {
+std::string CommandParser::CMD_GET_BIT(const std::string& data) {
 
     std::string s;
 
@@ -345,7 +345,7 @@ std::string CommandParser::CMD_GET_BIT(std::string data) {
     return replyOK(GET_BIT, s);
 }
 
-std::string CommandParser::CMD_SET_BIT(std::string data) {
+std::string CommandParser::CMD_SET_BIT(const std::string& data) {
 
     // Check data string
     if (data.length() == 0)
@@ -360,7 +360,7 @@ std::string CommandParser::CMD_SET_BIT(std::string data) {
     return replyOK(SET_BIT);
 }
 
-std::string CommandParser::CMD_RESET_BIT(std::string data) {
+std::string CommandParser::CMD_RESET_BIT(const std::string& data) {
 
     // Check data string
     if (data.length() == 0)
@@ -375,7 +375,7 @@ std::string CommandParser::CMD_RESET_BIT(std::string data) {
     return replyOK(RESET_BIT);
 }
 
-std::string CommandParser::CMD_INVERT_BIT(std::string data) {
+std::string CommandParser::CMD_INVERT_BIT(const std::string& data) {
 
     // Check data string
     if (data.length() == 0)
@@ -390,7 +390,7 @@ std::string CommandParser::CMD_INVERT_BIT(std::string data) {
     return replyOK(INVERT_BIT);
 }
 
-std::string CommandParser::CMD_GET_BITS(std::string data) {
+std::string CommandParser::CMD_GET_BITS(const std::string& data) {
 
     std::string s;
     std::vector<std::string> v;
@@ -421,7 +421,7 @@ std::string CommandParser::CMD_GET_BITS(std::string data) {
     return replyOK(GET_BITS, TagValues);
 }
 
-std::string CommandParser::CMD_SET_BITS(std::string data) {
+std::string CommandParser::CMD_SET_BITS(const std::string& data) {
 
     std::vector<std::string> v;
     std::vector<Tag> vTag;
@@ -444,7 +444,7 @@ std::string CommandParser::CMD_SET_BITS(std::string data) {
     return replyOK(SET_BITS);
 }
 
-std::string CommandParser::CMD_GET_BYTE(std::string data) {
+std::string CommandParser::CMD_GET_BYTE(const std::string& data) {
 
     std::stringstream s;
     BYTE v;
@@ -462,7 +462,7 @@ std::string CommandParser::CMD_GET_BYTE(std::string data) {
     return replyOK(v);
 }
 
-std::string CommandParser::CMD_WRITE_BYTE(std::string data) {
+std::string CommandParser::CMD_WRITE_BYTE(const std::string& data) {
 
     std::vector<std::string> v;
 
@@ -491,7 +491,7 @@ std::string CommandParser::CMD_WRITE_BYTE(std::string data) {
     return replyOK(WRITE_BYTE);
 }
 
-std::string CommandParser::CMD_GET_WORD(std::string data) {
+std::string CommandParser::CMD_GET_WORD(const std::string& data) {
 
     std::stringstream s;
     WORD w;
@@ -509,7 +509,7 @@ std::string CommandParser::CMD_GET_WORD(std::string data) {
     return replyOK(w);
 }
 
-std::string CommandParser::CMD_WRITE_WORD(std::string data) {
+std::string CommandParser::CMD_WRITE_WORD(const std::string& data) {
 
     std::vector<std::string> v;
 
@@ -536,7 +536,7 @@ std::string CommandParser::CMD_WRITE_WORD(std::string data) {
     return replyOK(WRITE_WORD);
 }
 
-std::string CommandParser::CMD_GET_DWORD(std::string data) {
+std::string CommandParser::CMD_GET_DWORD(const std::string& data) {
 
     std::stringstream s;
     DWORD dw;
@@ -554,7 +554,7 @@ std::string CommandParser::CMD_GET_DWORD(std::string data) {
     return replyOK(dw);
 }
 
-std::string CommandParser::CMD_WRITE_DWORD(std::string data) {
+std::string CommandParser::CMD_WRITE_DWORD(const std::string& data) {
 
     std::vector<std::string> v;
 
@@ -581,7 +581,7 @@ std::string CommandParser::CMD_WRITE_DWORD(std::string data) {
     return replyOK(WRITE_DWORD);
 }
 
-std::string CommandParser::CMD_GET_INT(std::string data) {
+std::string CommandParser::CMD_GET_INT(const std::string& data) {
 
     std::stringstream s;
     int v;
@@ -599,7 +599,7 @@ std::string CommandParser::CMD_GET_INT(std::string data) {
     return replyOK(v);
 }
 
-std::string CommandParser::CMD_WRITE_INT(std::string data) {
+std::string CommandParser::CMD_WRITE_INT(const std::string& data) {
 
     std::vector<std::string> v;
 
@@ -626,7 +626,7 @@ std::string CommandParser::CMD_WRITE_INT(std::string data) {
     return replyOK(WRITE_INT);
 }
 
-std::string CommandParser::CMD_GET_REAL(std::string data) {
+std::string CommandParser::CMD_GET_REAL(const std::string& data) {
 
     float f;
 
@@ -643,7 +643,7 @@ std::string CommandParser::CMD_GET_REAL(std::string data) {
     return replyOK(f);
 }
 
-std::string CommandParser::CMD_WRITE_REAL(std::string data) {
+std::string CommandParser::CMD_WRITE_REAL(const std::string& data) {
 
     std::vector<std::string> v;
 
@@ -670,7 +670,7 @@ std::string CommandParser::CMD_WRITE_REAL(std::string data) {
     return replyOK(WRITE_REAL);
 }
 
-std::string CommandParser::CMD_MULTI_CMD(std::string data) {
+std::string CommandParser::CMD_MULTI_CMD(const std::string& data) {
 
     std::vector<std::string> v;
     std::vector<std::string> cmdReply;
@@ -730,7 +730,7 @@ std::string CommandParser::getReplyFromMultiCMD(const std::string& cmd) {
     return parseCommand(pcmd, v[1]);
 }
 
-std::string CommandParser::CMD_ACK_ALARM(std::string data) {
+std::string CommandParser::CMD_ACK_ALARM(const std::string& data) {
 
     // Check data string
     if (data.length() == 0)
@@ -747,7 +747,7 @@ std::string CommandParser::CMD_ACK_ALARM(std::string data) {
     return replyOK(ACK_ALARM);
 }
 
-std::string CommandParser::CMD_GET_THREAD_CYCLE_TIME(std::string data) {
+std::string CommandParser::CMD_GET_THREAD_CYCLE_TIME(const std::string& data) {
 
     // Check data string
     if (data.length() == 0)
@@ -770,7 +770,7 @@ std::string CommandParser::CMD_GET_THREAD_CYCLE_TIME(std::string data) {
     return replyOK(UpdaterCT, LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, PollingCT);
 }
 
-std::string CommandParser::CMD_EXIT_APP(std::string data) {
+std::string CommandParser::CMD_EXIT_APP(const std::string& data) {
 
     // Check data string
     if (data.length() == 0)
@@ -785,7 +785,7 @@ std::string CommandParser::CMD_EXIT_APP(std::string data) {
     return replyOK(EXIT_APP);
 }
 
-std::string CommandParser::parseCommand(parserCMD cmd, std::string data) {
+std::string CommandParser::parseCommand(parserCMD cmd, const std::string& data) {
 
     std::string ret;
 
