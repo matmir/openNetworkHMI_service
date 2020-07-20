@@ -20,7 +20,7 @@
 #define SRC_DRIVER_PROCESSREADER_H_
 
 #include <vector>
-#include "ProcessReadWrite.h"
+#include "ProcessUtils.h"
 #include "../db/objs/Tag.h"
 #include "DriverProcessReader.h"
 
@@ -32,7 +32,7 @@ namespace onh {
 	/**
 	 * Process reader class
 	 */
-	class ProcessReader: public ProcessReadWrite {
+	class ProcessReader {
 
         public:
 
@@ -46,6 +46,11 @@ namespace onh {
             ProcessReader(const ProcessReader &pr);
 
             virtual ~ProcessReader();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            ProcessReader& operator=(const ProcessReader &pr) = delete;
 
             /**
              * Read bit from the process data
@@ -118,21 +123,11 @@ namespace onh {
         private:
 
             /**
-             * Default constructor (allowed only from ProcessManager)
-             */
-            ProcessReader();
-
-            /**
              * Constructor with parameters (allowed only from ProcessManager)
              *
              * @param dpr Pointer to the driver process data reader
              */
             ProcessReader(DriverProcessReader *dpr);
-
-            /**
-             * Assign operator
-             */
-            void operator=(const ProcessReader &pr) {};
 
             /// Driver process data reader
             DriverProcessReader *driverReader;

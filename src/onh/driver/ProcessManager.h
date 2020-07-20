@@ -43,7 +43,17 @@ namespace onh {
              */
             ProcessManager(Driver* drv, DriverBuffer* drvBuffHandle);
 
+            /**
+			 * Copy constructor - inactive
+			 */
+            ProcessManager(const ProcessManager&) = delete;
+
             virtual ~ProcessManager();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            ProcessManager& operator=(const ProcessManager &pu) = delete;
 
             /**
              * Get updater object

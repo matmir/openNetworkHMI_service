@@ -17,24 +17,19 @@
  */
 
 #include "ProcessReader.h"
+#include "DriverException.h"
 #include <sstream>
 
 using namespace onh;
 
-ProcessReader::ProcessReader():
-	ProcessReadWrite(), driverReader(0)
-{
-}
-
-ProcessReader::ProcessReader(const ProcessReader &pr):
-	ProcessReadWrite()
+ProcessReader::ProcessReader(const ProcessReader &pr)
 {
 	// Create new instance of the driver reader
 	driverReader = pr.driverReader->createNew();
 }
 
 ProcessReader::ProcessReader(DriverProcessReader *dpr):
-	ProcessReadWrite(), driverReader(dpr)
+	driverReader(dpr)
 {
 }
 
@@ -54,7 +49,7 @@ bool ProcessReader::getBitValue(const Tag& tg) {
     // Check Tag type
     if (tg.getType() != TT_BIT) {
 
-        triggerTagTypeError(tg.getName(), "ProcessReader::getBitValue");
+        ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessReader::getBitValue");
     }
 
     bool v = false;
@@ -68,7 +63,7 @@ bool ProcessReader::getBitValue(const Tag& tg) {
 
     } catch(DriverException &e) {
 
-        triggerError(e.what(), tg.getName(), "ProcessReader::getBitValue");
+    	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getBitValue");
     }
 
     return v;
@@ -94,7 +89,7 @@ std::vector<bool> ProcessReader::getBitsValue(const std::vector<Tag>& tags) {
         // Check Tag type
         if (tags[i].getType() != TT_BIT) {
 
-            triggerTagTypeError(tags[i].getName(), "ProcessReader::getBitsValue");
+        	ProcessUtils::triggerTagTypeError(tags[i].getName(), "ProcessReader::getBitsValue");
         }
 
         // Prepare address
@@ -108,7 +103,7 @@ std::vector<bool> ProcessReader::getBitsValue(const std::vector<Tag>& tags) {
 
     } catch(DriverException &e) {
 
-        triggerError(e.what(), "", "ProcessReader::getBitsValue");
+    	ProcessUtils::triggerError(e.what(), "", "ProcessReader::getBitsValue");
     }
 
     if (ret.size() == 0)
@@ -127,7 +122,7 @@ BYTE ProcessReader::getByte(const Tag& tg) {
     // Check Tag type
     if (tg.getType() != TT_BYTE) {
 
-        triggerTagTypeError(tg.getName(), "ProcessReader::getByte");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessReader::getByte");
     }
 
     BYTE b = 0;
@@ -141,7 +136,7 @@ BYTE ProcessReader::getByte(const Tag& tg) {
 
     } catch(DriverException &e) {
 
-        triggerError(e.what(), tg.getName(), "ProcessReader::getByte");
+    	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getByte");
     }
 
     return b;
@@ -157,7 +152,7 @@ WORD ProcessReader::getWord(const Tag& tg) {
     // Check Tag type
     if (tg.getType() != TT_WORD) {
 
-        triggerTagTypeError(tg.getName(), "ProcessReader::getWord");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessReader::getWord");
     }
 
     WORD w = 0;
@@ -171,7 +166,7 @@ WORD ProcessReader::getWord(const Tag& tg) {
 
     } catch(DriverException &e) {
 
-        triggerError(e.what(), tg.getName(), "ProcessReader::getWord");
+    	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getWord");
     }
 
     return w;
@@ -187,7 +182,7 @@ DWORD ProcessReader::getDWord(const Tag& tg) {
     // Check Tag type
     if (tg.getType() != TT_DWORD) {
 
-        triggerTagTypeError(tg.getName(), "ProcessReader::getDWord");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessReader::getDWord");
     }
 
     DWORD dw = 0;
@@ -201,7 +196,7 @@ DWORD ProcessReader::getDWord(const Tag& tg) {
 
     } catch(DriverException &e) {
 
-        triggerError(e.what(), tg.getName(), "ProcessReader::getDWord");
+    	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getDWord");
     }
 
     return dw;
@@ -217,7 +212,7 @@ int ProcessReader::getInt(const Tag& tg) {
     // Check Tag type
     if (tg.getType() != TT_INT) {
 
-        triggerTagTypeError(tg.getName(), "ProcessReader::getInt");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessReader::getInt");
     }
 
     int v = 0;
@@ -231,7 +226,7 @@ int ProcessReader::getInt(const Tag& tg) {
 
     } catch(DriverException &e) {
 
-        triggerError(e.what(), tg.getName(), "ProcessReader::getInt");
+    	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getInt");
     }
 
     return v;
@@ -247,7 +242,7 @@ float ProcessReader::getReal(const Tag& tg) {
     // Check Tag type
     if (tg.getType()!= TT_REAL) {
 
-        triggerTagTypeError(tg.getName(), "ProcessReader::getReal");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessReader::getReal");
     }
 
     float f = 0;
@@ -261,7 +256,7 @@ float ProcessReader::getReal(const Tag& tg) {
 
     } catch(DriverException &e) {
 
-        triggerError(e.what(), tg.getName(), "ProcessReader::getReal");
+    	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getReal");
     }
 
     return f;

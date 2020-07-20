@@ -21,18 +21,13 @@
 
 using namespace onh;
 
-ProcessWriter::ProcessWriter():
-    ProcessReadWrite(), driver(0), driverLock()
-{
-}
-
 ProcessWriter::ProcessWriter(const ProcessWriter &pw):
-    ProcessReadWrite(), driver(pw.driver), driverLock(pw.driverLock)
+    driver(pw.driver), driverLock(pw.driverLock)
 {
 }
 
 ProcessWriter::ProcessWriter(Driver* drv, const MutexAccess& lock):
-    ProcessReadWrite(), driver(drv), driverLock(lock)
+    driver(drv), driverLock(lock)
 {
 }
 
@@ -50,7 +45,7 @@ void ProcessWriter::setBit(const Tag& tg) {
     // Check Tag type
     if (tg.getType() != TT_BIT) {
 
-        triggerTagTypeError(tg.getName(), "ProcessWriter::setBit");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessWriter::setBit");
     }
 
     processDataAddress addr = tg.getAddress();
@@ -66,7 +61,7 @@ void ProcessWriter::setBit(const Tag& tg) {
     } catch(DriverException &e) {
         driverLock.unlock();
 
-        triggerError(e.what(), tg.getName(), "ProcessWriter::setBit");
+        ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::setBit");
     }
 
     // Unlock access to the driver
@@ -83,7 +78,7 @@ void ProcessWriter::resetBit(const Tag& tg) {
     // Check Tag type
     if (tg.getType() != TT_BIT) {
 
-        triggerTagTypeError(tg.getName(), "ProcessWriter::resetBit");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessWriter::resetBit");
     }
 
     processDataAddress addr = tg.getAddress();
@@ -99,7 +94,7 @@ void ProcessWriter::resetBit(const Tag& tg) {
     } catch(DriverException &e) {
         driverLock.unlock();
 
-        triggerError(e.what(), tg.getName(), "ProcessWriter::resetBit");
+        ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::resetBit");
     }
 
     // Unlock access to the driver
@@ -117,7 +112,7 @@ void ProcessWriter::invertBit(const Tag& tg) {
     // Check Tag type
     if (tg.getType() != TT_BIT) {
 
-        triggerTagTypeError(tg.getName(), "ProcessWriter::invertBit");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessWriter::invertBit");
     }
 
     processDataAddress addr = tg.getAddress();
@@ -133,7 +128,7 @@ void ProcessWriter::invertBit(const Tag& tg) {
     } catch(DriverException &e) {
         driverLock.unlock();
 
-        triggerError(e.what(), tg.getName(), "ProcessWriter::invertBit");
+        ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::invertBit");
     }
 
     // Unlock access to the driver
@@ -159,7 +154,7 @@ void ProcessWriter::setBits(const std::vector<Tag>& tags) {
         // Check Tag type
         if (tags[i].getType() != TT_BIT) {
 
-            triggerTagTypeError(tags[i].getName(), "ProcessWriter::setBits");
+        	ProcessUtils::triggerTagTypeError(tags[i].getName(), "ProcessWriter::setBits");
         }
 
         addr.push_back(tags[i].getAddress());
@@ -177,7 +172,7 @@ void ProcessWriter::setBits(const std::vector<Tag>& tags) {
     } catch(DriverException &e) {
         driverLock.unlock();
 
-        triggerError(e.what(), "", "ProcessWriter::setBits");
+        ProcessUtils::triggerError(e.what(), "", "ProcessWriter::setBits");
     }
 
     // Unlock access to the driver
@@ -194,7 +189,7 @@ void ProcessWriter::writeByte(const Tag& tg, BYTE val) {
     // Check Tag type
     if (tg.getType() != TT_BYTE) {
 
-        triggerTagTypeError(tg.getName(), "ProcessWriter::writeByte");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessWriter::writeByte");
     }
 
     processDataAddress addr = tg.getAddress();
@@ -210,7 +205,7 @@ void ProcessWriter::writeByte(const Tag& tg, BYTE val) {
     } catch(DriverException &e) {
         driverLock.unlock();
 
-        triggerError(e.what(), tg.getName(), "ProcessWriter::writeByte");
+        ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeByte");
     }
 
     // Unlock access to the driver
@@ -227,7 +222,7 @@ void ProcessWriter::writeWord(const Tag& tg, WORD val) {
     // Check Tag type
     if (tg.getType() != TT_WORD) {
 
-        triggerTagTypeError(tg.getName(), "ProcessWriter::writeWord");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessWriter::writeWord");
     }
 
     processDataAddress addr = tg.getAddress();
@@ -243,7 +238,7 @@ void ProcessWriter::writeWord(const Tag& tg, WORD val) {
     } catch(DriverException &e) {
         driverLock.unlock();
 
-        triggerError(e.what(), tg.getName(), "ProcessWriter::writeWord");
+        ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeWord");
     }
 
     // Unlock access to the driver
@@ -260,7 +255,7 @@ void ProcessWriter::writeDWord(const Tag& tg, DWORD val) {
     // Check Tag type
     if (tg.getType() != TT_DWORD) {
 
-        triggerTagTypeError(tg.getName(), "ProcessWriter::writeDWord");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessWriter::writeDWord");
     }
 
     processDataAddress addr = tg.getAddress();
@@ -276,7 +271,7 @@ void ProcessWriter::writeDWord(const Tag& tg, DWORD val) {
     } catch(DriverException &e) {
         driverLock.unlock();
 
-        triggerError(e.what(), tg.getName(), "ProcessWriter::writeDWord");
+        ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeDWord");
     }
 
     // Unlock access to the driver
@@ -293,7 +288,7 @@ void ProcessWriter::writeInt(const Tag& tg, int val) {
     // Check Tag type
     if (tg.getType() != TT_INT) {
 
-        triggerTagTypeError(tg.getName(), "ProcessWriter::writeInt");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessWriter::writeInt");
     }
 
     processDataAddress addr = tg.getAddress();
@@ -309,7 +304,7 @@ void ProcessWriter::writeInt(const Tag& tg, int val) {
     } catch(DriverException &e) {
         driverLock.unlock();
 
-        triggerError(e.what(), tg.getName(), "ProcessWriter::writeInt");
+        ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeInt");
     }
 
     // Unlock access to the driver
@@ -326,7 +321,7 @@ void ProcessWriter::writeReal(const Tag& tg, float val) {
     // Check Tag type
     if (tg.getType() != TT_REAL) {
 
-        triggerTagTypeError(tg.getName(), "ProcessWriter::writeReal");
+    	ProcessUtils::triggerTagTypeError(tg.getName(), "ProcessWriter::writeReal");
     }
 
     processDataAddress addr = tg.getAddress();
@@ -342,7 +337,7 @@ void ProcessWriter::writeReal(const Tag& tg, float val) {
     } catch(DriverException &e) {
         driverLock.unlock();
 
-        triggerError(e.what(), tg.getName(), "ProcessWriter::writeReal");
+        ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeReal");
     }
 
     // Unlock access to the driver

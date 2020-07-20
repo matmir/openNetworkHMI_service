@@ -16,33 +16,26 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ProcessReadWrite.h"
+#include "ProcessUtils.h"
 #include <sstream>
 
 using namespace onh;
 
-ProcessReadWrite::ProcessReadWrite() {
-}
-
-ProcessReadWrite::~ProcessReadWrite()
-{
-}
-
-void ProcessReadWrite::triggerTagTypeError(const std::string& tagName, const std::string& fName) const {
+void ProcessUtils::triggerTagTypeError(const std::string& tagName, const std::string& fName) {
 
     std::stringstream s;
     s << "Tag: " << tagName << " has wrong type";
     throw TagException(TagException::WRONG_TYPE, s.str(), fName);
 }
 
-void ProcessReadWrite::triggerTagAreaError(const std::string& tagName, const std::string& fName) const {
+void ProcessUtils::triggerTagAreaError(const std::string& tagName, const std::string& fName) {
 
     std::stringstream s;
     s << "Tag: " << tagName << " has wrong area";
     throw TagException(TagException::WRONG_AREA, s.str(), fName);
 }
 
-void ProcessReadWrite::triggerError(const std::string& msg, const std::string& tagName, const std::string& fName) const {
+void ProcessUtils::triggerError(const std::string& msg, const std::string& tagName, const std::string& fName) {
 
     std::stringstream s;
 

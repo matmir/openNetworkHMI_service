@@ -46,21 +46,16 @@ namespace onh {
             virtual ~ProcessUpdater();
 
             /**
+			 * Assign operator - inactive
+			 */
+            ProcessUpdater& operator=(const ProcessUpdater &pu) = delete;
+
+            /**
              * Update process data (read from controller)
              */
             void update();
 
         private:
-
-            /**
-             * Default constructor (allowed only from ProcessManager)
-             */
-            ProcessUpdater();
-
-            /**
-             * Assign operator
-             */
-            void operator=(const ProcessUpdater &pu) {};
 
             /**
              * Constructor with parameters (allowed only from ProcessManager)

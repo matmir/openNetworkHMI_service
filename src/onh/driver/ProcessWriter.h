@@ -20,7 +20,9 @@
 #define PROCESSWRITER_H
 
 #include <vector>
-#include "ProcessReadWrite.h"
+#include "ProcessUtils.h"
+#include "Driver.h"
+#include "../utils/MutexAccess.h"
 #include "../db/objs/Tag.h"
 
 namespace onh {
@@ -31,7 +33,7 @@ namespace onh {
 	/**
 	 * Process writer class
 	 */
-    class ProcessWriter: public ProcessReadWrite {
+    class ProcessWriter {
 
         public:
 
@@ -45,6 +47,11 @@ namespace onh {
             ProcessWriter(const ProcessWriter &pw);
 
             virtual ~ProcessWriter();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            ProcessWriter& operator=(const ProcessWriter &pw) = delete;
 
             /**
              * Set bit in process data
@@ -117,22 +124,12 @@ namespace onh {
         private:
 
             /**
-             * Default constructor (allowed only from ProcessManager)
-             */
-            ProcessWriter();
-
-            /**
              * Constructor with parameters (allowed only from ProcessManager)
              *
              * @param drv Driver instance
              * @param lock Mutex access
              */
             ProcessWriter(Driver* drv, const MutexAccess& lock);
-
-            /**
-             * Assign operator
-             */
-            void operator=(const ProcessWriter &pw) {};
 
             /// Driver instance
 			Driver* driver;

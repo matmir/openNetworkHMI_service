@@ -20,11 +20,6 @@
 
 using namespace onh;
 
-ProcessUpdater::ProcessUpdater():
-	driver(0), driverLock()
-{
-}
-
 ProcessUpdater::ProcessUpdater(const ProcessUpdater &pu):
 	driver(pu.driver), driverLock(pu.driverLock)
 {

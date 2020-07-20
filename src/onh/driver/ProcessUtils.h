@@ -16,54 +16,46 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROCESSREADWRITE_H
-#define PROCESSREADWRITE_H
+#ifndef PROCESSUTILS_H
+#define PROCESSUTILS_H
 
-#include "Driver.h"
 #include "../db/objs/Tag.h"
-#include "../utils/MutexAccess.h"
 
 namespace onh {
 
     /**
-     * Process data access base class
+     * Process utils class
      */
-    class ProcessReadWrite {
+    class ProcessUtils {
 
         public:
-
-            ProcessReadWrite();
-
-            virtual ~ProcessReadWrite();
-
-        protected:
 
             /**
              * Triggers tag type error
              *
              * @param tagName Tag name
-             * @param fName Function from which exception was throwed
+             * @param fName Function from which exception was thrown
              */
-            void triggerTagTypeError(const std::string& tagName, const std::string& fName) const;
+            static void triggerTagTypeError(const std::string& tagName, const std::string& fName);
 
             /**
              * Triggers tag area error
              *
              * @param tagName Tag name
-             * @param fName Function from which exception was throwed
+             * @param fName Function from which exception was thrown
              */
-            void triggerTagAreaError(const std::string& tagName, const std::string& fName) const;
+            static void triggerTagAreaError(const std::string& tagName, const std::string& fName);
 
             /**
              * Triggers error
              *
              * @param msg Exception message
              * @param tagName Tag name
-             * @param fName Function from which exception was throwed
+             * @param fName Function from which exception was thrown
              */
-            void triggerError(const std::string& msg, const std::string& tagName, const std::string& fName) const;
+            static void triggerError(const std::string& msg, const std::string& tagName, const std::string& fName);
     };
 
 }
 
-#endif // PROCESSREADWRITE_H
+#endif // PROCESSUTILS_H
