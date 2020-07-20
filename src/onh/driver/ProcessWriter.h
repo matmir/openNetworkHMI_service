@@ -51,7 +51,7 @@ namespace onh {
             /**
 			 * Assign operator - inactive
 			 */
-            ProcessWriter& operator=(const ProcessWriter &pw) = delete;
+            ProcessWriter& operator=(const ProcessWriter&) = delete;
 
             /**
              * Set bit in process data

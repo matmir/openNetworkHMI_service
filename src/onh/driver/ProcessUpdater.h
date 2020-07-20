@@ -48,7 +48,7 @@ namespace onh {
             /**
 			 * Assign operator - inactive
 			 */
-            ProcessUpdater& operator=(const ProcessUpdater &pu) = delete;
+            ProcessUpdater& operator=(const ProcessUpdater&) = delete;
 
             /**
              * Update process data (read from controller)

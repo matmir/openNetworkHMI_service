@@ -50,7 +50,7 @@ namespace onh {
             /**
 			 * Assign operator - inactive
 			 */
-            ProcessReader& operator=(const ProcessReader &pr) = delete;
+            ProcessReader& operator=(const ProcessReader&) = delete;
 
             /**
              * Read bit from the process data
