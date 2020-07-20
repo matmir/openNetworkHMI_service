@@ -30,11 +30,11 @@ ScriptException::ScriptException(ExceptionType type, const std::string& desc , c
 {
 }
 
-ScriptException::~ScriptException() throw()
+ScriptException::~ScriptException() noexcept
 {
 }
 
-ScriptException::ExceptionType ScriptException::getType() const throw() {
+ScriptException::ExceptionType ScriptException::getType() const {
 
     return exType;
 }

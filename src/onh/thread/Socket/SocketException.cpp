@@ -49,6 +49,6 @@ SocketException::SocketException(const std::string& desc, int errorNumber, const
 	allMessage = s.str();
 }
 
-SocketException::~SocketException() {
+SocketException::~SocketException() noexcept {
 }
 

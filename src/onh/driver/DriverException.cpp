@@ -35,6 +35,6 @@ DriverException::DriverException(const std::string& desc, const std::string& fNa
 {
 }
 
-DriverException::~DriverException() throw()
+DriverException::~DriverException() noexcept
 {
 }

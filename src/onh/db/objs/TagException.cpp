@@ -30,7 +30,7 @@ TagException::TagException(ExceptionType type, const std::string& desc, const st
 {
 }
 
-TagException::~TagException()
+TagException::~TagException() noexcept
 {
 }
 

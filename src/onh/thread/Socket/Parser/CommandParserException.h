@@ -48,7 +48,7 @@ namespace onh {
              *
              * @param type Exception type
              * @param desc Additional exception information
-             * @param fName Function from which exception was throwed
+             * @param fName Function from which exception was thrown
              */
             CommandParserException(ExceptionType type, const std::string& desc = "", const std::string& fName = "");
 

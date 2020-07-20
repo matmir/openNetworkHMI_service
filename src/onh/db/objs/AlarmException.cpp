@@ -30,11 +30,11 @@ AlarmException::AlarmException(ExceptionType type, const std::string& desc, cons
 {
 }
 
-AlarmException::~AlarmException() throw()
+AlarmException::~AlarmException() noexcept
 {
 }
 
-AlarmException::ExceptionType AlarmException::getType() const throw()
+AlarmException::ExceptionType AlarmException::getType() const
 {
     return exType;
 }

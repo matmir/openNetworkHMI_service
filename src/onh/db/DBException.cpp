@@ -35,6 +35,6 @@ DBException::DBException(const std::string& desc, const std::string& fName):
 {
 }
 
-DBException::~DBException()
+DBException::~DBException() noexcept
 {
 }

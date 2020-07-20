@@ -44,14 +44,14 @@ namespace onh {
 
             TagException();
 
-            virtual ~TagException();
+            virtual ~TagException() noexcept;
 
             /**
              * Exception constructor
              *
              * @param type Exception type
              * @param desc Additional exception information
-             * @param fName Function from which exception was throwed
+             * @param fName Function from which exception was thrown
              */
             TagException(ExceptionType type, const std::string& desc = "", const std::string& fName = "");
 

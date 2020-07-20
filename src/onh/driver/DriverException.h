@@ -43,11 +43,11 @@ namespace onh {
              * Exception constructor with message and function name
              *
              * @param desc Exception error
-             * @param fName Function from which exception was throwed
+             * @param fName Function from which exception was thrown
              */
             DriverException(const std::string& desc, const std::string& fName);
 
-            virtual ~DriverException() throw();
+            virtual ~DriverException() noexcept;
     };
 
 }

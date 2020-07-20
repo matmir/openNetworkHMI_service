@@ -42,14 +42,14 @@ namespace onh {
 
             ScriptException();
 
-            virtual ~ScriptException() throw();
+            virtual ~ScriptException() noexcept;
 
             /**
              * Exception constructor
              *
              * @param type Exception type
              * @param desc Additional exception information
-             * @param fName Function from which exception was throwed
+             * @param fName Function from which exception was thrown
              */
             ScriptException(ExceptionType type, const std::string& desc = "", const std::string& fName = "");
 
@@ -58,7 +58,7 @@ namespace onh {
              *
              * @return Exception type
              */
-            ExceptionType getType() const throw();
+            ExceptionType getType() const;
 
         private:
 

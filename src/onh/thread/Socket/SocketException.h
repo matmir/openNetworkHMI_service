@@ -43,7 +43,7 @@ namespace onh {
 			 * Exception constructor with message and function name
 			 *
 			 * @param desc Exception error
-			 * @param fName Function from which exception was throwed
+			 * @param fName Function from which exception was thrown
 			 */
 			SocketException(const std::string& desc, const std::string& fName);
 
@@ -52,11 +52,11 @@ namespace onh {
 			 *
 			 * @param desc Exception error
 			 * @param errorNumber errno value
-			 * @param fName Function from which exception was throwed
+			 * @param fName Function from which exception was thrown
 			 */
 			SocketException(const std::string& desc, int errorNumber, const std::string& fName);
 
-			virtual ~SocketException();
+			virtual ~SocketException() noexcept;
 	};
 
 }
