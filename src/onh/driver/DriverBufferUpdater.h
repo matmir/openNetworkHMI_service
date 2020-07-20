@@ -45,15 +45,16 @@ namespace onh {
             virtual ~DriverBufferUpdater();
 
             /**
+			 * Assign operator - inactive
+			 */
+            DriverBufferUpdater& operator=(const DriverBufferUpdater&) = delete;
+
+            /**
              * Update driver buffer
              */
             void update();
 
         private:
-            /**
-             * Default constructor (allowed only from ProcessManager)
-             */
-            DriverBufferUpdater();
 
             /**
              * Constructor with parameters (allowed only from ProcessManager)
