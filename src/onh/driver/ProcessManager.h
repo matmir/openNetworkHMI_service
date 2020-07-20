@@ -53,7 +53,7 @@ namespace onh {
             /**
 			 * Assign operator - inactive
 			 */
-            ProcessManager& operator=(const ProcessManager &pu) = delete;
+            ProcessManager& operator=(const ProcessManager&) = delete;
 
             /**
              * Get updater object
