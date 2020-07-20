@@ -39,7 +39,17 @@ namespace onh {
 
 			friend class ShmDriver;
 
+			/**
+			 * Copy constructor - inactive
+			 */
+			ShmProcessReader(const ShmProcessReader&) = delete;
+
 			virtual ~ShmProcessReader();
+
+			/**
+			 * Assign operator - inactive
+			 */
+			ShmProcessReader& operator=(const ShmProcessReader&) = delete;
 
 			/**
 			 * Get bit value from process data
@@ -117,11 +127,6 @@ namespace onh {
 			virtual DriverProcessReader* createNew();
 
 		private:
-
-			/**
-			 * Constructor (allowed only from ShmDriver)
-			 */
-			ShmProcessReader();
 
 			/**
 			 * Constructor (allowed only from ShmDriver)

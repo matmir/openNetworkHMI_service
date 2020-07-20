@@ -22,9 +22,6 @@
 
 using namespace onh;
 
-ShmProcessReader::ShmProcessReader() {
-}
-
 ShmProcessReader::ShmProcessReader(const ShmProcessDataController& spdc):
 	driverProcess(spdc)
 {

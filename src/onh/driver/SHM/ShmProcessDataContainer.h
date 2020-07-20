@@ -34,7 +34,17 @@ namespace onh {
 
 			ShmProcessDataContainer();
 
+			/**
+			 * Copy constructor - inactive
+			 */
+			ShmProcessDataContainer(const ShmProcessDataContainer&) = delete;
+
 			virtual ~ShmProcessDataContainer();
+
+			/**
+			 * Assign operator - inactive
+			 */
+			ShmProcessDataContainer& operator=(const ShmProcessDataContainer&) = delete;
 
 			/**
 			 * Get Shm process data container controller object
@@ -56,16 +66,6 @@ namespace onh {
 			void clear();
 
 		private:
-
-			/**
-			 * Copy constructor
-			 */
-			ShmProcessDataContainer(const ShmProcessDataContainer&) {};
-
-			/**
-			 * Assign operator
-			 */
-			void operator=(const ShmProcessDataContainer&) {};
 
 			/// Process data
 			processData process;

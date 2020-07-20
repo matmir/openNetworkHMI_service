@@ -37,11 +37,6 @@ namespace onh {
 			friend class ShmProcessDataContainer;
 
 			/**
-			 * Default constructor
-			 */
-			ShmProcessDataController();
-
-			/**
 			 * Copy constructor
 			 *
 			 * @param spdc Shm process data controller object to copy
@@ -49,6 +44,11 @@ namespace onh {
 			ShmProcessDataController(const ShmProcessDataController& spdc);
 
 			virtual ~ShmProcessDataController();
+
+			/**
+			 * Assign operator - inactive
+			 */
+			ShmProcessDataController& operator=(const ShmProcessDataController&) = delete;
 
 			/**
 			 * Get copy of the driver process data
@@ -66,11 +66,6 @@ namespace onh {
 			 * @param procDT Pointer to process data
 			 */
 			ShmProcessDataController(const MutexAccess &pdLock, processData *procDT);
-
-			/**
-			 * Assign operator
-			 */
-			void operator=(const ShmProcessDataController&) {};
 
 			/// Pointer to the process data
 			processData *process;

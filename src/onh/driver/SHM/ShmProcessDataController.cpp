@@ -20,18 +20,13 @@
 
 using namespace onh;
 
-ShmProcessDataController::ShmProcessDataController():
-	process(0), processLock()
-{
-}
-
 ShmProcessDataController::ShmProcessDataController(const ShmProcessDataController& spdc):
 	process(spdc.process), processLock(spdc.processLock)
 {
 }
 
 ShmProcessDataController::ShmProcessDataController(const MutexAccess &pdLock, processData *procDT):
-		process(procDT), processLock(pdLock)
+	process(procDT), processLock(pdLock)
 {
 }
 

@@ -34,6 +34,7 @@ namespace onh {
 	class ShmDriver: public Driver {
 
         public:
+
             /**
              * Default Shared memory client constructor
              *
@@ -41,7 +42,17 @@ namespace onh {
              */
             ShmDriver(const std::string& segmentName);
 
+            /**
+			 * Copy constructor - inactive
+			 */
+            ShmDriver(const ShmDriver&) = delete;
+
             virtual ~ShmDriver();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            ShmDriver& operator=(const ShmDriver&) = delete;
 
             /**
              * Update process data (copy from shared memory)
