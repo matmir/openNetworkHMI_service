@@ -20,11 +20,6 @@
 
 using namespace onh;
 
-ModbusProcessDataController::ModbusProcessDataController():
-	process(0), processLock(), registersCount(0)
-{
-}
-
 ModbusProcessDataController::ModbusProcessDataController(const ModbusProcessDataController& spdc):
 	process(spdc.process), processLock(spdc.processLock), registersCount(spdc.registersCount)
 {

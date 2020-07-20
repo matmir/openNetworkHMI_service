@@ -38,7 +38,17 @@ namespace onh {
 
 			friend class ModbusDriver;
 
+			/**
+			 * Copy constructor - inactive
+			 */
+			ModbusProcessReader(const ModbusProcessReader&) = delete;
+
 			virtual ~ModbusProcessReader();
+
+			/**
+			 * Assign operator - inactive
+			 */
+			ModbusProcessReader& operator=(const ModbusProcessReader&) = delete;
 
 			/**
 			 * Get bit value from process data
@@ -118,12 +128,7 @@ namespace onh {
 		private:
 
 			/**
-			 * Constructor (allowed only from Modbus)
-			 */
-			ModbusProcessReader();
-
-			/**
-			 * Constructor (allowed only from Modbus)
+			 * Constructor (allowed only from ModbusDriver)
 			 *
 			 * @param spdc Modbus process data controller
 			 */

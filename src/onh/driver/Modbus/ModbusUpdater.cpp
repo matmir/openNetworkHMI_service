@@ -21,34 +21,6 @@
 
 using namespace onh;
 
-ModbusUpdater::ModbusUpdater():
-    driver(0), regCount(0)
-{
-    buff.holdingReg = 0;
-    buff.inputReg = 0;
-
-    tempBuff.holdingReg = 0;
-    tempBuff.inputReg = 0;
-}
-
-ModbusUpdater::ModbusUpdater(const ModbusUpdater &mtu) {
-
-    driver = mtu.driver;
-    regCount = mtu.regCount;
-
-    // Copy buffer pointers
-    buff.holdingReg = mtu.buff.holdingReg;
-    buff.inputReg = mtu.buff.inputReg;
-
-    // Prepare temporary buffers
-    tempBuff.holdingReg = new WORD[regCount];
-    tempBuff.inputReg = new WORD[regCount];
-
-    // Copy lock protections
-    driverLock = mtu.driverLock;
-    bufferLock = mtu.bufferLock;
-}
-
 ModbusUpdater::ModbusUpdater(modbusM::ModbusMaster* drv,
                                    ModbusProcessData buffH,
                                    WORD cnt,
@@ -78,32 +50,6 @@ ModbusUpdater::~ModbusUpdater()
 
     if (tempBuff.inputReg)
         delete [] tempBuff.inputReg;
-}
-
-ModbusUpdater& ModbusUpdater::operator=(const ModbusUpdater &mtu) {
-
-    driver = mtu.driver;
-    regCount = mtu.regCount;
-
-    // Copy buffer pointers
-    buff.holdingReg = mtu.buff.holdingReg;
-    buff.inputReg = mtu.buff.inputReg;
-
-    // Prepare temporary buffers
-    if (tempBuff.holdingReg)
-        delete [] tempBuff.holdingReg;
-
-    if (tempBuff.inputReg)
-        delete [] tempBuff.inputReg;
-
-    tempBuff.holdingReg = new WORD[regCount];
-    tempBuff.inputReg = new WORD[regCount];
-
-    // Copy lock protections
-    driverLock = mtu.driverLock;
-    bufferLock = mtu.bufferLock;
-
-    return *this;
 }
 
 void ModbusUpdater::updateBuffer() {

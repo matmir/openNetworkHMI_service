@@ -33,6 +33,7 @@ namespace onh {
     class ModbusDriver: public Driver {
 
         public:
+
             /**
              * ModbusDriver Constructor
              *
@@ -40,7 +41,17 @@ namespace onh {
              */
             ModbusDriver(const modbusM::ModbusCfg& cfg);
 
+            /**
+			 * Copy constructor - inactive
+			 */
+            ModbusDriver(const ModbusDriver&) = delete;
+
             virtual ~ModbusDriver();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            ModbusDriver& operator=(const ModbusDriver&) = delete;
 
             /**
              * Update process data (copy from load buffer)

@@ -39,7 +39,17 @@ namespace onh {
 			 */
 			ModbusProcessDataContainer(WORD regCount);
 
+			/**
+			 * Copy constructor - inactive
+			 */
+			ModbusProcessDataContainer(const ModbusProcessDataContainer&) = delete;
+
 			virtual ~ModbusProcessDataContainer();
+
+			/**
+			 * Assign operator - inactive
+			 */
+			ModbusProcessDataContainer& operator=(const ModbusProcessDataContainer&) = delete;
 
 			/**
 			 * Get Modbus process data container controller object
@@ -61,16 +71,6 @@ namespace onh {
 			void clear();
 
 		private:
-
-			/**
-			 * Copy constructor
-			 */
-			ModbusProcessDataContainer(const ModbusProcessDataContainer&) {};
-
-			/**
-			 * Assign operator
-			 */
-			void operator=(const ModbusProcessDataContainer&) {};
 
 			/// Process data
 			ModbusProcessData process;

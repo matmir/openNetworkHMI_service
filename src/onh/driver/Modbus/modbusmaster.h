@@ -78,7 +78,17 @@ namespace modbusM {
     		 */
             ModbusMaster(const ModbusCfg& cfg);
 
+            /**
+			 * Copy constructor - inactive
+			 */
+            ModbusMaster(const ModbusMaster&) = delete;
+
             ~ModbusMaster();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            ModbusMaster& operator=(const ModbusMaster&) = delete;
 
             /**
              * Connect to the slave

@@ -22,13 +22,6 @@
 
 using namespace onh;
 
-ModbusUtils::ModbusUtils() {
-
-}
-
-ModbusUtils::~ModbusUtils() {
-}
-
 void ModbusUtils::checkProcessAddress(processDataAddress addr, unsigned int maxByteCount, unsigned int byteFactor, bool writeOperation) {
 
     // Check bit address

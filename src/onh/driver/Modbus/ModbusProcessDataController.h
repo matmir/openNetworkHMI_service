@@ -37,11 +37,6 @@ namespace onh {
 			friend class ModbusProcessDataContainer;
 
 			/**
-			 * Default constructor
-			 */
-			ModbusProcessDataController();
-
-			/**
 			 * Copy constructor
 			 *
 			 * @param spdc Shm process data controller object to copy
@@ -49,6 +44,11 @@ namespace onh {
 			ModbusProcessDataController(const ModbusProcessDataController& spdc);
 
 			virtual ~ModbusProcessDataController();
+
+			/**
+			 * Assign operator - inactive
+			 */
+			ModbusProcessDataController& operator=(const ModbusProcessDataController&) = delete;
 
 			/**
 			 * Get copy of the driver process data
@@ -74,11 +74,6 @@ namespace onh {
 			 * @param registersCount Max number modbus registers to read
 			 */
 			ModbusProcessDataController(const MutexAccess &pdLock, ModbusProcessData *procDT, WORD regCount);
-
-			/**
-			 * Assign operator
-			 */
-			void operator=(const ModbusProcessDataController&) {};
 
 			/// Pointer to the process data
 			ModbusProcessData *process;

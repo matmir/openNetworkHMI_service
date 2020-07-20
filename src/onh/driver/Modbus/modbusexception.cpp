@@ -37,11 +37,11 @@ ModbusException::ModbusException(const std::string& exceptionMSG, const std::str
 	allMessage += errorMessage;
 }
 
-ModbusException::~ModbusException() throw()
+ModbusException::~ModbusException() noexcept
 {
 }
 
-const char* ModbusException::what() const throw() {
+const char* ModbusException::what() const noexcept {
 
     return allMessage.c_str();
 }

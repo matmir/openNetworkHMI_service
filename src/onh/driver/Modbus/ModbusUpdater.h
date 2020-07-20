@@ -39,7 +39,17 @@ namespace onh {
 
             friend class ModbusDriver;
 
+            /**
+			 * Copy constructor - inactive
+			 */
+			ModbusUpdater(const ModbusUpdater&) = delete;
+
             virtual ~ModbusUpdater();
+
+            /**
+			 * Assign operator - inactive
+			 */
+			ModbusUpdater& operator=(const ModbusUpdater&) = delete;
 
             /**
              * Update driver buffer (Get data from controller)
@@ -47,20 +57,9 @@ namespace onh {
             virtual void updateBuffer();
 
         private:
-            /**
-             * Default constructor (allowed only from Modbus)
-             */
-            ModbusUpdater();
 
             /**
-             * Copy constructor (allowed only from Modbus)
-             *
-             * @param mtu ModbusUpdater object
-             */
-            ModbusUpdater(const ModbusUpdater &mtu);
-
-            /**
-             * Constructor with parameters (allowed only from Modbus)
+             * Constructor with parameters (allowed only from ModbusDriver)
              *
              * @param drv Driver instance
              * @param buffH Buffer structure
@@ -73,13 +72,6 @@ namespace onh {
                              WORD cnt,
                              const MutexAccess &malDriver,
                              const MutexAccess &malBuff);
-
-            /**
-             * Assign operator (allowed only from Modbus)
-             *
-             * @param mtu ModbusUpdater object
-             */
-            ModbusUpdater& operator=(const ModbusUpdater &mtu);
 
             /**
              * Clear temporary registers

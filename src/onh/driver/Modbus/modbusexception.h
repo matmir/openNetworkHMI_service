@@ -32,7 +32,7 @@ namespace modbusM {
 
     		ModbusException();
 
-            virtual ~ModbusException() throw();
+            virtual ~ModbusException() noexcept;
 
             /**
              * Exception constructor with message
@@ -45,7 +45,7 @@ namespace modbusM {
              * Exception constructor with message and function name
              *
              * @param exceptionMSG Exception additional info
-             * @param funcName Function from which exception was throwed
+             * @param funcName Function from which exception was thrown
              */
             ModbusException(const std::string& exceptionMSG, const std::string& funcName);
 
@@ -54,13 +54,13 @@ namespace modbusM {
              *
              * @return Exception message
              */
-            virtual const char* what() const throw();
+            virtual const char* what() const noexcept;
 
         private:
             /// String with the error message
             std::string errorMessage;
 
-            /// Function from which exception was throwed
+            /// Function from which exception was thrown
             std::string functionName;
 
             /// Full error message

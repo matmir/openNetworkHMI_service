@@ -31,9 +31,6 @@ namespace onh {
 
 		public:
 
-			ModbusUtils();
-			virtual ~ModbusUtils();
-
 			/**
 			 * Check process data address
 			 *

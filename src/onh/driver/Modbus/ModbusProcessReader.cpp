@@ -23,13 +23,6 @@
 
 using namespace onh;
 
-ModbusProcessReader::ModbusProcessReader():
-	DriverProcessReader(), maxByteCount(0), driverProcess()
-{
-	process.holdingReg = 0;
-	process.inputReg = 0;
-}
-
 ModbusProcessReader::ModbusProcessReader(const ModbusProcessDataController& spdc):
 	driverProcess(spdc)
 {
