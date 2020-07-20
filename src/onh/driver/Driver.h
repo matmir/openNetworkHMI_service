@@ -43,7 +43,17 @@ namespace onh {
 			 */
 			Driver(const std::string& logName);
 
+			/**
+			 * Copy constructor - inactive
+			 */
+			Driver(const Driver&) = delete;
+
 			virtual ~Driver();
+
+			/**
+			 * Assign operator - inactive
+			 */
+			Driver& operator=(const Driver&) = delete;
 
 			/**
 			 * Update process data (copy from controller)
