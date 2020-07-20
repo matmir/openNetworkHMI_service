@@ -21,13 +21,6 @@
 
 using namespace onh;
 
-DriverUtils::DriverUtils() {
-
-}
-
-DriverUtils::~DriverUtils() {
-}
-
 void DriverUtils::checkBitAddress(processDataAddress addr) {
 
     if (addr.bitAddr > 7) {

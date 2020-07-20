@@ -30,9 +30,6 @@ namespace onh {
 
 		public:
 
-			DriverUtils();
-			virtual ~DriverUtils();
-
 			/**
 			 * Check bit address of the process data address
 			 *
