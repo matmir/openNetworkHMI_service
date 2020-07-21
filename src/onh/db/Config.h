@@ -47,6 +47,11 @@ namespace onh {
             virtual ~Config();
 
             /**
+			 * Assign operator - inactive
+			 */
+            Config& operator=(const Config&) = delete;
+
+            /**
              * Get string value from configuration DB
              *
              * @param field Configuration name
@@ -82,10 +87,6 @@ namespace onh {
             void setValue(const std::string& field, const std::string& val);
 
         private:
-            /**
-             * Default constructor (allowed only from DBManager)
-             */
-            Config();
 
             /**
              * Constructor with connection param (allowed only from DBManager)
@@ -93,11 +94,6 @@ namespace onh {
              * @param connection Connection handle
              */
             Config(MYSQL *connDB);
-
-            /**
-             * Assign operator
-             */
-            void operator=(const Config&) {};
     };
 
 }

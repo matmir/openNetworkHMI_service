@@ -36,6 +36,7 @@ namespace onh {
     class DBManager {
 
         public:
+
             /**
              * DB manager constructor
              *
@@ -45,7 +46,17 @@ namespace onh {
              */
             DBManager(const std::string& db, const std::string& addr, const std::string& user, const std::string& pass);
 
+            /**
+			 * Copy constructor - inactive
+			 */
+            DBManager(const DBManager&) = delete;
+
             virtual ~DBManager();
+
+            /**
+			 * Assignment operator - inactive
+			 */
+            DBManager& operator=(const DBManager&) = delete;
 
             /**
              * Get AlarmingDB object

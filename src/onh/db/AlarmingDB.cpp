@@ -21,11 +21,6 @@
 
 using namespace onh;
 
-AlarmingDB::AlarmingDB():
-    DB()
-{
-}
-
 AlarmingDB::AlarmingDB(MYSQL *connDB):
     DB(connDB)
 {

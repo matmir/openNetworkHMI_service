@@ -21,11 +21,6 @@
 
 using namespace onh;
 
-Config::Config():
-    DB()
-{
-}
-
 Config::Config(MYSQL *connDB):
     DB(connDB)
 {

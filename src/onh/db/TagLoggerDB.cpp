@@ -21,11 +21,6 @@
 
 using namespace onh;
 
-TagLoggerDB::TagLoggerDB():
-    DB()
-{
-}
-
 TagLoggerDB::TagLoggerDB(const TagLoggerDB &tlDB):
     DB(tlDB)
 {

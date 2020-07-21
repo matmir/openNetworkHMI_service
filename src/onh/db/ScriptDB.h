@@ -47,6 +47,11 @@ namespace onh {
             virtual ~ScriptDB();
 
             /**
+			 * Assign operator - inactive
+			 */
+            ScriptDB& operator=(const ScriptDB&) = delete;
+
+            /**
              * Get script items from DB
              *
              * @param enabled Get only enabled scripts
@@ -70,10 +75,6 @@ namespace onh {
             void clearScriptLock(const ScriptItem& script);
 
         private:
-            /**
-             * Default constructor (allowed only from DBManager)
-             */
-            ScriptDB();
 
             /**
              * Constructor with connection param (allowed only from DBManager)
@@ -81,11 +82,6 @@ namespace onh {
              * @param connection Connection handle
              */
             ScriptDB(MYSQL *connDB);
-
-            /**
-             * Assign operator
-             */
-            void operator=(const ScriptDB&) {};
     };
 
 }

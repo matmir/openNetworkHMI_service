@@ -31,6 +31,7 @@ namespace onh {
     class DB {
 
         public:
+
             /**
              * DB constructor
              *
@@ -48,9 +49,12 @@ namespace onh {
 
             virtual ~DB();
 
-        protected:
+            /**
+			 * Assign operator - inactive
+			 */
+            DB& operator=(const DB&) = delete;
 
-            DB();
+        protected:
 
             /**
              * Copy constructor
@@ -78,11 +82,6 @@ namespace onh {
             /// DB connection instance
             MYSQL *conn;
 
-        private:
-            /**
-             * Assign operator
-             */
-            void operator=(const DB&) {};
     };
 
 }

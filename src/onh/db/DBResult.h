@@ -37,7 +37,17 @@ namespace onh {
 
             friend class DB;
 
+            /**
+			 * Copy constructor - inactive
+			 */
+			DBResult(const DBResult&) = delete;
+
             virtual ~DBResult();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            DBResult& operator=(const DBResult&) = delete;
 
             /**
              * Get string value from result
@@ -107,27 +117,13 @@ namespace onh {
             unsigned long int rowsCount();
 
         private:
+
             /**
              * Default constructor (allowed only from DB)
-             */
-            DBResult();
-
-            /**
-             * Copy constructor
-             */
-            DBResult(const DBResult&) {};
-
-            /**
-             * Assign operator
-             */
-            void operator=(const DBResult&) {};
-
-            /**
-             * Store result from MySQL into structures
              *
              * @param DBConn Connection handle
              */
-            void storeResult(MYSQL *DBConn);
+            DBResult(MYSQL *DBConn);
 
             /**
              * Get field name position in result

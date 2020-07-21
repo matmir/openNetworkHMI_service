@@ -22,11 +22,6 @@
 
 using namespace onh;
 
-ScriptDB::ScriptDB():
-    DB()
-{
-}
-
 ScriptDB::ScriptDB(const ScriptDB &sDB):
     DB(sDB)
 {

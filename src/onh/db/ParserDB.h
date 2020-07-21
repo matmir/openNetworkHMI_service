@@ -51,6 +51,11 @@ namespace onh {
             virtual ~ParserDB();
 
             /**
+			 * Assign operator - inactive
+			 */
+            ParserDB& operator=(const ParserDB&) = delete;
+
+            /**
              * Get Tag data from DB
              *
              * @param tagName String with tag name
@@ -75,10 +80,6 @@ namespace onh {
             AlarmingDB& getAlarmDB();
 
         private:
-            /**
-             * Assign operator
-             */
-            void operator=(const ParserDB&) {};
 
             /**
              * Get Tag object from SQL resultset

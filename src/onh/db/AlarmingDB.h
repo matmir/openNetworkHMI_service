@@ -51,6 +51,11 @@ namespace onh {
             virtual ~AlarmingDB();
 
             /**
+			 * Assign operator - inactive
+			 */
+            AlarmingDB& operator=(const AlarmingDB&) = delete;
+
+            /**
              * Get Alarm definition items from DB
              *
              * @param enabled Get only enabled alarm definitions
@@ -82,10 +87,6 @@ namespace onh {
             void ackAlarm(unsigned int apadid=0);
 
         private:
-            /**
-             * Default constructor (allowed only from DBManager)
-             */
-            AlarmingDB();
 
             /**
              * Constructor with connection param (allowed only from DBManager)
@@ -93,11 +94,6 @@ namespace onh {
              * @param connection Connection handle
              */
             AlarmingDB(MYSQL *connDB);
-
-            /**
-             * Assign operator
-             */
-            void operator=(const AlarmingDB&) {};
     };
 
 }

@@ -21,11 +21,6 @@
 
 using namespace onh;
 
-DB::DB():
-    conn(0)
-{
-}
-
 DB::DB(MYSQL *connDB):
     conn(connDB)
 {
@@ -66,8 +61,6 @@ bool DB::checkStringValue(std::string val)
 
 DBResult* DB::executeQuery(const std::string &q) {
 
-    DBResult* res = 0;
-
     if (!conn)
         throw DBException("Connection not initialized", "DB::executeQuery");
 
@@ -78,11 +71,7 @@ DBResult* DB::executeQuery(const std::string &q) {
         throw DBException(s.str(), "DB::executeQuery");
 	}
 
-	// Return result set
-	res = new DBResult();
-	res->storeResult(conn);
-
-	return res;
+	return new DBResult(conn);
 }
 
 void DB::executeSaveQuery(const std::string &q) {

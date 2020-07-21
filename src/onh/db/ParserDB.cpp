@@ -24,10 +24,8 @@
 using namespace onh;
 
 ParserDB::ParserDB(const DBCredentials & dbData):
-	DB()
+	DB(mysql_init(NULL))
 {
-	// Inicialize connection struct
-	conn = mysql_init(NULL);
 
 	// Check initializations
 	if (!conn)

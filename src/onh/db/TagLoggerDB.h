@@ -48,6 +48,11 @@ namespace onh {
             virtual ~TagLoggerDB();
 
             /**
+			 * Assign operator - inactive
+			 */
+            TagLoggerDB& operator=(const TagLoggerDB&) = delete;
+
+            /**
              * Get Tag logger items from DB
              *
              * @param enabled Get only enabled loggers
@@ -64,10 +69,6 @@ namespace onh {
 			void logTag(const TagLoggerItem& loggerItem);
 
         private:
-            /**
-             * Default constructor (allowed only from DBManager)
-             */
-            TagLoggerDB();
 
             /**
              * Constructor with connection param (allowed only from DBManager)
@@ -75,11 +76,6 @@ namespace onh {
              * @param connection Connection handle
              */
             TagLoggerDB(MYSQL *connDB);
-
-            /**
-             * Assign operator
-             */
-            void operator=(const TagLoggerDB&) {};
     };
 
 }

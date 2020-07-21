@@ -21,50 +21,45 @@
 
 using namespace onh;
 
-DBResult::DBResult():
-    conn(0), result(0), fields(0), row(0)
+DBResult::DBResult(MYSQL *DBConn):
+    conn(0), result(0), fields(0), row(0), fieldsCount(0)
 {
-    fieldsCount = 0;
+	conn = DBConn;
+
+	// Get data from DB
+	result = mysql_store_result(conn);
+
+	if (!result && mysql_errno(conn)) {
+		std::stringstream s;
+		s << "Store result error: " << mysql_error(conn);
+		throw DBException(s.str(), "DBResult::DBResult");
+	}
+
+	// Get fields count
+	fieldsCount = mysql_num_fields(result);
+
+	if (fieldsCount==0 && mysql_errno(conn)) {
+		std::stringstream s;
+		s << "Get fields count error: " << mysql_error(conn);
+		throw DBException(s.str(), "DBResult::DBResult");
+	}
+
+	// Get field names
+	if (fieldsCount) {
+		fields = mysql_fetch_fields(result);
+
+		if (!fields && mysql_errno(conn)) {
+			std::stringstream s;
+			s << "Get fields error: " << mysql_error(conn);
+			throw DBException(s.str(), "DBResult::DBResult");
+		}
+	}
 }
 
 DBResult::~DBResult()
 {
     // Release memory
     mysql_free_result(result);
-}
-
-void DBResult::storeResult(MYSQL *DBConn) {
-
-    conn = DBConn;
-
-    // Get data from DB
-    result = mysql_store_result(conn);
-
-    if (!result && mysql_errno(conn)) {
-        std::stringstream s;
-        s << "Store result error: " << mysql_error(conn);
-        throw DBException(s.str(), "DBResult::storeResult");
-    }
-
-    // Get fields count
-    fieldsCount = mysql_num_fields(result);
-
-    if (fieldsCount==0 && mysql_errno(conn)) {
-        std::stringstream s;
-        s << "Get fields count error: " << mysql_error(conn);
-        throw DBException(s.str(), "DBResult::storeResult");
-    }
-
-    // Get field names
-    if (fieldsCount) {
-        fields = mysql_fetch_fields(result);
-
-        if (!fields && mysql_errno(conn)) {
-            std::stringstream s;
-            s << "Get fields error: " << mysql_error(conn);
-            throw DBException(s.str(), "DBResult::storeResult");
-        }
-    }
 }
 
 unsigned int DBResult::getFieldPos(const std::string &fName) {
