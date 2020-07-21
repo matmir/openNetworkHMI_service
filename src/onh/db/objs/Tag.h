@@ -55,7 +55,17 @@ namespace onh {
              */
             Tag(unsigned int id, const std::string& name, const TagType& type, const processDataAddress& address);
 
+            /**
+			 * Copy constructor - default
+			 */
+            Tag(const Tag&) = default;
+
             virtual ~Tag();
+
+            /**
+			 * Assign operator - default
+			 */
+            Tag& operator=(const Tag&) = default;
 
             /**
 			 * Get Tag identifier

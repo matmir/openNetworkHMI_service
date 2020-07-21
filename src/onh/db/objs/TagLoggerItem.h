@@ -79,7 +79,17 @@ namespace onh {
                           const std::string& lastValue,
                           bool enable);
 
+            /**
+			 * Copy constructor - default
+			 */
+            TagLoggerItem(const TagLoggerItem&) = default;
+
             virtual ~TagLoggerItem();
+
+            /**
+			 * Assign operator - default
+			 */
+            TagLoggerItem& operator=(const TagLoggerItem&) = default;
 
             /**
              * Get Tag logger identifier
