@@ -43,8 +43,7 @@ namespace onh {
         public:
 
     		ShmException();
-
-            virtual ~ShmException() throw();
+            virtual ~ShmException() noexcept;
 
             /**
              * Exception constructor with message
@@ -57,7 +56,7 @@ namespace onh {
              * Exception constructor with message and function name
              *
              * @param exceptionMSG Exception additional info
-             * @param funcName Function from which exception was throwed
+             * @param funcName Function from which exception was thrown
              */
             ShmException(const std::string& exceptionMSG, const std::string& funcName);
 
@@ -66,13 +65,13 @@ namespace onh {
              *
              * @return Exception message
              */
-            virtual const char* what() const throw();
+            virtual const char* what() const noexcept;
 
         private:
             /// String with the error message
             std::string errorMessage;
 
-            /// Function from which exception was throwed
+            /// Function from which exception was thrown
             std::string functionName;
 
             /// Full error message

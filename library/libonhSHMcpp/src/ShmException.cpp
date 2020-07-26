@@ -48,11 +48,11 @@ ShmException::ShmException(const std::string& exceptionMSG, const std::string& f
 	allMessage += errorMessage;
 }
 
-ShmException::~ShmException() throw()
+ShmException::~ShmException() noexcept
 {
 }
 
-const char* ShmException::what() const throw() {
+const char* ShmException::what() const noexcept {
 
     return allMessage.c_str();
 }
