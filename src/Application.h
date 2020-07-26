@@ -37,20 +37,31 @@ namespace onh {
 
         public:
 
-            /**
-             * Application constructor
-             * @param test Test environment flag
-             */
-            Application(bool test);
+    		/**
+			 * Application constructor
+			 *
+			 * @param test Test environment flag
+			 */
+			Application(bool test);
 
-            /**
-             * Start application
-             *
-             * @return Return value to the system
-             */
-            int start();
+    		/**
+			 * Copy constructor - inactive
+			 */
+    		Application(const Application&) = delete;
 
             virtual ~Application();
+
+            /**
+			 * Assignment operator - inactive
+			 */
+            Application& operator=(const Application&) = delete;
+
+            /**
+			 * Start application
+			 *
+			 * @return Return value to the system
+			 */
+			int start();
 
         private:
 

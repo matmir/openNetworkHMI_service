@@ -25,8 +25,6 @@ using namespace onh;
 
 int main(int argc, char *argv[]) {
 
-    int ret = 0;
-
     // Test environment flag
     bool testEnv = false;
 
@@ -38,17 +36,8 @@ int main(int argc, char *argv[]) {
     	}
     }
 
-    try {
+    // Create application
+	Application app(testEnv);
 
-    	// Create application
-		Application app(testEnv);
-
-		// Run application
-		ret = app.start();
-
-    } catch (Exception &e) {
-    	std::cout << e.what() << std::endl;
-    }
-
-	return ret;
+	return app.start();
 }

@@ -29,7 +29,6 @@ Application::Application(bool test):
 {
     // Create logger
     log = new Logger("mainProg","main_");
-    log->write("Application starting...");
 
     // Create tag logger buffer container
     tagLoggerBuffer = new TagLoggerBufferContainer();
@@ -72,6 +71,8 @@ int Application::start() {
 
     try {
 
+    	log->write("Application starting...");
+
         // Initialize database connection
         initDB();
 
@@ -90,7 +91,7 @@ int Application::start() {
         // Run all threads
         runThreads();
 
-    } catch (Exception &e) {
+    } catch (std::exception &e) {
 
         log->write(e.what());
 
