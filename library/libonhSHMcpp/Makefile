@@ -1,5 +1,5 @@
 CC		:= g++
-CFLAGS	:= -Wall -std=c++14
+CFLAGS	:= -Wall -std=c++17
 INCLUDE	:= -Iinclude/
 
 BUILD    := ./build
