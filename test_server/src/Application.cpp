@@ -60,7 +60,7 @@ void Application::run() {
 			exitProg = shmServer.isExitFlag();
 
 			d.wait();
-			d.stopDelay();
+
 		} catch(std::exception &e) {
 
 			exitProg = true;

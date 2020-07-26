@@ -151,12 +151,12 @@ void Delay::wait() {
 		throw Exception("Timer already running", "Delay::wait");
 	}
 
-	// Seconds
-	long int seconds = itsMsec / 1000;
-	// milliseconds
-	long int ms = itsMsec % 1000;
-	// nanoseconds
-	long nst = ms * 1000000;
+    // Convert to nanoseconds
+    long int ns = itsMsec*1000000;
+    // Seconds
+    long int seconds = ns / 1000000000L;
+    // nanoseconds
+    long nst = ns % 1000000000L;
 
     // Configure time structure
     struct timespec time1 = {0};

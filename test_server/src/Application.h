@@ -27,21 +27,43 @@
 class Application {
 
 	public:
+
+		/**
+		 * Application constructor
+		 *
+		 * @param smem Shared memory segment name
+		 * @param exSignal Exit signal pointer
+		 */
 		Application(const std::string &smem, bool *exSignal);
+
+		/**
+		 * Copy constructor - inactive
+		 */
+		Application(const Application&) = delete;
+
 		virtual ~Application();
 
+		/**
+		 * Assignment operator - inactive
+		 */
+		Application& operator=(const Application&) = delete;
+
+		/**
+		 * Run application
+		 */
 		void run();
 
 	private:
-		// SHM server
+
+		/// SHM server
 		onh::ShmServer shmServer;
 
 		onh::processDataAccess* pda;
 
-		// Exit program flag
+		/// Exit program flag
 		bool exitProg;
 
-		// Handle for exit signal flag
+		/// Handle for exit signal flag
 		bool *exitSignal;
 
 		/**
