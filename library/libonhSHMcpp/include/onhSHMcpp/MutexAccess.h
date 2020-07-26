@@ -30,7 +30,7 @@
 #ifndef SRC_DRIVER_SHMSERVER_MUTEXACCESS_H
 #define SRC_DRIVER_SHMSERVER_MUTEXACCESS_H
 
-#include <pthread.h>
+#include <mutex>
 #include "ShmException.h"
 
 namespace onh {
@@ -77,6 +77,10 @@ namespace onh {
 
             /**
              * Assign operator
+             *
+             * @param ma MutexAccess object
+             *
+             * @return MutexAccess
              */
             MutexAccess& operator=(const MutexAccess& ma);
 
@@ -87,10 +91,10 @@ namespace onh {
              *
              * @param mcLock mutex handle
              */
-            MutexAccess(pthread_mutex_t* mcLock);
+            MutexAccess(std::mutex* mcLock);
 
             /// Handle for mutex
-            pthread_mutex_t* itsLock;
+            std::mutex* itsLock;
     };
 
 }

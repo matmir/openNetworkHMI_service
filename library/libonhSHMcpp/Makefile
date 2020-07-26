@@ -1,5 +1,5 @@
 CC		:= g++
-CFLAGS	:= -Wall -std=c++17
+CFLAGS	:= -Wall -std=c++17 -Wno-int-in-bool-context
 INCLUDE	:= -Iinclude/
 
 BUILD    := ./build

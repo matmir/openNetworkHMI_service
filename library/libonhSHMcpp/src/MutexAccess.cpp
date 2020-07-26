@@ -28,11 +28,13 @@
  */
 
 #include "onhSHMcpp/MutexAccess.h"
+#include <system_error>
+#include <sstream>
 
 using namespace onh;
 
 MutexAccess::MutexAccess():
-    itsLock(0)
+    itsLock(nullptr)
 {
 }
 
@@ -41,7 +43,7 @@ MutexAccess::MutexAccess(const MutexAccess& ma):
 {
 }
 
-MutexAccess::MutexAccess(pthread_mutex_t* mcLock):
+MutexAccess::MutexAccess(std::mutex* mcLock):
     itsLock(mcLock)
 {
 }
@@ -57,8 +59,15 @@ void MutexAccess::lock() {
     }
 
     // Lock access to the data
-	if (pthread_mutex_lock(itsLock) != 0) {
-		throw ShmException("Lock mutex error", "MutexAccess::lock");
+	try {
+
+		itsLock->lock();
+
+	} catch (const std::system_error& e) {
+		std::stringstream s;
+		s << "Lock mutex error code: " << e.code() << ", error: " << e.what();
+
+		throw ShmException(s.str(), "MutexAccess::lock");
 	}
 }
 
@@ -69,7 +78,7 @@ bool MutexAccess::tryLock() {
     }
 
     // Try lock access to the data
-	return (pthread_mutex_trylock(itsLock)==0)?(true):(false);
+	return itsLock->try_lock();
 }
 
 void MutexAccess::unlock() {
@@ -78,10 +87,8 @@ void MutexAccess::unlock() {
         throw ShmException("Lock mechanism not initialized", "MutexAccess::unlock");
     }
 
-    // Lock access to the data
-	if (pthread_mutex_unlock(itsLock) != 0) {
-		throw ShmException("Unlock mutex error", "MutexAccess::unlock");
-	}
+    // Unlock access to the data
+	itsLock->unlock();
 }
 
 MutexAccess& MutexAccess::operator=(const MutexAccess& ma) {

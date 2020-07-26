@@ -44,6 +44,7 @@ namespace onh {
 	class ShmServer {
 
 		public:
+
 			/**
 			 * Shared memory server constructor
 			 *
@@ -51,7 +52,17 @@ namespace onh {
 			 */
 			ShmServer(const std::string& shmSegmentName);
 
+			/**
+			 * Copy constructor - inactive
+			 */
+			ShmServer(const ShmServer&) = delete;
+
 			virtual ~ShmServer();
+
+			/**
+			 * Assignment operator - inactive
+			 */
+			ShmServer& operator=(const ShmServer&) = delete;
 
 			/**
 			 * Parse client commands

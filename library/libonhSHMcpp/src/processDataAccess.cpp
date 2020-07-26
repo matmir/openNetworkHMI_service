@@ -32,11 +32,6 @@
 
 using namespace onh;
 
-processDataAccess::processDataAccess():
-	process(0)
-{
-}
-
 processDataAccess::processDataAccess(processData *processDT, const MutexAccess& lock):
 	process(processDT), processLock(lock)
 {

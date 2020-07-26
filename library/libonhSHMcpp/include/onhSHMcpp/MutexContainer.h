@@ -30,7 +30,7 @@
 #ifndef SRC_DRIVER_SHMSERVER_MUTEXCONTAINER_H
 #define SRC_DRIVER_SHMSERVER_MUTEXCONTAINER_H
 
-#include <pthread.h>
+#include <mutex>
 #include "MutexAccess.h"
 #include "ShmException.h"
 
@@ -45,7 +45,17 @@ namespace onh {
 
             MutexContainer();
 
+            /**
+			 * Copy constructor - inactive
+			 */
+			MutexContainer(const MutexContainer&) = delete;
+
             virtual ~MutexContainer();
+
+            /**
+			 * Assign operator - inactive
+			 */
+            MutexContainer& operator=(const MutexContainer&) = delete;
 
             /**
              * Lock mutex
@@ -72,18 +82,9 @@ namespace onh {
             MutexAccess getAccess();
 
         private:
-            /**
-             * Copy constructor
-             */
-            MutexContainer(const MutexContainer&) {};
-
-            /**
-             * Assign operator
-             */
-            void operator=(const MutexContainer&) {};
 
             /// Mutex
-            pthread_mutex_t itsLock;
+            std::mutex itsLock;
     };
 
 }

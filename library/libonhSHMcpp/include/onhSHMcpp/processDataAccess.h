@@ -59,6 +59,11 @@ namespace onh {
 			virtual ~processDataAccess();
 
 			/**
+			 * Assign operator - inactive
+			 */
+			processDataAccess& operator=(const processDataAccess&) = delete;
+
+			/**
 			 * Get bit from process data
 			 *
 			 * @param addr Process data address
@@ -207,10 +212,6 @@ namespace onh {
 			void clear(bool processIn = true, bool processOut = true, bool processMem = true);
 
 		private:
-			/**
-			 * Default constructor (allowed only from ShmServer)
-			 */
-			processDataAccess();
 
 			/**
 			 * Constructor with parameters (allowed only from ShmServer)
@@ -219,11 +220,6 @@ namespace onh {
 			 * @param lock Mutex access for protecting process data
 			 */
 			processDataAccess(processData *processDT, const MutexAccess& lock);
-
-			/**
-			 * Assign operator
-			 */
-			void operator=(const processDataAccess &pda) {};
 
 			/**
 			 * Check bit address in address
