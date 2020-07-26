@@ -39,22 +39,23 @@
 /**
  * 			Client - Server communication description.
  *
- *				Communication is realized based on Client - Server concept: client sends request, server is responding.
+ *				Communication is realized based on Client - Server concept: client sends a request and the server is responding.
  * 				There is only one server and one client!
  *
- * 				If client wants to send request to server he lock requestMutex, check that requestIn, replyIn are 0, write command data,
+ * 				If a client wants to send a request to the server, locks requestMutex, check that requestIn, replyIn are 0, write the command data,
  * 				set requestIn=1, unlock requestMutex and wait on signal from replyCondvar variable.
  *
- *				Server is checking in loop requestIn flag (if requestMutex is locked, he skipped - pthread_mutex_trylock).
- *				If requestIn is set he read request data, writes reply data, set requestIn=0, replyIn=1 and send signal to replyCondvar variable.
+ *				The server checks the requestIn flag in the loop.
+ *				If the requestIn is set, reads request data, executes request command, writes reply data, set requestIn=0,
+ *				replyIn=1 and send signal to the replyCondvar variable.
  *
- *				When client receive signal from replyCondvar he read reply and clear replyIn flag.
+ *				When the client receives a signal from the replyCondvar, reads reply and clears replyIn flag.
  *
  *			Client - Server process data exchange description.
  *
- *				If client wants to read process data he lock processMutex, read data and unlock processMutex.
+ *				If a client wants to read the process data, locks processMutex, reads data and unlocks processMutex.
  *
- *				If server wants to write process data he try to lock processMutex - pthread_mutex_trylock, write data and unlock processMutex.
+ *				If the server wants to write the process data, tries to lock processMutex, writes data and unlocks processMutex.
  */
 
 /**
