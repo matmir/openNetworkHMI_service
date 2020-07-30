@@ -68,6 +68,14 @@ void DBManager::initConnections() {
     if (!connScript)
         throw Exception("Can not initialize ScriptDB structures", "DBManager::initConnections");
 
+    // Reconnect option
+	bool reconnect = true;
+	mysql_options(connDB, MYSQL_OPT_RECONNECT, &reconnect);
+	mysql_options(connAlarming, MYSQL_OPT_RECONNECT, &reconnect);
+	mysql_options(connTagLogger, MYSQL_OPT_RECONNECT, &reconnect);
+	mysql_options(connTagLoggerWriter, MYSQL_OPT_RECONNECT, &reconnect);
+	mysql_options(connScript, MYSQL_OPT_RECONNECT, &reconnect);
+
     // Create connection for DB manager
     if (!mysql_real_connect(connDB, dbC.addr.c_str(), dbC.user.c_str(), dbC.pass.c_str(), dbC.db.c_str(), 0, NULL, 0)) {
         std::stringstream s;
