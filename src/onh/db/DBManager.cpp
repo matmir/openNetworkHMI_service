@@ -70,11 +70,21 @@ void DBManager::initConnections() {
 
     // Reconnect option
 	bool reconnect = true;
-	mysql_options(connDB, MYSQL_OPT_RECONNECT, &reconnect);
-	mysql_options(connAlarming, MYSQL_OPT_RECONNECT, &reconnect);
-	mysql_options(connTagLogger, MYSQL_OPT_RECONNECT, &reconnect);
-	mysql_options(connTagLoggerWriter, MYSQL_OPT_RECONNECT, &reconnect);
-	mysql_options(connScript, MYSQL_OPT_RECONNECT, &reconnect);
+	if (mysql_options(connDB, MYSQL_OPT_RECONNECT, &reconnect)) {
+		throw Exception("Invalid MySQL option for DB manager", "DBManager::initConnections");
+	}
+	if (mysql_options(connAlarming, MYSQL_OPT_RECONNECT, &reconnect)) {
+		throw Exception("Invalid MySQL option for AlarmingDB", "DBManager::initConnections");
+	}
+	if (mysql_options(connTagLogger, MYSQL_OPT_RECONNECT, &reconnect)) {
+		throw Exception("Invalid MySQL option for TagLoggerDB", "DBManager::initConnections");
+	}
+	if (mysql_options(connTagLoggerWriter, MYSQL_OPT_RECONNECT, &reconnect)) {
+		throw Exception("Invalid MySQL option for TagLoggerWriterDB", "DBManager::initConnections");
+	}
+	if (mysql_options(connScript, MYSQL_OPT_RECONNECT, &reconnect)) {
+		throw Exception("Invalid MySQL option for ScriptDB", "DBManager::initConnections");
+	}
 
     // Create connection for DB manager
     if (!mysql_real_connect(connDB, dbC.addr.c_str(), dbC.user.c_str(), dbC.pass.c_str(), dbC.db.c_str(), 0, NULL, 0)) {
