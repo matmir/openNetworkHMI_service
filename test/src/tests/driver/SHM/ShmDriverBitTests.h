@@ -39,7 +39,7 @@ TEST_F(shmDriverTests, setInputBit) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->setBit(testAddr);
+	shmWriter->setBit(testAddr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -77,7 +77,7 @@ TEST_F(shmDriverTests, setOutputBit) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->setBit(testAddr);
+	shmWriter->setBit(testAddr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -115,7 +115,7 @@ TEST_F(shmDriverTests, setMemoryBit) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->setBit(testAddr);
+	shmWriter->setBit(testAddr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -143,13 +143,13 @@ TEST_F(shmDriverTests, exceptionSetBit1) {
 
 	try {
 
-		shmDriver->setBit({onh::PDA_INPUT, PROCESS_DT_SIZE+10, 0});
+		shmWriter->setBit({onh::PDA_INPUT, PROCESS_DT_SIZE+10, 0});
 
 		FAIL() << "Expected onh::DriverException";
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmDriver::modifyBit: Byte address is out of range");
+		ASSERT_STREQ(e.what(), "ShmProcessWriter::modifyBit: Byte address is out of range");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -163,7 +163,7 @@ TEST_F(shmDriverTests, exceptionSetBit2) {
 
 	try {
 
-		shmDriver->setBit({onh::PDA_INPUT, 45, 9});
+		shmWriter->setBit({onh::PDA_INPUT, 45, 9});
 
 		FAIL() << "Expected onh::DriverException";
 
@@ -183,13 +183,13 @@ TEST_F(shmDriverTests, exceptionSetBit3) {
 
 	try {
 
-		shmDriver->setBit({(onh::processDataArea)70, 45, 3});
+		shmWriter->setBit({(onh::processDataArea)70, 45, 3});
 
 		FAIL() << "Expected onh::DriverException";
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmDriver::modifyBit: Wrong address area");
+		ASSERT_STREQ(e.what(), "ShmProcessWriter::modifyBit: Wrong address area");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -209,7 +209,7 @@ TEST_F(shmDriverTests, exceptionGetBit1) {
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmProcessReader::getBitValue: Byte address is out of range");
+		ASSERT_STREQ(e.what(), "ShmProcessData::getBitValue: Byte address is out of range");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -249,7 +249,7 @@ TEST_F(shmDriverTests, exceptionGetBit3) {
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmProcessReader::getBitValue: Wrong address area");
+		ASSERT_STREQ(e.what(), "ShmProcessData::getBitValue: Wrong address area");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -273,7 +273,7 @@ TEST_F(shmDriverTests, invertInputBit) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->invertBit(testAddr);
+	shmWriter->invertBit(testAddr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -311,7 +311,7 @@ TEST_F(shmDriverTests, invertOutputBit) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->invertBit(testAddr);
+	shmWriter->invertBit(testAddr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -349,7 +349,7 @@ TEST_F(shmDriverTests, invertMemoryBit) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->invertBit(testAddr);
+	shmWriter->invertBit(testAddr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -388,14 +388,14 @@ TEST_F(shmDriverTests, resetInputBit) {
 	ASSERT_FALSE(shmReader->getBitValue(testAddr));
 
 	// 1001 1110
-	shmDriver->writeByte(testAddr, 158);
+	shmWriter->writeByte(testAddr, 158);
 
 	// Wait on synchronization
 	waitOnSyncBit();
 
 	ASSERT_TRUE(shmReader->getBitValue(testAddr));
 
-	shmDriver->resetBit(testAddr);
+	shmWriter->resetBit(testAddr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -432,14 +432,14 @@ TEST_F(shmDriverTests, resetOutputBit) {
 	ASSERT_FALSE(shmReader->getBitValue(testAddr));
 
 	// 1001 1110
-	shmDriver->writeByte(testAddr, 158);
+	shmWriter->writeByte(testAddr, 158);
 
 	// Wait on synchronization
 	waitOnSyncBit();
 
 	ASSERT_TRUE(shmReader->getBitValue(testAddr));
 
-	shmDriver->resetBit(testAddr);
+	shmWriter->resetBit(testAddr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -476,14 +476,14 @@ TEST_F(shmDriverTests, resetMemoryBit) {
 	ASSERT_FALSE(shmReader->getBitValue(testAddr));
 
 	// 1001 1110
-	shmDriver->writeByte(testAddr, 158);
+	shmWriter->writeByte(testAddr, 158);
 
 	// Wait on synchronization
 	waitOnSyncBit();
 
 	ASSERT_TRUE(shmReader->getBitValue(testAddr));
 
-	shmDriver->resetBit(testAddr);
+	shmWriter->resetBit(testAddr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -521,7 +521,7 @@ TEST_F(shmDriverTests, setInputBits) {
 	}
 
 	// 00001101
-	shmDriver->setBits(addr);
+	shmWriter->setBits(addr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -557,7 +557,7 @@ TEST_F(shmDriverTests, setOutputBits) {
 	}
 
 	// 00001101
-	shmDriver->setBits(addr);
+	shmWriter->setBits(addr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -593,7 +593,7 @@ TEST_F(shmDriverTests, setMemoryBits) {
 	}
 
 	// 00001101
-	shmDriver->setBits(addr);
+	shmWriter->setBits(addr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -629,7 +629,7 @@ TEST_F(shmDriverTests, setBits1) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->setBits(addr);
+	shmWriter->setBits(addr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -670,13 +670,13 @@ TEST_F(shmDriverTests, exceptionSetBits1) {
 
 	try {
 
-		shmDriver->setBits(addr);
+		shmWriter->setBits(addr);
 
 		FAIL() << "Expected onh::DriverException";
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmDriver::setBits: Byte address is out of range");
+		ASSERT_STREQ(e.what(), "ShmProcessWriter::setBits: Byte address is out of range");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -697,7 +697,7 @@ TEST_F(shmDriverTests, exceptionSetBits2) {
 
 	try {
 
-		shmDriver->setBits(addr);
+		shmWriter->setBits(addr);
 
 		FAIL() << "Expected onh::DriverException";
 
@@ -724,13 +724,13 @@ TEST_F(shmDriverTests, exceptionSetBits3) {
 
 	try {
 
-		shmDriver->setBits(addr);
+		shmWriter->setBits(addr);
 
 		FAIL() << "Expected onh::DriverException";
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmDriver::setBits: Wrong address area");
+		ASSERT_STREQ(e.what(), "ShmProcessWriter::setBits: Wrong address area");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -755,14 +755,14 @@ TEST_F(shmDriverTests, exceptionSetBits4) {
 
 	try {
 
-		shmDriver->setBits(addr);
+		shmWriter->setBits(addr);
 
 		FAIL() << "Expected onh::DriverException";
 
 	} catch (onh::DriverException &e) {
 
 		std::stringstream s;
-		s << "ShmDriver::setBits: ";
+		s << "ShmProcessWriter::setBits: ";
 		s << "Too much bits to set - max numbers bits to set is " << maxTags << " received " << addr.size();
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
@@ -794,7 +794,7 @@ TEST_F(shmDriverTests, getBits1) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->setBits(addr);
+	shmWriter->setBits(addr);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -851,7 +851,7 @@ TEST_F(shmDriverTests, exceptionGetBits1) {
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmProcessReader::getBitValue: Byte address is out of range");
+		ASSERT_STREQ(e.what(), "ShmProcessData::getBitValue: Byte address is out of range");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -905,7 +905,7 @@ TEST_F(shmDriverTests, exceptionGetBits3) {
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmProcessReader::getBitValue: Wrong address area");
+		ASSERT_STREQ(e.what(), "ShmProcessData::getBitValue: Wrong address area");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";

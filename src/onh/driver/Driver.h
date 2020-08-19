@@ -24,6 +24,8 @@
 #include "DriverBuffer.h"
 #include "DriverUtils.h"
 #include "DriverProcessReader.h"
+#include "DriverProcessWriter.h"
+#include "DriverProcessUpdater.h"
 #include "DriverException.h"
 #include "DriverRegisterTypes.h"
 #include "ProcessDataTypes.h"
@@ -39,6 +41,7 @@ namespace onh {
 
 			/**
 			 * Default constructor
+			 *
 			 * @param logName Logger name
 			 */
 			Driver(const std::string& logName);
@@ -56,79 +59,6 @@ namespace onh {
 			Driver& operator=(const Driver&) = delete;
 
 			/**
-			 * Update process data (copy from controller)
-			 */
-			virtual void updateProcessData() = 0;
-
-			/**
-			 * Set bit in process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void setBit(processDataAddress addr) = 0;
-
-			/**
-			 * Reset bit in process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void resetBit(processDataAddress addr) = 0;
-
-			/**
-			 * Invert bit in process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void invertBit(processDataAddress addr) = 0;
-
-			/**
-			 * Set bits in process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void setBits(std::vector<processDataAddress> addr) = 0;
-
-			/**
-			 * Write byte in process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeByte(processDataAddress addr, BYTE val) = 0;
-
-			/**
-			 * Write word in process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeWord(processDataAddress addr, WORD val) = 0;
-
-			/**
-			 * Write double word in process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeDWord(processDataAddress addr, DWORD val) = 0;
-
-			/**
-			 * Write int in process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeInt(processDataAddress addr, int val) = 0;
-
-			/**
-			 * Write real in process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeReal(processDataAddress addr, float val) = 0;
-
-			/**
 			 * Get driver buffer handle
 			 *
 			 * @return Driver buffer handle
@@ -141,6 +71,20 @@ namespace onh {
 			 * @return Driver process data reader handle
 			 */
 			virtual DriverProcessReader* getReader() = 0;
+
+			/**
+			 * Get driver process data writer
+			 *
+			 * @return Driver process data writer handle
+			 */
+			virtual DriverProcessWriter* getWriter() = 0;
+
+			/**
+			 * Get driver process data updater
+			 *
+			 * @return Driver process data updater handle
+			 */
+			virtual DriverProcessUpdater* getUpdater() = 0;
 
 		protected:
 

@@ -21,8 +21,7 @@
 
 #include "../DriverProcessReader.h"
 #include "ModbusProcessData.h"
-#include "../../utils/MutexAccess.h"
-#include "ModbusProcessDataController.h"
+#include "../../utils/GuardDataController.h"
 
 namespace onh {
 
@@ -130,26 +129,15 @@ namespace onh {
 			/**
 			 * Constructor (allowed only from ModbusDriver)
 			 *
-			 * @param spdc Modbus process data controller
+			 * @param gdc Modbus process data controller
 			 */
-			ModbusProcessReader(const ModbusProcessDataController& spdc);
-
-			/// Maximum Byte address
-			unsigned int maxByteCount;
+			ModbusProcessReader(const GuardDataController<ModbusProcessData> &gdc);
 
 			/// Copy of the driver process data
 			ModbusProcessData process;
 
 			/// Driver process data controller
-			ModbusProcessDataController driverProcess;
-
-			/**
-			 * Trigger error
-			 *
-			 * @param msg Exception message
-			 * @param fName Function from which exception was throwed
-			 */
-			void triggerError(const std::string& msg, const std::string& fName);
+			GuardDataController<ModbusProcessData> driverProcess;
 	};
 
 }

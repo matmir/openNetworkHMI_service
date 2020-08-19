@@ -112,7 +112,7 @@ TEST_F(driverTests, processWriterSetBitException2) {
 
 		std::stringstream s;
 		s << "ProcessWriter::setBit: (" << testTag->getName() << "): ";
-		s << "ShmDriver::modifyBit: Byte address is out of range";
+		s << "ShmProcessWriter::modifyBit: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -211,7 +211,7 @@ TEST_F(driverTests, processWriterResetBitException2) {
 
 		std::stringstream s;
 		s << "ProcessWriter::resetBit: (" << testTag->getName() << "): ";
-		s << "ShmDriver::modifyBit: Byte address is out of range";
+		s << "ShmProcessWriter::modifyBit: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -322,7 +322,7 @@ TEST_F(driverTests, processWriterInvertBitException2) {
 
 		std::stringstream s;
 		s << "ProcessWriter::invertBit: (" << testTag->getName() << "): ";
-		s << "ShmDriver::modifyBit: Byte address is out of range";
+		s << "ShmProcessWriter::modifyBit: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -482,7 +482,7 @@ TEST_F(driverTests, processWriterSetBitsException3) {
 
 		std::stringstream s;
 		s << "ProcessWriter::setBits: ";
-		s << "ShmDriver::setBits: Byte address is out of range";
+		s << "ShmProcessWriter::setBits: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -578,7 +578,7 @@ TEST_F(driverTests, processWriterSetByteException2) {
 
 		std::stringstream s;
 		s << "ProcessWriter::writeByte: (" << testTag->getName() << "): ";
-		s << "ShmDriver::writeByte: Byte address is out of range";
+		s << "ShmProcessWriter::writeByte: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -678,7 +678,7 @@ TEST_F(driverTests, processWriterSetWordException2) {
 
 		std::stringstream s;
 		s << "ProcessWriter::writeWord: (" << testTag->getName() << "): ";
-		s << "ShmDriver::writeWord: Byte address is out of range";
+		s << "ShmProcessWriter::writeWord: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -790,7 +790,7 @@ TEST_F(driverTests, processWriterSetDWordException2) {
 
 		std::stringstream s;
 		s << "ProcessWriter::writeDWord: (" << testTag->getName() << "): ";
-		s << "ShmDriver::writeDWord: Byte address is out of range";
+		s << "ShmProcessWriter::writeDWord: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -890,7 +890,7 @@ TEST_F(driverTests, processWriterSetIntException2) {
 
 		std::stringstream s;
 		s << "ProcessWriter::writeInt: (" << testTag->getName() << "): ";
-		s << "ShmDriver::writeInt: Byte address is out of range";
+		s << "ShmProcessWriter::writeInt: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -990,7 +990,7 @@ TEST_F(driverTests, processWriterSetRealException2) {
 
 		std::stringstream s;
 		s << "ProcessWriter::writeReal: (" << testTag->getName() << "): ";
-		s << "ShmDriver::writeReal: Byte address is out of range";
+		s << "ShmProcessWriter::writeReal: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 

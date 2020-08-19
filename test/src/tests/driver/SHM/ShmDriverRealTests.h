@@ -34,7 +34,7 @@ TEST_F(shmDriverTests, writeInputReal) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->writeReal({onh::PDA_INPUT, 2, 0}, -49.709);
+	shmWriter->writeReal({onh::PDA_INPUT, 2, 0}, -49.709);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -67,7 +67,7 @@ TEST_F(shmDriverTests, writeOutputReal) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->writeReal({onh::PDA_OUTPUT, 2, 0}, -49.709);
+	shmWriter->writeReal({onh::PDA_OUTPUT, 2, 0}, -49.709);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -100,7 +100,7 @@ TEST_F(shmDriverTests, writeMemoryReal) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->writeReal({onh::PDA_MEMORY, 2, 0}, -49.709);
+	shmWriter->writeReal({onh::PDA_MEMORY, 2, 0}, -49.709);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -128,13 +128,13 @@ TEST_F(shmDriverTests, exceptionWriteReal1) {
 
 	try {
 
-		shmDriver->writeReal({onh::PDA_INPUT, PROCESS_DT_SIZE-3, 0}, -49.709);
+		shmWriter->writeReal({onh::PDA_INPUT, PROCESS_DT_SIZE-3, 0}, -49.709);
 
 		FAIL() << "Expected onh::DriverException";
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmDriver::writeReal: Byte address is out of range");
+		ASSERT_STREQ(e.what(), "ShmProcessWriter::writeReal: Byte address is out of range");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -148,7 +148,7 @@ TEST_F(shmDriverTests, exceptionWriteReal2) {
 
 	try {
 
-		shmDriver->writeReal({onh::PDA_INPUT, 80, 9}, -49.709);
+		shmWriter->writeReal({onh::PDA_INPUT, 80, 9}, -49.709);
 
 		FAIL() << "Expected onh::DriverException";
 
@@ -168,13 +168,13 @@ TEST_F(shmDriverTests, exceptionWriteReal3) {
 
 	try {
 
-		shmDriver->writeReal({(onh::processDataArea)8, 2, 4}, -49.709);
+		shmWriter->writeReal({(onh::processDataArea)8, 2, 4}, -49.709);
 
 		FAIL() << "Expected onh::DriverException";
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmDriver::writeReal: Wrong address area");
+		ASSERT_STREQ(e.what(), "ShmProcessWriter::writeReal: Wrong address area");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -194,7 +194,7 @@ TEST_F(shmDriverTests, exceptionReadReal1) {
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmProcessReader::getReal: Byte address is out of range");
+		ASSERT_STREQ(e.what(), "ShmProcessData::getReal: Byte address is out of range");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -234,7 +234,7 @@ TEST_F(shmDriverTests, exceptionReadReal3) {
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmProcessReader::getReal: Wrong address area");
+		ASSERT_STREQ(e.what(), "ShmProcessData::getReal: Wrong address area");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";

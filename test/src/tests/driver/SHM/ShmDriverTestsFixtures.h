@@ -35,8 +35,10 @@ class shmDriverTests: public ::testing::Test {
 			// Create SHM driver instance
 			shmDriver = new onh::ShmDriver(SHM_SEGMENT_NAME);
 
-			// Create reader
+			// Create reader/writer/updater
 			shmReader = shmDriver->getReader();
+			shmWriter = shmDriver->getWriter();
+			shmUpdater = shmDriver->getUpdater();
 
 			// Clear server process data
 			clearServerProcessData();
@@ -45,6 +47,12 @@ class shmDriverTests: public ::testing::Test {
 		void TearDown() override {
 			if (shmReader)
 				delete shmReader;
+
+			if (shmWriter)
+				delete shmWriter;
+
+			if (shmUpdater)
+				delete shmUpdater;
 
 			if (shmDriver)
 				delete shmDriver;
@@ -59,7 +67,7 @@ class shmDriverTests: public ::testing::Test {
 		void clearServerProcessData() {
 
 			// Set clear bit in server
-			shmDriver->setBit(BIT_CLEAR_PROCESS);
+			shmWriter->setBit(BIT_CLEAR_PROCESS);
 
 			// Wait on synchronization
 			waitOnSyncBit();
@@ -71,34 +79,34 @@ class shmDriverTests: public ::testing::Test {
 		void waitOnSyncBit() {
 
 			// Set sync bit server process data
-			shmDriver->setBit(BIT_SYNC);
+			shmWriter->setBit(BIT_SYNC);
 			// Wait until server copy modified process data to SHM
 			usleep(1500);
 			// Update local process data (copy from server)
-			shmDriver->updateProcessData();
+			shmUpdater->updateProcessData();
 			shmReader->updateProcessData();
 			// Check sync bit to be 1
 			while (!shmReader->getBitValue(BIT_SYNC)) {
 				// Sleep 1.5ms
 				usleep(1500);
 				// Update local process data (copy from server)
-				shmDriver->updateProcessData();
+				shmUpdater->updateProcessData();
 				shmReader->updateProcessData();
 			}
 
 			// Reset sync bit server process data
-			shmDriver->resetBit(BIT_SYNC);
+			shmWriter->resetBit(BIT_SYNC);
 			// Wait until server copy modified process data to SHM
 			usleep(1500);
 			// Update local process data (copy from server)
-			shmDriver->updateProcessData();
+			shmUpdater->updateProcessData();
 			shmReader->updateProcessData();
 			// Check sync bit to be 0
 			while (shmReader->getBitValue(BIT_SYNC)) {
 				// Sleep 1.5ms
 				usleep(1500);
 				// Update local process data (copy from server)
-				shmDriver->updateProcessData();
+				shmUpdater->updateProcessData();
 				shmReader->updateProcessData();
 			}
 		}
@@ -107,7 +115,11 @@ class shmDriverTests: public ::testing::Test {
 		onh::ShmDriver *shmDriver;
 
 		// driver process reader
-		onh::DriverProcessReader * shmReader;
+		onh::DriverProcessReader *shmReader;
+		// driver process writer
+		onh::DriverProcessWriter *shmWriter;
+		// driver process updater
+		onh::DriverProcessUpdater *shmUpdater;
 };
 
 #endif /* TESTS_DRIVER_SHM_SHMDRIVERTESTSFIXTURES_H_ */

@@ -16,44 +16,25 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ShmProcessDataContainer.h"
+#include "ModbusProcessUpdater.h"
 
 using namespace onh;
 
-ShmProcessDataContainer::ShmProcessDataContainer() {
-
+ModbusProcessUpdater::ModbusProcessUpdater(const GuardDataController<ModbusProcessData> &mbuff, const GuardDataController<ModbusProcessData> &gdc):
+	buff(mbuff), process(gdc)
+{
 }
 
-ShmProcessDataContainer::~ShmProcessDataContainer() {
+ModbusProcessUpdater::~ModbusProcessUpdater() {
 }
 
-ShmProcessDataController ShmProcessDataContainer::getController() {
+void ModbusProcessUpdater::updateProcessData() {
 
-	return ShmProcessDataController(processLock.getAccess(), &process);
+	// Copy data from buffer registers to the process data registers
+	process.setData(buff);
 }
 
-void ShmProcessDataContainer::update(const processData& newDT) {
+DriverProcessUpdater* ModbusProcessUpdater::createNew() {
 
-	// Lock access to the process data
-	processLock.lock();
-
-	process = newDT;
-
-	// Unlock access to the process data
-	processLock.unlock();
-}
-
-void ShmProcessDataContainer::clear() {
-
-	// Lock access to the process data
-	processLock.lock();
-
-	for (int i=0; i<PROCESS_DT_SIZE; ++i) {
-		process.in[i] = 0;
-		process.out[i] = 0;
-		process.mem[i] = 0;
-	}
-
-	// Unlock access to the process data
-	processLock.unlock();
+	return new ModbusProcessUpdater(buff, process);
 }

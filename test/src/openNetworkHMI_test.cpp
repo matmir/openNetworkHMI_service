@@ -31,6 +31,7 @@
 #include "tests/utils/MutexTests.h"
 #include "tests/utils/CycleTimeTests.h"
 #include "tests/utils/DelayTests.h"
+#include "tests/utils/GuardDataControllerTests.h"
 
 #include "tests/db/objs/TagTests.h"
 #include "tests/db/objs/TagLoggerItemTests.h"
@@ -53,6 +54,7 @@
 #include "tests/driver/ProcessReaderTests.h"
 #include "tests/driver/ProcessWriterTests.h"
 #include "tests/driver/ProcessUpdaterTests.h"
+#include <driver/SHM/ShmProcessWriter.h>
 
 using namespace std;
 
@@ -68,8 +70,13 @@ int main(int argc, char **argv) {
 
 		// Create SHM driver instance
 		onh::ShmDriver sDriver(SHM_SEGMENT_NAME);
+		onh::DriverProcessWriter *dWriter = sDriver.getWriter();
+		onh::ShmProcessWriter *sWriter = dynamic_cast<onh::ShmProcessWriter*>(dWriter);
+
 		// Close server app
-		sDriver.sendServerExitCommand();
+		sWriter->sendServerExitCommand();
+
+		delete sWriter;
 	} catch (onh::Exception &e) {
 		cout << e.what() << endl;
 	}

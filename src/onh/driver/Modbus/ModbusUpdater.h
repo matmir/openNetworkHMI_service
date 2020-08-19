@@ -23,7 +23,7 @@
 #include "../DriverException.h"
 #include "modbusmaster.h"
 #include "ModbusProcessData.h"
-#include "../../utils/MutexAccess.h"
+#include "../../utils/GuardDataController.h"
 
 namespace onh {
 
@@ -62,40 +62,24 @@ namespace onh {
              * Constructor with parameters (allowed only from ModbusDriver)
              *
              * @param drv Driver instance
-             * @param buffH Buffer structure
-             * @param cnt Number of registers in buffer
-             * @param driverL Driver Mutex locking structure
-             * @param buffL Buffer Mutex locking structure
+             * @param drvLock Driver Mutex locking structure
+             * @param mbuff Driver buffer data controller (write mode)
              */
             ModbusUpdater(modbusM::ModbusMaster* drv,
-                             ModbusProcessData buffH,
-                             WORD cnt,
-                             const MutexAccess &malDriver,
-                             const MutexAccess &malBuff);
+                             const MutexAccess &drvLock,
+                             const GuardDataController<ModbusProcessData> &mbuff);
 
-            /**
-             * Clear temporary registers
-             */
-            void clearTempRegisters();
-
-            /**
-             * Copy temporary registers to the buffer
-             */
-            void copyTempRegistersToBuffer();
+            void clearTempReg();
 
             /// Driver instance
             modbusM::ModbusMaster* driver;
             MutexAccess driverLock;
 
-            /// Modbus process data buffer structure
-            ModbusProcessData buff;
-            MutexAccess bufferLock;
+            /// Driver buffer data controller (write mode)
+			GuardDataController<ModbusProcessData> buff;
 
-            /// Modbus process data temporary buffer structure
-            ModbusProcessData tempBuff;
-
-            /// Register count to update
-            WORD regCount;
+            /// Modbus temporary registers
+            ModbusRegisters tempBuff;
     };
 
 }

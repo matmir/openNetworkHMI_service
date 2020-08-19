@@ -30,10 +30,10 @@ class driverTests: public shmDriverTests {
 			shmDriverTests::SetUp();
 
 			// Driver
-			driver = shmDriver;
+			//driver = shmDriver;
 
 			// Process Manager
-			procM = new onh::ProcessManager(driver, 0);
+			procM = new onh::ProcessManager(shmDriver, 0);
 
 			// Process Reader
 			procReader = new onh::ProcessReader(procM->getReader());
@@ -82,7 +82,7 @@ class driverTests: public shmDriverTests {
 		}
 
 		// Driver handle
-		onh::Driver *driver;
+		//onh::Driver *driver;
 
 		// Process manager instance
 		onh::ProcessManager *procM;

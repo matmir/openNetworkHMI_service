@@ -21,9 +21,9 @@
 
 #include <vector>
 #include "ProcessUtils.h"
-#include "Driver.h"
 #include "../utils/MutexAccess.h"
 #include "../db/objs/Tag.h"
+#include "DriverProcessWriter.h"
 
 namespace onh {
 
@@ -126,16 +126,12 @@ namespace onh {
             /**
              * Constructor with parameters (allowed only from ProcessManager)
              *
-             * @param drv Driver instance
-             * @param lock Mutex access
+             * @param dpw Pointer to the driver process data writer
              */
-            ProcessWriter(Driver* drv, const MutexAccess& lock);
+            ProcessWriter(DriverProcessWriter *dpw);
 
-            /// Driver instance
-			Driver* driver;
-
-			/// Mutex for protecting driver
-			MutexAccess driverLock;
+            /// Driver process data writer
+			DriverProcessWriter *driverWriter;
     };
 
 }

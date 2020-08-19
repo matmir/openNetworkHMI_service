@@ -34,7 +34,7 @@ TEST_F(shmDriverTests, writeInputInt) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->writeInt({onh::PDA_INPUT, 2, 0}, -37489);
+	shmWriter->writeInt({onh::PDA_INPUT, 2, 0}, -37489);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -67,7 +67,7 @@ TEST_F(shmDriverTests, writeOutputInt) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->writeInt({onh::PDA_OUTPUT, 2, 0}, -37489);
+	shmWriter->writeInt({onh::PDA_OUTPUT, 2, 0}, -37489);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -100,7 +100,7 @@ TEST_F(shmDriverTests, writeMemoryInt) {
 		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
 	}
 
-	shmDriver->writeInt({onh::PDA_MEMORY, 2, 0}, -37489);
+	shmWriter->writeInt({onh::PDA_MEMORY, 2, 0}, -37489);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -128,13 +128,13 @@ TEST_F(shmDriverTests, exceptionWriteInt1) {
 
 	try {
 
-		shmDriver->writeInt({onh::PDA_INPUT, PROCESS_DT_SIZE-3, 0}, -37489);
+		shmWriter->writeInt({onh::PDA_INPUT, PROCESS_DT_SIZE-3, 0}, -37489);
 
 		FAIL() << "Expected onh::DriverException";
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmDriver::writeInt: Byte address is out of range");
+		ASSERT_STREQ(e.what(), "ShmProcessWriter::writeInt: Byte address is out of range");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -148,7 +148,7 @@ TEST_F(shmDriverTests, exceptionWriteInt2) {
 
 	try {
 
-		shmDriver->writeInt({onh::PDA_INPUT, 80, 9}, -37489);
+		shmWriter->writeInt({onh::PDA_INPUT, 80, 9}, -37489);
 
 		FAIL() << "Expected onh::DriverException";
 
@@ -168,13 +168,13 @@ TEST_F(shmDriverTests, exceptionWriteInt3) {
 
 	try {
 
-		shmDriver->writeInt({(onh::processDataArea)8, 2, 4}, -37489);
+		shmWriter->writeInt({(onh::processDataArea)8, 2, 4}, -37489);
 
 		FAIL() << "Expected onh::DriverException";
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmDriver::writeInt: Wrong address area");
+		ASSERT_STREQ(e.what(), "ShmProcessWriter::writeInt: Wrong address area");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -194,7 +194,7 @@ TEST_F(shmDriverTests, exceptionReadInt1) {
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmProcessReader::getInt: Byte address is out of range");
+		ASSERT_STREQ(e.what(), "ShmProcessData::getInt: Byte address is out of range");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -234,7 +234,7 @@ TEST_F(shmDriverTests, exceptionReadInt3) {
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmProcessReader::getInt: Wrong address area");
+		ASSERT_STREQ(e.what(), "ShmProcessData::getInt: Wrong address area");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";

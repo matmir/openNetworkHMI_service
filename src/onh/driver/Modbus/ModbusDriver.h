@@ -20,10 +20,9 @@
 #define MODBUSDRIVER_H
 
 #include "../Driver.h"
-#include "../../utils/MutexContainer.h"
 #include "modbusmaster.h"
-#include "ModbusProcessReader.h"
-#include "ModbusProcessDataContainer.h"
+#include "ModbusProcessData.h"
+#include "../../utils/GuardDataContainer.h"
 
 namespace onh {
 
@@ -54,79 +53,6 @@ namespace onh {
             ModbusDriver& operator=(const ModbusDriver&) = delete;
 
             /**
-             * Update process data (copy from load buffer)
-             */
-            virtual void updateProcessData();
-
-            /**
-             * Set bit in process data
-             *
-             * @param addr Process data address
-             */
-            virtual void setBit(processDataAddress addr);
-
-            /**
-             * Reset bit in process data
-             *
-             * @param addr Process data address
-             */
-            virtual void resetBit(processDataAddress addr);
-
-            /**
-             * Invert bit in process data
-             *
-             * @param addr Process data address
-             */
-            virtual void invertBit(processDataAddress addr);
-
-            /**
-             * Set bits in process data
-             *
-             * @param addr Process data address
-             */
-            virtual void setBits(std::vector<processDataAddress> addr);
-
-            /**
-             * Write byte in process data
-             *
-             * @param addr Process data address
-             * @param val Value to write
-             */
-            virtual void writeByte(processDataAddress addr, BYTE val);
-
-            /**
-             * Write word in process data
-             *
-             * @param addr Process data address
-             * @param val Value to write
-             */
-            virtual void writeWord(processDataAddress addr, WORD val);
-
-            /**
-             * Write double word in process data
-             *
-             * @param addr Process data address
-             * @param val Value to write
-             */
-            virtual void writeDWord(processDataAddress addr, DWORD val);
-
-            /**
-             * Write int in process data
-             *
-             * @param addr Process data address
-             * @param val Value to write
-             */
-            virtual void writeInt(processDataAddress addr, int val);
-
-            /**
-             * Write real in process data.
-             *
-             * @param addr Process data address
-             * @param val Value to write
-             */
-            virtual void writeReal(processDataAddress addr, float val);
-
-            /**
              * Get driver buffer handle
              *
              * @return Driver buffer handle
@@ -140,6 +66,20 @@ namespace onh {
 			 */
 			virtual DriverProcessReader* getReader();
 
+			/**
+			 * Get driver process data writer
+			 *
+			 * @return Driver process data writer handle
+			 */
+			virtual DriverProcessWriter* getWriter();
+
+			/**
+			 * Get driver process data updater
+			 *
+			 * @return Driver process data updater handle
+			 */
+			virtual DriverProcessUpdater* getUpdater();
+
         private:
             /// Process registers count
             WORD regCount;
@@ -147,16 +87,17 @@ namespace onh {
             /// Maximum Byte address
             unsigned int maxByteCount;
 
-            // Modbus process data
-            ModbusProcessDataContainer processDT;
+            /// Modbus process data
+            GuardDataContainer<ModbusProcessData> *process;
 
-            // Modbus process data buffer
-            ModbusProcessData buff;
-            MutexContainer bufferLock;
+            /// Modbus process data buffer
+            GuardDataContainer<ModbusProcessData> *buff;
 
             /// Modbus Master protocol
             modbusM::ModbusMaster *modbus;
-            MutexContainer modbusLock;
+
+            /// Mutex for protecting driver
+            MutexContainer driverLock;
 
             /**
 			 * Connect to the slave device

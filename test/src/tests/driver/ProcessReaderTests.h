@@ -38,7 +38,7 @@ TEST_F(driverTests, processReaderGetBit) {
 	ASSERT_FALSE(procReader->getBitValue(*testTag));
 
 	// Change bit
-	driver->setBit(testTag->getAddress());
+	shmWriter->setBit(testTag->getAddress());
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -117,7 +117,7 @@ TEST_F(driverTests, processReaderGetBitException2) {
 
 		std::stringstream s;
 		s << "ProcessReader::getBitValue: (" << testTag->getName() << "): ";
-		s << "ShmProcessReader::getBitValue: Byte address is out of range";
+		s << "ShmProcessData::getBitValue: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -168,9 +168,9 @@ TEST_F(driverTests, processReaderGetBits) {
 	ASSERT_FALSE(vRet[2]);
 
 	// Change bit
-	driver->setBit(testTag->getAddress());
-	driver->setBit(tag2.getAddress());
-	driver->setBit(tag3.getAddress());
+	shmWriter->setBit(testTag->getAddress());
+	shmWriter->setBit(tag2.getAddress());
+	shmWriter->setBit(tag3.getAddress());
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -304,7 +304,7 @@ TEST_F(driverTests, processReaderGetBitsException3) {
 
 		std::stringstream s;
 		s << "ProcessReader::getBitsValue: ";
-		s << "ShmProcessReader::getBitValue: Byte address is out of range";
+		s << "ShmProcessData::getBitValue: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -331,7 +331,7 @@ TEST_F(driverTests, processReaderGetByte) {
 	ASSERT_EQ(0, procReader->getByte(*testTag));
 
 	// Change byte
-	driver->writeByte(testTag->getAddress(), 154);
+	shmWriter->writeByte(testTag->getAddress(), 154);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -409,7 +409,7 @@ TEST_F(driverTests, processReaderGetByteException2) {
 
 		std::stringstream s;
 		s << "ProcessReader::getByte: (" << testTag->getName() << "): ";
-		s << "ShmProcessReader::getByte: Byte address is out of range";
+		s << "ShmProcessData::getByte: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -436,7 +436,7 @@ TEST_F(driverTests, processReaderGetWord) {
 	ASSERT_EQ(0, procReader->getWord(*testTag));
 
 	// Change word
-	driver->writeWord(testTag->getAddress(), 45801);
+	shmWriter->writeWord(testTag->getAddress(), 45801);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -517,7 +517,7 @@ TEST_F(driverTests, processReaderGetWordException2) {
 
 		std::stringstream s;
 		s << "ProcessReader::getWord: (" << testTag->getName() << "): ";
-		s << "ShmProcessReader::getWord: Byte address is out of range";
+		s << "ShmProcessData::getWord: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -544,7 +544,7 @@ TEST_F(driverTests, processReaderGetDWord) {
 	ASSERT_EQ((DWORD)0, procReader->getDWord(*testTag));
 
 	// Change dword (1110 0010 1100 0110 0101 0001 1101 1100)
-	driver->writeDWord(testTag->getAddress(), 3804647900);
+	shmWriter->writeDWord(testTag->getAddress(), 3804647900);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -637,7 +637,7 @@ TEST_F(driverTests, processReaderGetDWordException2) {
 
 		std::stringstream s;
 		s << "ProcessReader::getDWord: (" << testTag->getName() << "): ";
-		s << "ShmProcessReader::getDWord: Byte address is out of range";
+		s << "ShmProcessData::getDWord: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -664,7 +664,7 @@ TEST_F(driverTests, processReaderGetInt) {
 	ASSERT_EQ(0, procReader->getInt(*testTag));
 
 	// Change int
-	driver->writeInt(testTag->getAddress(), -548);
+	shmWriter->writeInt(testTag->getAddress(), -548);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -745,7 +745,7 @@ TEST_F(driverTests, processReaderGetIntException2) {
 
 		std::stringstream s;
 		s << "ProcessReader::getInt: (" << testTag->getName() << "): ";
-		s << "ShmProcessReader::getInt: Byte address is out of range";
+		s << "ShmProcessData::getInt: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 
@@ -772,7 +772,7 @@ TEST_F(driverTests, processReaderGetReal) {
 	ASSERT_EQ((float)0, procReader->getReal(*testTag));
 
 	// Change real
-	driver->writeReal(testTag->getAddress(), -1589.74);
+	shmWriter->writeReal(testTag->getAddress(), -1589.74);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -853,7 +853,7 @@ TEST_F(driverTests, processReaderGetRealException2) {
 
 		std::stringstream s;
 		s << "ProcessReader::getReal: (" << testTag->getName() << "): ";
-		s << "ShmProcessReader::getReal: Byte address is out of range";
+		s << "ShmProcessData::getReal: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
 

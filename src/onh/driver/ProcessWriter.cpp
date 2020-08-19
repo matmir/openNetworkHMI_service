@@ -17,29 +17,33 @@
  */
 
 #include "ProcessWriter.h"
+#include "DriverException.h"
 #include <sstream>
 
 using namespace onh;
 
-ProcessWriter::ProcessWriter(const ProcessWriter &pw):
-    driver(pw.driver), driverLock(pw.driverLock)
+ProcessWriter::ProcessWriter(const ProcessWriter &pw)
 {
+	// Create new instance of the driver writer
+	driverWriter = pw.driverWriter->createNew();
 }
 
-ProcessWriter::ProcessWriter(Driver* drv, const MutexAccess& lock):
-    driver(drv), driverLock(lock)
+ProcessWriter::ProcessWriter(DriverProcessWriter *dpw):
+	driverWriter(dpw)
 {
 }
 
 ProcessWriter::~ProcessWriter()
 {
+	if (driverWriter)
+		delete driverWriter;
 }
 
 void ProcessWriter::setBit(const Tag& tg) {
 
-	// Check driver
-	if (!driver) {
-		throw Exception("Missing driver instance", "ProcessWriter::setBit");
+	// Check driver writer
+	if (!driverWriter) {
+		throw Exception("Missing driver writer instance", "ProcessWriter::setBit");
 	}
 
     // Check Tag type
@@ -50,29 +54,22 @@ void ProcessWriter::setBit(const Tag& tg) {
 
     processDataAddress addr = tg.getAddress();
 
-    // Lock access to the driver
-    driverLock.lock();
-
     try {
 
         // Modify bit
-        driver->setBit(addr);
+    	driverWriter->setBit(addr);
 
     } catch(DriverException &e) {
-        driverLock.unlock();
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::setBit");
     }
-
-    // Unlock access to the driver
-    driverLock.unlock();
 }
 
 void ProcessWriter::resetBit(const Tag& tg) {
 
-	// Check driver
-	if (!driver) {
-		throw Exception("Missing driver instance", "ProcessWriter::resetBit");
+	// Check driver writer
+	if (!driverWriter) {
+		throw Exception("Missing driver writer instance", "ProcessWriter::resetBit");
 	}
 
     // Check Tag type
@@ -83,30 +80,23 @@ void ProcessWriter::resetBit(const Tag& tg) {
 
     processDataAddress addr = tg.getAddress();
 
-    // Lock access to the driver
-    driverLock.lock();
-
     try {
 
         // Modify bit
-        driver->resetBit(addr);
+    	driverWriter->resetBit(addr);
 
     } catch(DriverException &e) {
-        driverLock.unlock();
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::resetBit");
     }
-
-    // Unlock access to the driver
-    driverLock.unlock();
 
 }
 
 void ProcessWriter::invertBit(const Tag& tg) {
 
-	// Check driver
-	if (!driver) {
-		throw Exception("Missing driver instance", "ProcessWriter::invertBit");
+	// Check driver writer
+	if (!driverWriter) {
+		throw Exception("Missing driver writer instance", "ProcessWriter::invertBit");
 	}
 
     // Check Tag type
@@ -117,29 +107,22 @@ void ProcessWriter::invertBit(const Tag& tg) {
 
     processDataAddress addr = tg.getAddress();
 
-    // Lock access to the driver
-    driverLock.lock();
-
     try {
 
         // Modify bit
-        driver->invertBit(addr);
+    	driverWriter->invertBit(addr);
 
     } catch(DriverException &e) {
-        driverLock.unlock();
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::invertBit");
     }
-
-    // Unlock access to the driver
-    driverLock.unlock();
 }
 
 void ProcessWriter::setBits(const std::vector<Tag>& tags) {
 
-	// Check driver
-	if (!driver) {
-		throw Exception("Missing driver instance", "ProcessWriter::setBits");
+	// Check driver writer
+	if (!driverWriter) {
+		throw Exception("Missing driver writer instance", "ProcessWriter::setBits");
 	}
 
     // Check input values
@@ -161,29 +144,22 @@ void ProcessWriter::setBits(const std::vector<Tag>& tags) {
 
     }
 
-    // Lock access to the driver
-    driverLock.lock();
-
     try {
 
         // Set bits
-        driver->setBits(addr);
+    	driverWriter->setBits(addr);
 
     } catch(DriverException &e) {
-        driverLock.unlock();
 
         ProcessUtils::triggerError(e.what(), "", "ProcessWriter::setBits");
     }
-
-    // Unlock access to the driver
-    driverLock.unlock();
 }
 
 void ProcessWriter::writeByte(const Tag& tg, BYTE val) {
 
-	// Check driver
-	if (!driver) {
-		throw Exception("Missing driver instance", "ProcessWriter::writeByte");
+	// Check driver writer
+	if (!driverWriter) {
+		throw Exception("Missing driver writer instance", "ProcessWriter::writeByte");
 	}
 
     // Check Tag type
@@ -194,29 +170,22 @@ void ProcessWriter::writeByte(const Tag& tg, BYTE val) {
 
     processDataAddress addr = tg.getAddress();
 
-    // Lock access to the driver
-    driverLock.lock();
-
     try {
 
         // Write byte
-        driver->writeByte(addr, val);
+    	driverWriter->writeByte(addr, val);
 
     } catch(DriverException &e) {
-        driverLock.unlock();
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeByte");
     }
-
-    // Unlock access to the driver
-    driverLock.unlock();
 }
 
 void ProcessWriter::writeWord(const Tag& tg, WORD val) {
 
-	// Check driver
-	if (!driver) {
-		throw Exception("Missing driver instance", "ProcessWriter::writeWord");
+	// Check driver writer
+	if (!driverWriter) {
+		throw Exception("Missing driver writer instance", "ProcessWriter::writeWord");
 	}
 
     // Check Tag type
@@ -227,29 +196,22 @@ void ProcessWriter::writeWord(const Tag& tg, WORD val) {
 
     processDataAddress addr = tg.getAddress();
 
-    // Lock access to the driver
-    driverLock.lock();
-
     try {
 
         // Write word
-        driver->writeWord(addr, val);
+    	driverWriter->writeWord(addr, val);
 
     } catch(DriverException &e) {
-        driverLock.unlock();
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeWord");
     }
-
-    // Unlock access to the driver
-    driverLock.unlock();
 }
 
 void ProcessWriter::writeDWord(const Tag& tg, DWORD val) {
 
-	// Check driver
-	if (!driver) {
-		throw Exception("Missing driver instance", "ProcessWriter::writeDWord");
+	// Check driver writer
+	if (!driverWriter) {
+		throw Exception("Missing driver writer instance", "ProcessWriter::writeDWord");
 	}
 
     // Check Tag type
@@ -260,29 +222,22 @@ void ProcessWriter::writeDWord(const Tag& tg, DWORD val) {
 
     processDataAddress addr = tg.getAddress();
 
-    // Lock access to the driver
-    driverLock.lock();
-
     try {
 
         // Write word
-        driver->writeDWord(addr, val);
+    	driverWriter->writeDWord(addr, val);
 
     } catch(DriverException &e) {
-        driverLock.unlock();
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeDWord");
     }
-
-    // Unlock access to the driver
-    driverLock.unlock();
 }
 
 void ProcessWriter::writeInt(const Tag& tg, int val) {
 
-	// Check driver
-	if (!driver) {
-		throw Exception("Missing driver instance", "ProcessWriter::writeInt");
+	// Check driver writer
+	if (!driverWriter) {
+		throw Exception("Missing driver writer instance", "ProcessWriter::writeInt");
 	}
 
     // Check Tag type
@@ -293,29 +248,22 @@ void ProcessWriter::writeInt(const Tag& tg, int val) {
 
     processDataAddress addr = tg.getAddress();
 
-    // Lock access to the driver
-    driverLock.lock();
-
     try {
 
         // Write word
-        driver->writeInt(addr, val);
+    	driverWriter->writeInt(addr, val);
 
     } catch(DriverException &e) {
-        driverLock.unlock();
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeInt");
     }
-
-    // Unlock access to the driver
-    driverLock.unlock();
 }
 
 void ProcessWriter::writeReal(const Tag& tg, float val) {
 
-	// Check driver
-	if (!driver) {
-		throw Exception("Missing driver instance", "ProcessWriter::writeReal");
+	// Check driver writer
+	if (!driverWriter) {
+		throw Exception("Missing driver writer instance", "ProcessWriter::writeReal");
 	}
 
     // Check Tag type
@@ -326,20 +274,13 @@ void ProcessWriter::writeReal(const Tag& tg, float val) {
 
     processDataAddress addr = tg.getAddress();
 
-    // Lock access to the driver
-    driverLock.lock();
-
     try {
 
         // Write word
-        driver->writeReal(addr, val);
+    	driverWriter->writeReal(addr, val);
 
     } catch(DriverException &e) {
-        driverLock.unlock();
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeReal");
     }
-
-    // Unlock access to the driver
-    driverLock.unlock();
 }

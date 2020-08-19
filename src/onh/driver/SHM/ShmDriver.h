@@ -16,15 +16,13 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_DRIVER_KSHMDRIVER_H_
-#define SRC_DRIVER_KSHMDRIVER_H_
+#ifndef SRC_ONH_DRIVER_SHM_SHMDRIVER_H_
+#define SRC_ONH_DRIVER_SHM_SHMDRIVER_H_
 
 #include "../Driver.h"
-#include "../../utils/MutexContainer.h"
-#include "ShmProcessReader.h"
-#include "ShmProcessDataContainer.h"
+#include "../../utils/GuardDataContainer.h"
 #include "sMemory.h"
-#include "processData.h"
+#include "ShmProcessData.h"
 
 namespace onh {
 
@@ -55,79 +53,6 @@ namespace onh {
             ShmDriver& operator=(const ShmDriver&) = delete;
 
             /**
-             * Update process data (copy from shared memory)
-             */
-            virtual void updateProcessData();
-
-            /**
-             * Set bit in process data
-             *
-             * @param addr Process data address
-             */
-            virtual void setBit(processDataAddress addr);
-
-            /**
-             * Reset bit in process data
-             *
-             * @param addr Process data address
-             */
-            virtual void resetBit(processDataAddress addr);
-
-            /**
-             * Invert bit in process data
-             *
-             * @param addr Process data address
-             */
-            virtual void invertBit(processDataAddress addr);
-
-            /**
-             * Set bits in process data
-             *
-             * @param addr Process data address
-             */
-            virtual void setBits(std::vector<processDataAddress> addr);
-
-            /**
-             * Write byte in process data
-             *
-             * @param addr Process data address
-             * @param val Value to write
-             */
-            virtual void writeByte(processDataAddress addr, BYTE val);
-
-            /**
-             * Write word in process data
-             *
-             * @param addr Process data address
-             * @param val Value to write
-             */
-            virtual void writeWord(processDataAddress addr, WORD val);
-
-            /**
-             * Write double word in process data
-             *
-             * @param addr Process data address
-             * @param val Value to write
-             */
-            virtual void writeDWord(processDataAddress addr, DWORD val);
-
-            /**
-             * Write int in process data
-             *
-             * @param addr Process data address
-             * @param val Value to write
-             */
-            virtual void writeInt(processDataAddress addr, int val);
-
-            /**
-             * Write real in process data
-             *
-             * @param addr Process data address
-             * @param val Value to write
-             */
-            virtual void writeReal(processDataAddress addr, float val);
-
-            /**
              * Get driver buffer handle
              *
              * @return Driver buffer handle
@@ -141,10 +66,19 @@ namespace onh {
 			 */
 			virtual DriverProcessReader* getReader();
 
-            /**
-			 * Send exit command to the server
+			/**
+			 * Get driver process data writer
+			 *
+			 * @return Driver process data writer handle
 			 */
-            void sendServerExitCommand();
+			virtual DriverProcessWriter* getWriter();
+
+			/**
+			 * Get driver process data updater
+			 *
+			 * @return Driver process data updater handle
+			 */
+			virtual DriverProcessUpdater* getUpdater();
 
         private:
 
@@ -160,40 +94,21 @@ namespace onh {
             /// Shared memory segment name
             std::string shmName;
 
+            /// Driver access protection
+            MutexContainer driverLock;
+
             /// Copy of the controller process data
-            ShmProcessDataContainer process;
-
-            /**
-             * Puts a request to server
-             *
-             * @param cmd The command
-             *
-             * @return Server reply command
-             */
-            extCMD putRequest(extCMD cmd);
-
-            /**
-			 * Clear process data
-			 */
-			void clearProcessData();
-
-            /**
-             * Modify bit in process memory
-             *
-             * @param addr The command
-             * @param drvFunc Bit function
-             */
-            void modifyBit(processDataAddress addr, int drvFunc);
+            GuardDataContainer<ShmProcessData> process;
 
             /**
              * Trigger error (write log and throw exception)
              *
              * @param msg Exception message
-             * @param fName Function from which exception was throwed
+             * @param fName Function from which exception was thrown
              */
             void triggerError(const std::string& msg, const std::string& fName);
 	};
 
 }
 
-#endif /* SRC_DRIVER_KSHMDRIVER_H_ */
+#endif /* SRC_ONH_DRIVER_SHM_SHMDRIVER_H_ */

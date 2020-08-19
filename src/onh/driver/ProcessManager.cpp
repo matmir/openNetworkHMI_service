@@ -31,7 +31,7 @@ ProcessManager::~ProcessManager()
 
 ProcessUpdater ProcessManager::getUpdater() {
 
-	ProcessUpdater pr(driver, itsLock.getAccess());
+	ProcessUpdater pr(driver->getUpdater());
 
 	return pr;
 }
@@ -45,7 +45,7 @@ ProcessReader ProcessManager::getReader() {
 
 ProcessWriter ProcessManager::getWriter() {
 
-	ProcessWriter pr(driver, itsLock.getAccess());
+	ProcessWriter pr(driver->getWriter());
 
 	return pr;
 }

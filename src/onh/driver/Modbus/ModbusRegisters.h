@@ -16,29 +16,30 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ProcessUpdater.h"
+#ifndef SRC_ONH_DRIVER_MODBUS_MODBUSREGISTERS_H_
+#define SRC_ONH_DRIVER_MODBUS_MODBUSREGISTERS_H_
 
-using namespace onh;
+#include "../DriverRegisterTypes.h"
 
-ProcessUpdater::ProcessUpdater(const ProcessUpdater &pu)
-{
-	// Create new instance of the driver updater
-	driverUpdater = pu.driverUpdater->createNew();
+namespace onh {
+
+	/**
+	 * Modbus registers structure
+	 */
+    typedef struct {
+        /// Modbus holding registers
+        WORD *holdingReg;
+
+        /// Modbus input registers
+        WORD *inputReg;
+
+        /// Registers count
+		WORD regCount;
+
+		/// Maximum Byte count
+		unsigned int maxByteCount;
+    } ModbusRegisters;
+
 }
 
-ProcessUpdater::ProcessUpdater(DriverProcessUpdater *dpu):
-	driverUpdater(dpu)
-{
-}
-
-ProcessUpdater::~ProcessUpdater()
-{
-	if (driverUpdater)
-		delete driverUpdater;
-}
-
-void ProcessUpdater::update() {
-
-	// Update process data in driver
-	driverUpdater->updateProcessData();
-}
+#endif /* SRC_ONH_DRIVER_MODBUS_MODBUSREGISTERS_H_ */

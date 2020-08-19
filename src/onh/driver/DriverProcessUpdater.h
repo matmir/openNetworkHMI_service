@@ -16,29 +16,35 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ProcessUpdater.h"
+#ifndef SRC_ONH_DRIVER_DRIVERPROCESSUPDATER_H_
+#define SRC_ONH_DRIVER_DRIVERPROCESSUPDATER_H_
 
-using namespace onh;
+namespace onh {
 
-ProcessUpdater::ProcessUpdater(const ProcessUpdater &pu)
-{
-	// Create new instance of the driver updater
-	driverUpdater = pu.driverUpdater->createNew();
+	/**
+	 * Base driver process data updater class
+	 */
+	class DriverProcessUpdater {
+
+		public:
+
+			DriverProcessUpdater();
+
+			virtual ~DriverProcessUpdater();
+
+			/**
+			 * Update process data (copy from device)
+			 */
+			virtual void updateProcessData() = 0;
+
+			/**
+			 * Create new driver process updater
+			 *
+			 * @return Pointer to the new driver process updater
+			 */
+			virtual DriverProcessUpdater* createNew() = 0;
+	};
+
 }
 
-ProcessUpdater::ProcessUpdater(DriverProcessUpdater *dpu):
-	driverUpdater(dpu)
-{
-}
-
-ProcessUpdater::~ProcessUpdater()
-{
-	if (driverUpdater)
-		delete driverUpdater;
-}
-
-void ProcessUpdater::update() {
-
-	// Update process data in driver
-	driverUpdater->updateProcessData();
-}
+#endif /* SRC_ONH_DRIVER_DRIVERPROCESSUPDATER_H_ */

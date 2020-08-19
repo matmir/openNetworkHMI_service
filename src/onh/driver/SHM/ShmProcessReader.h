@@ -19,11 +19,9 @@
 #ifndef SRC_ONH_DRIVER_SHM_SHMPROCESSREADER_H_
 #define SRC_ONH_DRIVER_SHM_SHMPROCESSREADER_H_
 
-#include <string.h>
 #include "../DriverProcessReader.h"
-#include "processData.h"
-#include "../../utils/MutexAccess.h"
-#include "ShmProcessDataController.h"
+#include "ShmProcessData.h"
+#include "../../utils/GuardDataController.h"
 
 namespace onh {
 
@@ -131,23 +129,15 @@ namespace onh {
 			/**
 			 * Constructor (allowed only from ShmDriver)
 			 *
-			 * @param spdc Shm process data controller
+			 * @param gdc Shm process data controller
 			 */
-			ShmProcessReader(const ShmProcessDataController& spdc);
+			ShmProcessReader(const GuardDataController<ShmProcessData>& gdc);
 
 			/// Copy of the driver process data
-			processData process;
+			ShmProcessData process;
 
 			/// Driver process data controller
-			ShmProcessDataController driverProcess;
-
-			/**
-			 * Trigger error
-			 *
-			 * @param msg Exception message
-			 * @param fName Function from which exception was throwed
-			 */
-			void triggerError(const std::string& msg, const std::string& fName);
+			GuardDataController<ShmProcessData> driverProcess;
 	};
 
 }

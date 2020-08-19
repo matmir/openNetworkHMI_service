@@ -35,7 +35,7 @@ TEST_F(shmDriverTests, writeInputDWord) {
 	}
 
 	// 1110 0010 1100 0110 0101 0001 1101 1100
-	shmDriver->writeDWord({onh::PDA_INPUT, 7, 0}, 3804647900);
+	shmWriter->writeDWord({onh::PDA_INPUT, 7, 0}, 3804647900);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -81,7 +81,7 @@ TEST_F(shmDriverTests, writeOutputDWord) {
 	}
 
 	// 1110 0010 1100 0110 0101 0001 1101 1100
-	shmDriver->writeDWord({onh::PDA_OUTPUT, 7, 0}, 3804647900);
+	shmWriter->writeDWord({onh::PDA_OUTPUT, 7, 0}, 3804647900);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -127,7 +127,7 @@ TEST_F(shmDriverTests, writeMemoryDWord) {
 	}
 
 	// 1110 0010 1100 0110 0101 0001 1101 1100
-	shmDriver->writeDWord({onh::PDA_MEMORY, 7, 0}, 3804647900);
+	shmWriter->writeDWord({onh::PDA_MEMORY, 7, 0}, 3804647900);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -167,13 +167,13 @@ TEST_F(shmDriverTests, exceptionWriteDWord1) {
 
 	try {
 
-		shmDriver->writeDWord({onh::PDA_INPUT, PROCESS_DT_SIZE-3, 0}, 3804647900);
+		shmWriter->writeDWord({onh::PDA_INPUT, PROCESS_DT_SIZE-3, 0}, 3804647900);
 
 		FAIL() << "Expected onh::DriverException";
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmDriver::writeDWord: Byte address is out of range");
+		ASSERT_STREQ(e.what(), "ShmProcessWriter::writeDWord: Byte address is out of range");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -187,7 +187,7 @@ TEST_F(shmDriverTests, exceptionWriteDWord2) {
 
 	try {
 
-		shmDriver->writeDWord({onh::PDA_INPUT, 80, 9}, 3804647900);
+		shmWriter->writeDWord({onh::PDA_INPUT, 80, 9}, 3804647900);
 
 		FAIL() << "Expected onh::DriverException";
 
@@ -207,13 +207,13 @@ TEST_F(shmDriverTests, exceptionWriteDWord3) {
 
 	try {
 
-		shmDriver->writeDWord({(onh::processDataArea)8, 2, 4}, 3804647900);
+		shmWriter->writeDWord({(onh::processDataArea)8, 2, 4}, 3804647900);
 
 		FAIL() << "Expected onh::DriverException";
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmDriver::writeDWord: Wrong address area");
+		ASSERT_STREQ(e.what(), "ShmProcessWriter::writeDWord: Wrong address area");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -233,7 +233,7 @@ TEST_F(shmDriverTests, exceptionReadDWord1) {
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmProcessReader::getDWord: Byte address is out of range");
+		ASSERT_STREQ(e.what(), "ShmProcessData::getDWord: Byte address is out of range");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";
@@ -273,7 +273,7 @@ TEST_F(shmDriverTests, exceptionReadDWord3) {
 
 	} catch (onh::DriverException &e) {
 
-		ASSERT_STREQ(e.what(), "ShmProcessReader::getDWord: Wrong address area");
+		ASSERT_STREQ(e.what(), "ShmProcessData::getDWord: Wrong address area");
 
 	} catch(...) {
 		FAIL() << "Expected onh::DriverException";

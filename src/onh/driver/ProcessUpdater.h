@@ -19,8 +19,7 @@
 #ifndef PROCESSUPDATER_H
 #define PROCESSUPDATER_H
 
-#include "Driver.h"
-#include "../utils/MutexAccess.h"
+#include "DriverProcessUpdater.h"
 
 namespace onh {
 
@@ -60,16 +59,12 @@ namespace onh {
             /**
              * Constructor with parameters (allowed only from ProcessManager)
              *
-             * @param drv Driver instance
-             * @param lock Mutex access
+             * @param dpu Pointer to the driver process data updater
              */
-            ProcessUpdater(Driver* drv, const MutexAccess& lock);
+            ProcessUpdater(DriverProcessUpdater *dpu);
 
-            /// Driver instance
-			Driver* driver;
-
-			/// Mutex for protecting driver
-			MutexAccess driverLock;
+            /// Driver process data updater
+            DriverProcessUpdater *driverUpdater;
     };
 
 }

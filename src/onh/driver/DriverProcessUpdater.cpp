@@ -16,29 +16,12 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ProcessUpdater.h"
+#include "DriverProcessUpdater.h"
 
 using namespace onh;
 
-ProcessUpdater::ProcessUpdater(const ProcessUpdater &pu)
-{
-	// Create new instance of the driver updater
-	driverUpdater = pu.driverUpdater->createNew();
+DriverProcessUpdater::DriverProcessUpdater() {
 }
 
-ProcessUpdater::ProcessUpdater(DriverProcessUpdater *dpu):
-	driverUpdater(dpu)
-{
-}
-
-ProcessUpdater::~ProcessUpdater()
-{
-	if (driverUpdater)
-		delete driverUpdater;
-}
-
-void ProcessUpdater::update() {
-
-	// Update process data in driver
-	driverUpdater->updateProcessData();
+DriverProcessUpdater::~DriverProcessUpdater() {
 }

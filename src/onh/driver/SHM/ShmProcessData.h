@@ -16,55 +16,48 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBSPROCESSDATA_INCLUDED
-#define MODBSPROCESSDATA_INCLUDED
+#ifndef SRC_ONH_DRIVER_SHM_SHMPROCESSDATA_H_
+#define SRC_ONH_DRIVER_SHM_SHMPROCESSDATA_H_
 
+#include "processData.h"
 #include <vector>
-#include "ModbusRegisters.h"
 #include "../DriverRegisterTypes.h"
 #include "../ProcessDataTypes.h"
 
 namespace onh {
 
-    /**
-	 * Modbus process data class
+	/**
+	 * SHM process data class
 	 */
-    class ModbusProcessData {
+	class ShmProcessData {
 
-    	public:
+		public:
 
-    		/**
-    		 * Default constructor
-    		 */
-    		ModbusProcessData();
-
-    		/**
-			 * Constructor
-			 *
-			 * @param regCnt Process registers count
+			/**
+			 * Default constructor
 			 */
-			ModbusProcessData(WORD regCnt);
+			ShmProcessData();
 
 			/**
 			 * Constructor
 			 *
-			 * @param mr Modbus registers structure
+			 * @param pd SHM process data structure
 			 */
-			ModbusProcessData(const ModbusRegisters &mr);
+			ShmProcessData(const processData &pd);
 
-    		/**
+			/**
 			 * Copy constructor
 			 */
-    		ModbusProcessData(const ModbusProcessData &mpd);
+			ShmProcessData(const ShmProcessData &spd);
 
-    		~ModbusProcessData();
+			virtual ~ShmProcessData();
 
-    		/**
+			/**
 			 * Assign operator
 			 */
-    		ModbusProcessData& operator=(const ModbusProcessData &mpd);
+			ShmProcessData& operator=(const ShmProcessData &spd);
 
-    		/**
+			/**
 			 * Get bit from process data
 			 *
 			 * @param addr Process data address
@@ -127,31 +120,17 @@ namespace onh {
 			 */
 			float getReal(processDataAddress addr) const;
 
-    		/**
-    		 * Get max Byte address
-    		 *
-    		 * @return Max Byte address
-    		 */
-    		unsigned int getMaxByte() const;
+			/**
+			 * Clear process data
+			 */
+			void clear();
 
-    		/**
-    		 * Get registers count
-    		 *
-    		 * @return Registers count
-    		 */
-    		WORD getRegCount() const;
+		private:
 
-    		/**
-    		 * Clear modbus registers
-    		 */
-    		void clear();
-
-    	private:
-
-			/// Process registers count
-    		ModbusRegisters mreg;
-    };
+			/// SHM process data
+			processData *process;
+	};
 
 }
 
-#endif // MODBSPROCESSDATA_INCLUDED
+#endif /* SRC_ONH_DRIVER_SHM_SHMPROCESSDATA_H_ */

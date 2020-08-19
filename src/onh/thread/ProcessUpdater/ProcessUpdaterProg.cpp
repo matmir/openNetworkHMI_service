@@ -53,7 +53,7 @@ void ProcessUpdaterProg::operator()() {
     	getLogger().write("Start main loop");
 
         if (!prUpdater)
-            throw DriverException("No updater object!");
+            throw Exception("No updater object!");
 
         while(!isExitFlag()) {
 

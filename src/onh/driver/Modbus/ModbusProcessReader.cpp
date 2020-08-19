@@ -23,213 +23,54 @@
 
 using namespace onh;
 
-ModbusProcessReader::ModbusProcessReader(const ModbusProcessDataController& spdc):
-	driverProcess(spdc)
+ModbusProcessReader::ModbusProcessReader(const GuardDataController<ModbusProcessData> &gdc):
+	driverProcess(gdc)
 {
-	process.holdingReg = new WORD[driverProcess.getRegistersCount()];
-	process.inputReg = new WORD[driverProcess.getRegistersCount()];
-	// Clear registers
-	for (int i=0; i<driverProcess.getRegistersCount(); ++i) {
-		process.holdingReg[i] = 0;
-		process.inputReg[i] = 0;
-	}
-
-	maxByteCount = driverProcess.getRegistersCount()*2;
+	// Init process data
+	driverProcess.getData(process);
 }
 
 ModbusProcessReader::~ModbusProcessReader() {
-
-	if (process.holdingReg) {
-		delete process.holdingReg;
-	}
-	if (process.inputReg) {
-		delete process.inputReg;
-	}
-}
-
-void ModbusProcessReader::triggerError(const std::string& msg, const std::string& fName) {
-
-    throw DriverException(msg, fName);
 }
 
 bool ModbusProcessReader::getBitValue(processDataAddress addr) {
 
-    // Check process address
-    ModbusUtils::checkProcessAddress(addr, maxByteCount);
-
-    // Reg address
-    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
-
-    // Modbus register
-    WORD reg = 0;
-    switch (addr.area) {
-        case PDA_INPUT: reg = process.inputReg[regAddr]; break;
-        case PDA_OUTPUT: reg = process.holdingReg[regAddr]; break;
-        default: reg = 0;
-    }
-
-    // Low byte of the register
-    BYTE bLO = reg & 0x00FF;
-    // High byte of the register
-    BYTE bHI = (reg & 0xFF00) >> 8;
-
-    BYTE b = (addr.byteAddr % 2)?(bHI):(bLO);
-
-    // Read bit value
-    bool v = (b >> addr.bitAddr & 0x01);
-
-    return v;
-
+    return process.getBit(addr);
 }
 
 std::vector<bool> ModbusProcessReader::getBitsValue(std::vector<processDataAddress> addr) {
 
-    std::vector<bool> retV;
-
-    for (unsigned int i=0; i<addr.size(); ++i) {
-
-        // Get one bit
-        retV.push_back(getBitValue(addr[i]));
-
-    }
-
-    return retV;
-
+    return process.getBits(addr);
 }
 
 BYTE ModbusProcessReader::getByte(processDataAddress addr) {
 
-    // Check process address
-    ModbusUtils::checkProcessAddress(addr, maxByteCount);
-
-    // Reg address
-    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
-
-    // Modbus register
-    WORD reg = 0;
-    switch (addr.area) {
-        case PDA_INPUT: reg = process.inputReg[regAddr]; break;
-        case PDA_OUTPUT: reg = process.holdingReg[regAddr]; break;
-        default: reg = 0;
-    }
-
-    // Low byte of the register
-    BYTE bLO = reg & 0x00FF;
-    // High byte of the register
-    BYTE bHI = (reg & 0xFF00) >> 8;
-
-    // Get byte
-    BYTE b = (addr.byteAddr % 2)?(bHI):(bLO);
-
-    return b;
+    return process.getByte(addr);
 }
 
 WORD ModbusProcessReader::getWord(processDataAddress addr) {
 
-    // Check process address
-    ModbusUtils::checkProcessAddress(addr, maxByteCount, 1);
-
-    // Reg address
-    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
-
-    // Modbus register
-    WORD reg = 0;
-    switch (addr.area) {
-        case PDA_INPUT: reg = process.inputReg[regAddr]; break;
-        case PDA_OUTPUT: reg = process.holdingReg[regAddr]; break;
-        default: reg = 0;
-    }
-
-    return reg;
-
+    return process.getWord(addr);
 }
 
 DWORD ModbusProcessReader::getDWord(processDataAddress addr) {
 
-    // Check process address
-    ModbusUtils::checkProcessAddress(addr, maxByteCount, 3);
-
-    // Reg address
-    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
-
-    DWORD reg = 0;
-
-    // Modbus registers
-    WORD regLo = 0;
-    WORD regHi = 0;
-    switch (addr.area) {
-        case PDA_INPUT: {
-            regLo = process.inputReg[regAddr];
-            regHi = process.inputReg[regAddr+1];
-        } break;
-        case PDA_OUTPUT: {
-            regLo = process.holdingReg[regAddr];
-            regHi = process.holdingReg[regAddr+1];
-        } break;
-        default: {
-            regLo = 0;
-            regHi = 0;
-        }
-    }
-
-    // DWord
-    reg = regHi;
-    reg = reg << 16;
-    reg = (reg | regLo);
-
-    return reg;
-
+    return process.getDWord(addr);
 }
 
 int ModbusProcessReader::getInt(processDataAddress addr) {
 
-    // Check process address
-    ModbusUtils::checkProcessAddress(addr, maxByteCount, 3);
-
-    // Reg address
-    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
-
-    // Get int
-    int* v = 0;
-    int def = 0;
-
-    // Read Modbus registers
-    switch (addr.area) {
-        case PDA_INPUT: v = (int*)&process.inputReg[regAddr]; break;
-        case PDA_OUTPUT: v = (int*)&process.holdingReg[regAddr]; break;
-        default: v = &def;
-    }
-
-    return *v;
-
+    return process.getInt(addr);
 }
 
 float ModbusProcessReader::getReal(processDataAddress addr) {
 
-    // Check process address
-    ModbusUtils::checkProcessAddress(addr, maxByteCount, 3);
-
-    // Reg address
-    WORD regAddr = ModbusUtils::getRegisterAddress(addr);
-
-    // Get float
-    float v = 0;
-    float def = 0;
-
-    // Read Modbus registers
-    switch (addr.area) {
-    	case PDA_INPUT: memcpy(&v, &process.inputReg[regAddr], sizeof v); break;
-    	case PDA_OUTPUT: memcpy(&v, &process.holdingReg[regAddr], sizeof v); break;
-        default: v = def;
-    }
-
-    return v;
-
+    return process.getReal(addr);
 }
 
 void ModbusProcessReader::updateProcessData() {
 
-	driverProcess.getProcessDataCopy(&process);
+	driverProcess.getData(process);
 }
 
 DriverProcessReader* ModbusProcessReader::createNew() {

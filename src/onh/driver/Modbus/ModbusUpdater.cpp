@@ -22,92 +22,62 @@
 using namespace onh;
 
 ModbusUpdater::ModbusUpdater(modbusM::ModbusMaster* drv,
-                                   ModbusProcessData buffH,
-                                   WORD cnt,
-                                   const MutexAccess &malDriver,
-                                   const MutexAccess &malBuff)
+								const MutexAccess &drvLock,
+								const GuardDataController<ModbusProcessData> &mbuff):
+	driver(drv), driverLock(drvLock), buff(mbuff), tempBuff{nullptr, nullptr, 0, 0}
 {
-    driver = drv;
-    regCount = cnt;
+	ModbusProcessData tmp;
+    // Init temporary buffer
+    buff.getData(tmp);
 
-    // Copy buffer pointers
-    buff.holdingReg = buffH.holdingReg;
-    buff.inputReg = buffH.inputReg;
-
-    // Prepare temporary buffers
-    tempBuff.holdingReg = new WORD[regCount];
-    tempBuff.inputReg = new WORD[regCount];
-
-    // Copy lock protections
-    driverLock = malDriver;
-    bufferLock = malBuff;
+    tempBuff.regCount = tmp.getRegCount();
+    tempBuff.maxByteCount = tmp.getMaxByte();
+    tempBuff.holdingReg = new WORD[tempBuff.regCount];
+    tempBuff.inputReg = new WORD[tempBuff.regCount];
 }
 
-ModbusUpdater::~ModbusUpdater()
-{
-    if (tempBuff.holdingReg)
-        delete [] tempBuff.holdingReg;
+ModbusUpdater::~ModbusUpdater() {
+	if (tempBuff.holdingReg)
+		delete [] tempBuff.holdingReg;
 
-    if (tempBuff.inputReg)
-        delete [] tempBuff.inputReg;
+	if (tempBuff.inputReg)
+		delete [] tempBuff.inputReg;
 }
 
 void ModbusUpdater::updateBuffer() {
 
-    // Clear load buffers
-    clearTempRegisters();
+    // Clear temporary load buffers
+    clearTempReg();
 
     driverLock.lock();
 
     try {
 
         // Read input registers
-        driver->READ_INPUT_REGISTERS(0x00, regCount, tempBuff.inputReg);
+        driver->READ_INPUT_REGISTERS(0x00, tempBuff.regCount, tempBuff.inputReg);
 
         // Read holding registers
-        driver->READ_HOLDING_REGISTERS(0x00, regCount, tempBuff.holdingReg);
+        driver->READ_HOLDING_REGISTERS(0x00, tempBuff.regCount, tempBuff.holdingReg);
 
     } catch (modbusM::ModbusException &e) {
 
         driverLock.unlock();
 
         throw DriverException(e.what(), "ModbusUpdater::updateBuffer");
-
     }
 
     driverLock.unlock();
 
     // Copy loaded data to the buffer
-    copyTempRegistersToBuffer();
-
+    buff.setData(tempBuff);
 }
 
-void ModbusUpdater::clearTempRegisters() {
+void ModbusUpdater::clearTempReg() {
 
-    // Clear registers
-    for (int i=0; i<regCount; ++i) {
-        tempBuff.holdingReg[i] = 0;
-        tempBuff.inputReg[i] = 0;
-    }
-}
-
-void ModbusUpdater::copyTempRegistersToBuffer() {
-
-    bufferLock.lock();
-
-    // Check buffers
-    if (!buff.holdingReg) {
-        throw DriverException("Buffers for holding registers not initialized", "ModbusUpdater::copyTempRegistersToBuffer");
-    }
-    if (!buff.inputReg) {
-        throw DriverException("Buffers for input registers not initialized", "ModbusUpdater::copyTempRegistersToBuffer");
-    }
-
-    // Copy data from load registers to the buffer
-    for (int i=0; i<regCount; ++i) {
-        buff.holdingReg[i] = tempBuff.holdingReg[i];
-        buff.inputReg[i] = tempBuff.inputReg[i];
-    }
-
-    bufferLock.unlock();
+	if ((tempBuff.holdingReg != nullptr) && (tempBuff.inputReg != nullptr)) {
+		for (int i=0; i<tempBuff.regCount; ++i) {
+			tempBuff.holdingReg[i] = 0;
+			tempBuff.inputReg[i] = 0;
+		}
+	}
 }

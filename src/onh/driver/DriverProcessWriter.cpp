@@ -16,38 +16,12 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ShmProcessDataController.h"
+#include "DriverProcessWriter.h"
 
 using namespace onh;
 
-ShmProcessDataController::ShmProcessDataController(const ShmProcessDataController& spdc):
-	process(spdc.process), processLock(spdc.processLock)
-{
+DriverProcessWriter::DriverProcessWriter() {
 }
 
-ShmProcessDataController::ShmProcessDataController(const MutexAccess &pdLock, processData *procDT):
-	process(procDT), processLock(pdLock)
-{
-}
-
-ShmProcessDataController::~ShmProcessDataController() {
-}
-
-processData ShmProcessDataController::getProcessDataCopy() {
-
-	if (!process)
-		throw Exception("Process data handle not initialized", "ShmProcessDataController::getProcessDataCopy");
-
-	processData pd;
-
-	// Lock access to the process data
-	processLock.lock();
-
-	// Copy data
-	pd = *process;
-
-	// Unlock access to the process data
-	processLock.unlock();
-
-	return pd;
+DriverProcessWriter::~DriverProcessWriter() {
 }
