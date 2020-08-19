@@ -40,14 +40,14 @@ namespace onh {
              * @param adb Alarming DB
              * @param updateInterval Alarm update interval (milliseconds)
              * @param thEC Thread exit controller
-             * @param thCCC Thread cycle time controller
+             * @param gdcCTD Thread cycle time controller
              */
             AlarmingProg(const ProcessReader& pr,
 							const ProcessWriter& pw,
 							const AlarmingDB& adb,
 							unsigned int updateInterval,
 							const ThreadExitController &thEC,
-							const ThreadCycleContainerController &thCCC);
+							const GuardDataController<CycleTimeData> &gdcCTD);
 
             /**
 			 * Copy constructor - inactive

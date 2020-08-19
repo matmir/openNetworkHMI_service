@@ -24,8 +24,8 @@ TagLoggerWriterProg::TagLoggerWriterProg(const TagLoggerDB& tldb,
 											const TagLoggerBufferController& tlbc,
 											unsigned int updateInterval,
 											const ThreadExitController &thEC,
-											const ThreadCycleContainerController &thCCC):
-	ThreadProgram(thEC, thCCC, "taglogger", "tagLogWriter_")
+											const GuardDataController<CycleTimeData> &gdcCTD):
+	ThreadProgram(thEC, gdcCTD, "taglogger", "tagLogWriter_")
 {
 	// Create delay
 	itsDelay = new Delay(updateInterval);

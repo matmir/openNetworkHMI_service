@@ -26,13 +26,15 @@ namespace onh {
     /**
      * Cycle time data structure
      */
-    typedef struct {
+    typedef struct CycleTimeData {
         /// Minimum cycle time (ms) of the program
         double min;
         /// Maximum cycle time (ms) of the program
         double max;
         /// Current cycle time (ms) of the program
         double current;
+
+        CycleTimeData(): min(0), max(0), current(0) {}
     } CycleTimeData;
 
     /**

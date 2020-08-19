@@ -24,9 +24,8 @@
 #include <vector>
 #include "ThreadProgram.h"
 #include "ThreadSocket.h"
-#include "ThreadCycleContainerController.h"
+#include "../utils/GuardDataContainer.h"
 #include "ThreadExit.h"
-#include "ThreadCycleContainer.h"
 #include "../driver/DriverBufferUpdater.h"
 #include "../driver/ProcessUpdater.h"
 #include "../driver/ProcessReader.h"
@@ -181,7 +180,7 @@ namespace onh {
              */
             typedef struct {
             	/// Cycle time container
-            	ThreadCycleContainer cycleContainer;
+            	GuardDataContainer<CycleTimeData> cycleContainer;
             	/// Thread program
             	ThreadProgram *thProgram;
 			} threadProgramData;

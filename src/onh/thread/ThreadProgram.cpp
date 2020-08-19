@@ -22,15 +22,13 @@
 using namespace onh;
 
 ThreadProgram::ThreadProgram(const ThreadExitController &thEC,
-		const ThreadCycleContainerController & thCCC,
-		const std::string& dirName,
-		const std::string& fPrefix)
+								const GuardDataController<CycleTimeData> &gdcCTD,
+								const std::string& dirName,
+								const std::string& fPrefix):
+	thCycleTimeController(gdcCTD)
 {
     // Thread exit controller
 	thExitControll = new ThreadExitController(thEC);
-
-	// Thread cycle time controller
-	thCycleTimeControll = new ThreadCycleContainerController(thCCC);
 
     // Create logger
     log = new Logger(dirName, fPrefix);
@@ -44,9 +42,6 @@ ThreadProgram::~ThreadProgram()
 {
     if (thExitControll)
         delete thExitControll;
-
-    if (thCycleTimeControll)
-    	delete thCycleTimeControll;
 
     if (thCycle)
         delete thCycle;
@@ -71,13 +66,10 @@ void ThreadProgram::stopCycleMeasure() {
     if (!thCycle)
         throw Exception("Cycle time object does not exist", "ThreadProgram::stopCycleMeasure");
 
-    if (!thCycleTimeControll)
-		throw Exception("Thread cycle time controller object does not exist", "ThreadProgram::stopCycleMeasure");
-
     thCycle->stop();
 
     // Pass counted value to the cycle time controller
-    thCycleTimeControll->setCycleTime(thCycle->getCycle());
+    thCycleTimeController.setData(thCycle->getCycle());
 }
 
 bool ThreadProgram::isExitFlag() const {

@@ -19,23 +19,24 @@
 #ifndef SRC_ONH_THREAD_THREADCYCLECONTROLLERS_H_
 #define SRC_ONH_THREAD_THREADCYCLECONTROLLERS_H_
 
-#include "ThreadCycleContainerController.h"
+#include "../utils/CycleTime.h"
+#include "../utils/GuardDataController.h"
 
 namespace onh {
 
 	typedef struct {
 		/// Cycle time controller Process updater
-		ThreadCycleContainerController cUpdater;
+		GuardDataController<CycleTimeData> cUpdater;
 		/// Cycle time controller Process updater
-		ThreadCycleContainerController cAlarming;
+		GuardDataController<CycleTimeData> cAlarming;
 		/// Cycle time controller Logger
-		ThreadCycleContainerController cLogger;
+		GuardDataController<CycleTimeData> cLogger;
 		/// Cycle time controller Logger writer
-		ThreadCycleContainerController cLoggerWriter;
+		GuardDataController<CycleTimeData> cLoggerWriter;
 		/// Cycle time controller Script system
-		ThreadCycleContainerController cScript;
+		GuardDataController<CycleTimeData> cScript;
 		/// Cycle time controller Driver polling
-		ThreadCycleContainerController cDriverPolling;
+		GuardDataController<CycleTimeData> cDriverPolling;
 	} ThreadCycleControllers;
 
 }

@@ -28,8 +28,8 @@ using namespace onh;
 DriverPollingProg::DriverPollingProg(const DriverBufferUpdater& dbu,
 										unsigned int updateInterval,
 										const ThreadExitController &thEC,
-										const ThreadCycleContainerController &thCCC):
-    ThreadProgram(thEC, thCCC, "driver", "polling_")
+										const GuardDataController<CycleTimeData> &gdcCTD):
+    ThreadProgram(thEC, gdcCTD, "driver", "polling_")
 {
     // Driver updater
     drvUpdater = new DriverBufferUpdater(dbu);

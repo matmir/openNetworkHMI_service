@@ -27,8 +27,8 @@ using namespace onh;
 ProcessUpdaterProg::ProcessUpdaterProg(const ProcessUpdater& pru,
 										unsigned int updateInterval,
 										const ThreadExitController &thEC,
-										const ThreadCycleContainerController &thCCC):
-	ThreadProgram(thEC, thCCC, "process", "procUpd_")
+										const GuardDataController<CycleTimeData> &gdcCTD):
+	ThreadProgram(thEC, gdcCTD, "process", "procUpd_")
 {
     // Process updater
     prUpdater = new ProcessUpdater(pru);

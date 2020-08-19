@@ -31,8 +31,8 @@ TagLoggerProg::TagLoggerProg(const ProcessReader& pr,
 								const TagLoggerBufferController& tlbc,
 								unsigned int updateInterval,
 								const ThreadExitController &thEC,
-								const ThreadCycleContainerController &thCCC):
-    ThreadProgram(thEC, thCCC, "taglogger", "tagLog_")
+								const GuardDataController<CycleTimeData> &gdcCTD):
+    ThreadProgram(thEC, gdcCTD, "taglogger", "tagLog_")
 {
     // Process reader
     prReader = new ProcessReader(pr);

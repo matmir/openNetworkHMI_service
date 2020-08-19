@@ -760,12 +760,12 @@ std::string CommandParser::CMD_GET_THREAD_CYCLE_TIME(const std::string& data) {
     CycleTimeData UpdaterCT, LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, PollingCT;
 
     // Get cycle times
-    UpdaterCT = cycleController.cUpdater.getCycleTime();
-    LoggerCT = cycleController.cLogger.getCycleTime();
-    LoggerWriterCT = cycleController.cLoggerWriter.getCycleTime();
-    AlarmingCT = cycleController.cAlarming.getCycleTime();
-    ScriptCT = cycleController.cScript.getCycleTime();
-    PollingCT = cycleController.cDriverPolling.getCycleTime();
+    cycleController.cUpdater.getData(UpdaterCT);
+    cycleController.cLogger.getData(LoggerCT);
+    cycleController.cLoggerWriter.getData(LoggerWriterCT);
+    cycleController.cAlarming.getData(AlarmingCT);
+    cycleController.cScript.getData(ScriptCT);
+    cycleController.cDriverPolling.getData(PollingCT);
 
     return replyOK(UpdaterCT, LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, PollingCT);
 }

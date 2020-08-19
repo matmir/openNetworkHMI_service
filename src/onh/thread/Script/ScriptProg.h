@@ -44,7 +44,7 @@ namespace onh {
              * @param execScript Full path to the main execute script
              * @param tstEnv Test environment flag
              * @param thEC Thread exit controller
-             * @param thCCC Thread cycle time controller
+             * @param gdcCTD Thread cycle time controller
              */
             ScriptProg(const ProcessReader& pr,
 						const ProcessWriter& pw,
@@ -53,7 +53,7 @@ namespace onh {
 						const std::string& execScript,
 						bool tstEnv,
 						const ThreadExitController &thEC,
-						const ThreadCycleContainerController &thCCC);
+						const GuardDataController<CycleTimeData> &gdcCTD);
 
             /**
 			 * Copy constructor - inactive

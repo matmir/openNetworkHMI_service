@@ -20,7 +20,7 @@
 #define THREADPROGRAM_H
 
 #include "ThreadExitController.h"
-#include "ThreadCycleContainerController.h"
+#include "../utils/GuardDataController.h"
 #include "../utils/Logger.h"
 #include "../utils/CycleTime.h"
 
@@ -41,7 +41,7 @@ namespace onh {
              * @param fPrefix Log file name prefix
              */
             ThreadProgram(const ThreadExitController &thEC,
-            		const ThreadCycleContainerController &thCCC,
+            		const GuardDataController<CycleTimeData> &gdcCTD,
             		const std::string& dirName,
 					const std::string& fPrefix = "");
 
@@ -72,8 +72,8 @@ namespace onh {
 			/// Thread exit controller
 			ThreadExitController *thExitControll;
 
-			/// Thread cycle time container controller
-			ThreadCycleContainerController *thCycleTimeControll;
+			/// Thread cycle time data controller
+			GuardDataController<CycleTimeData> thCycleTimeController;
 
 			/// Logger object
 			Logger* log;

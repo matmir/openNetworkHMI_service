@@ -80,7 +80,7 @@ void ThreadManager::initProcessUpdater(const ProcessUpdater& pu, unsigned int up
 	thProcessUpdater.thProgram = new ProcessUpdaterProg(pu,
 														updateInterval,
 														tmExit.getExitController(),
-														thProcessUpdater.cycleContainer.getController());
+														thProcessUpdater.cycleContainer.getController(false));
 }
 
 void ThreadManager::initDriverPolling(const DriverBufferUpdater& dbu, unsigned int updateInterval) {
@@ -91,7 +91,7 @@ void ThreadManager::initDriverPolling(const DriverBufferUpdater& dbu, unsigned i
 	thDriverPolling.thProgram = new DriverPollingProg(dbu,
 														updateInterval,
 														tmExit.getExitController(),
-														thDriverPolling.cycleContainer.getController());
+														thDriverPolling.cycleContainer.getController(false));
 }
 
 void ThreadManager::initAlarmingThread(const ProcessReader& pr,
@@ -107,7 +107,7 @@ void ThreadManager::initAlarmingThread(const ProcessReader& pr,
 											adb,
 											updateInterval,
 											tmExit.getExitController(),
-											thAlarming.cycleContainer.getController());
+											thAlarming.cycleContainer.getController(false));
 }
 
 void ThreadManager::initTagLoggerThread(const ProcessReader& pr,
@@ -123,7 +123,7 @@ void ThreadManager::initTagLoggerThread(const ProcessReader& pr,
 											tlbc,
 											updateInterval,
 											tmExit.getExitController(),
-											thLogger.cycleContainer.getController());
+											thLogger.cycleContainer.getController(false));
 }
 
 void ThreadManager::initTagLoggerWriterThread(const TagLoggerDB& tldb,
@@ -137,7 +137,7 @@ void ThreadManager::initTagLoggerWriterThread(const TagLoggerDB& tldb,
 														tlbc,
 														updateInterval,
 														tmExit.getExitController(),
-														thLoggerWriter.cycleContainer.getController());
+														thLoggerWriter.cycleContainer.getController(false));
 }
 
 void ThreadManager::initScriptThread(const ProcessReader& pr,
@@ -157,7 +157,7 @@ void ThreadManager::initScriptThread(const ProcessReader& pr,
 										executeScript,
 										testEnv,
 										tmExit.getExitController(),
-										thScript.cycleContainer.getController());
+										thScript.cycleContainer.getController(false));
 }
 
 void ThreadManager::initSocketThread(const ProcessReader& pr,
@@ -170,12 +170,12 @@ void ThreadManager::initSocketThread(const ProcessReader& pr,
 		throw Exception("Socket thread already initialized", "ThreadManager::initSocketThread");
 
 	ThreadCycleControllers cc = {
-		thProcessUpdater.cycleContainer.getController(true),
-		thAlarming.cycleContainer.getController(true),
-		thLogger.cycleContainer.getController(true),
-		thLoggerWriter.cycleContainer.getController(true),
-		thScript.cycleContainer.getController(true),
-		thDriverPolling.cycleContainer.getController(true),
+		thProcessUpdater.cycleContainer.getController(),
+		thAlarming.cycleContainer.getController(),
+		thLogger.cycleContainer.getController(),
+		thLoggerWriter.cycleContainer.getController(),
+		thScript.cycleContainer.getController(),
+		thDriverPolling.cycleContainer.getController(),
 	};
 
 	thSocket = new SocketProgram(pr,
