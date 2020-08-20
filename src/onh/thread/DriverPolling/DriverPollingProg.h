@@ -37,12 +37,12 @@ namespace onh {
              *
              * @param dbu Driver buffer updater
              * @param updateInterval Thread update interval (milliseconds)
-             * @param thEC Thread exit controller
+             * @param gdcTED Thread exit data controller
              * @param gdcCTD Thread cycle time controller
              */
             DriverPollingProg(const DriverBufferUpdater& dbu,
             					unsigned int updateInterval,
-								const ThreadExitController &thEC,
+								const GuardDataController<ThreadExitData> &gdcTED,
 								const GuardDataController<CycleTimeData> &gdcCTD);
 
             /**

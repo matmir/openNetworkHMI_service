@@ -29,7 +29,8 @@
 #include "CommandParserException.h"
 #include "../../../db/ParserDB.h"
 #include "../../../db/DBCredentials.h"
-#include "../../ThreadExitController.h"
+#include "../../ThreadExitData.h"
+#include "../../../utils/GuardDataController.h"
 
 namespace onh {
 
@@ -47,14 +48,14 @@ namespace onh {
              * @param pw Process writer
              * @param dbc DB data
              * @param cc Thread cycle controllers
-             * @param thEC Thread exit controller
+             * @param gdcTED Thread exit controller
              * @param connDescriptor Socket connection descriptor
              */
             CommandParser(const ProcessReader& pr,
 							const ProcessWriter& pw,
 							const DBCredentials& dbc,
 							const ThreadCycleControllers& cc,
-							const ThreadExitController &thEC,
+							const GuardDataController<ThreadExitData> &gdcTED,
 							int connDescriptor);
 
             /**
@@ -84,8 +85,8 @@ namespace onh {
             /// Process data writer
             ProcessWriter *prWriter;
 
-            /// Thread exit controller
-            ThreadExitController *thExitController;
+            /// Thread exit data controller
+            GuardDataController<ThreadExitData> thExitController;
 
             /// Thread cycle controllers
             ThreadCycleControllers cycleController;

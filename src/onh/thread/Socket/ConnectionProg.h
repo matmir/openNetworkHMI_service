@@ -22,7 +22,8 @@
 #include "../../driver/ProcessReader.h"
 #include "../../driver/ProcessWriter.h"
 #include "../../thread/ThreadCycleControllers.h"
-#include "../../thread/ThreadExitController.h"
+#include "../ThreadExitData.h"
+#include "../../utils/GuardDataController.h"
 #include "../../db/DBCredentials.h"
 #include "../../utils/Logger.h"
 #include "Parser/CommandParser.h"
@@ -44,14 +45,14 @@ namespace onh {
              * @param pw Process writer
              * @param cc Cycle time controllers
              * @param db Database credentials
-             * @param thEC Thread exit controller
+             * @param gdcTED Thread exit controller
              */
     		ConnectionProgram(int connDescriptor,
     							const ProcessReader& pr,
 								const ProcessWriter& pw,
 								const ThreadCycleControllers& cc,
 								const DBCredentials& db,
-    							const ThreadExitController &thEC);
+								const GuardDataController<ThreadExitData> &gdcTED);
 
             /**
              * Copy constructor
@@ -89,8 +90,8 @@ namespace onh {
 			/// DB credentials
 			DBCredentials dbCredentials;
 
-			/// Thread Exit controller
-			ThreadExitController *thExit;
+			/// Thread Exit data controller
+			GuardDataController<ThreadExitData> thExit;
 
 			/// Cycle controllers
 			ThreadCycleControllers cycleController;

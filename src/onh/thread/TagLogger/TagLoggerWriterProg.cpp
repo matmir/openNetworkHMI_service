@@ -23,9 +23,9 @@ using namespace onh;
 TagLoggerWriterProg::TagLoggerWriterProg(const TagLoggerDB& tldb,
 											const TagLoggerBufferController& tlbc,
 											unsigned int updateInterval,
-											const ThreadExitController &thEC,
+											const GuardDataController<ThreadExitData> &gdcTED,
 											const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(thEC, gdcCTD, "taglogger", "tagLogWriter_")
+	ThreadProgram(gdcTED, gdcCTD, "taglogger", "tagLogWriter_")
 {
 	// Create delay
 	itsDelay = new Delay(updateInterval);

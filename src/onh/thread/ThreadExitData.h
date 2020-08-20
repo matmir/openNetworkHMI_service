@@ -16,56 +16,23 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ThreadExit.h"
+#ifndef SRC_ONH_THREAD_THREADEXITDATA_H_
+#define SRC_ONH_THREAD_THREADEXITDATA_H_
 
-using namespace onh;
+#include <string>
 
-ThreadExit::ThreadExit():
-    exitFromMain(false), exitFromThread(false), additionalInfo(""), socketFD(0)
-{
+namespace onh {
+
+	typedef struct ThreadExitData {
+		/// Exit flag
+		bool exit;
+
+		/// Additional information about exit
+		std::string additionalInfo;
+
+		ThreadExitData(): exit(false), additionalInfo("") {}
+	} ThreadExitData;
+
 }
 
-ThreadExit::~ThreadExit()
-{
-}
-
-void ThreadExit::exit() {
-
-    teLock.lock();
-
-    exitFromMain = true;
-	additionalInfo = "Main process";
-
-	teLock.unlock();
-}
-
-std::string ThreadExit::getExitInfo() {
-
-    std::string s;
-
-    teLock.lock();
-
-    s = additionalInfo;
-
-	teLock.unlock();
-
-	return s;
-}
-
-ThreadExitController ThreadExit::getExitController() {
-
-    return ThreadExitController(teLock.getAccess(), &exitFromMain, &exitFromThread, &additionalInfo, &socketFD);
-}
-
-int ThreadExit::getSocketFD() {
-
-	int fd = 0;
-
-	teLock.lock();
-
-	fd = socketFD;
-
-	teLock.unlock();
-
-	return fd;
-}
+#endif /* SRC_ONH_THREAD_THREADEXITDATA_H_ */

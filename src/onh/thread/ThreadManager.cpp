@@ -79,7 +79,7 @@ void ThreadManager::initProcessUpdater(const ProcessUpdater& pu, unsigned int up
 
 	thProcessUpdater.thProgram = new ProcessUpdaterProg(pu,
 														updateInterval,
-														tmExit.getExitController(),
+														tmExit.getController(false),
 														thProcessUpdater.cycleContainer.getController(false));
 }
 
@@ -90,7 +90,7 @@ void ThreadManager::initDriverPolling(const DriverBufferUpdater& dbu, unsigned i
 
 	thDriverPolling.thProgram = new DriverPollingProg(dbu,
 														updateInterval,
-														tmExit.getExitController(),
+														tmExit.getController(false),
 														thDriverPolling.cycleContainer.getController(false));
 }
 
@@ -106,7 +106,7 @@ void ThreadManager::initAlarmingThread(const ProcessReader& pr,
 											pw,
 											adb,
 											updateInterval,
-											tmExit.getExitController(),
+											tmExit.getController(false),
 											thAlarming.cycleContainer.getController(false));
 }
 
@@ -122,7 +122,7 @@ void ThreadManager::initTagLoggerThread(const ProcessReader& pr,
 											tldb,
 											tlbc,
 											updateInterval,
-											tmExit.getExitController(),
+											tmExit.getController(false),
 											thLogger.cycleContainer.getController(false));
 }
 
@@ -136,7 +136,7 @@ void ThreadManager::initTagLoggerWriterThread(const TagLoggerDB& tldb,
 	thLoggerWriter.thProgram = new TagLoggerWriterProg(tldb,
 														tlbc,
 														updateInterval,
-														tmExit.getExitController(),
+														tmExit.getController(false),
 														thLoggerWriter.cycleContainer.getController(false));
 }
 
@@ -156,7 +156,7 @@ void ThreadManager::initScriptThread(const ProcessReader& pr,
 										updateInterval,
 										executeScript,
 										testEnv,
-										tmExit.getExitController(),
+										tmExit.getController(false),
 										thScript.cycleContainer.getController(false));
 }
 
@@ -184,7 +184,8 @@ void ThreadManager::initSocketThread(const ProcessReader& pr,
 									port,
 									maxConn,
 									cc,
-									tmExit.getExitController());
+									tmExit.getController(false),
+									tmSockDesc.getController(false));
 }
 
 void ThreadManager::run() {
@@ -237,17 +238,26 @@ void ThreadManager::run() {
 
 void ThreadManager::exitMain() {
 
-    tmExit.exit();
+	ThreadExitData ex;
+	ex.exit = true;
+	ex.additionalInfo = "Exit from main";
+
+	// Trigger application exit
+	tmExit.getController(false).setData(ex);
 }
 
 std::string ThreadManager::getExitInfo() {
 
-	return tmExit.getExitInfo();
+	ThreadExitData ex;
+	tmExit.getController().getData(ex);
+
+	return ex.additionalInfo;
 }
 
 void ThreadManager::shutdownSocket() {
 
-	int sockFD = tmExit.getSocketFD();
+	int sockFD = 0;
+	tmSockDesc.getController().getData(sockFD);
 
 	// Shutdown socket
 	if (sockFD != 0 && sockFD != -1) {

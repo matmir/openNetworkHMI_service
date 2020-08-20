@@ -19,7 +19,8 @@
 #ifndef THREADSOCKET_H
 #define THREADSOCKET_H
 
-#include "ThreadExitController.h"
+#include "ThreadExitData.h"
+#include "../utils/GuardDataController.h"
 #include "../utils/Logger.h"
 
 namespace onh {
@@ -34,13 +35,15 @@ namespace onh {
             /**
              * Constructor
              *
-             * @param thEC Thread exit controller
+             * @param gdcTED Thread exit data controller
+             * @param gdcSockDesc Socket file descriptor controller
              * @param dirName Name of the directory where to write log files
              * @param fPrefix Log file name prefix
              */
-    		ThreadSocket(const ThreadExitController &thEC,
-            		const std::string& dirName,
-					const std::string& fPrefix = "");
+    		ThreadSocket(const GuardDataController<ThreadExitData> &gdcTED,
+							const GuardDataController<int> &gdcSockDesc,
+							const std::string& dirName,
+							const std::string& fPrefix = "");
 
             /**
              * Copy constructor - inactive
@@ -64,20 +67,30 @@ namespace onh {
 
         private:
 
-			/// Thread exit controller
-			ThreadExitController *thExitControll;
+            /// Thread exit data controller
+			GuardDataController<ThreadExitData> thExitController;
+
+			/// Socket file descriptor controller
+			GuardDataController<int> thSockDecsController;
 
 			/// Logger object
 			Logger* log;
 
         protected:
 
+			/**
+			 * Get Exit controller
+			 *
+			 * @return Exit data controller
+			 */
+			const GuardDataController<ThreadExitData>& getExitController();
+
             /**
              * Check if thread need to be closed
              *
              * @return True if thread need to be closed
              */
-            bool isExitFlag() const;
+            bool isExitFlag();
 
             /**
              * Trigger exit from thread

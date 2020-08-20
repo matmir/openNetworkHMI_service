@@ -37,12 +37,12 @@ namespace onh {
              *
              * @param pru Process updater
              * @param updateInterval Process update interval (milliseconds)
-             * @param thEC Thread exit controller
+             * @param gdcTED Thread exit data controller
              * @param gdcCTD Thread cycle time controller
              */
             ProcessUpdaterProg(const ProcessUpdater& pru,
             					unsigned int updateInterval,
-								const ThreadExitController &thEC,
+								const GuardDataController<ThreadExitData> &gdcTED,
 								const GuardDataController<CycleTimeData> &gdcCTD);
 
             /**

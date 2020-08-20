@@ -45,7 +45,8 @@ namespace onh {
              * @param port Socket port
              * @param maxConn Socket max connection number
              * @param cc Thread cycle controllers
-             * @param thEC Thread exit controller
+             * @param gdcTED Thread exit data controller
+             * @param gdcSockDesc Socket file descriptor controller
              */
     		SocketProgram(const ProcessReader& pr,
 							const ProcessWriter& pw,
@@ -53,7 +54,8 @@ namespace onh {
 							int port,
 							int maxConn,
 							const ThreadCycleControllers& cc,
-							const ThreadExitController &thEC);
+							const GuardDataController<ThreadExitData> &gdcTED,
+							const GuardDataController<int> &gdcSockDesc);
 
     		/**
 			 * Copy constructor - inactive
@@ -78,7 +80,6 @@ namespace onh {
 			ProcessReader *pReader;
 			ProcessWriter *pWriter;
 			DBCredentials dbCredentials;
-			ThreadExitController *thExit;
 			ThreadCycleControllers cycleController;
 			int sPort;
 			int sMaxConn;

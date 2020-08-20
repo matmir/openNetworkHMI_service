@@ -29,17 +29,15 @@ SocketProgram::SocketProgram(const ProcessReader& pr,
 								int port,
 								int maxConn,
 								const ThreadCycleControllers& cc,
-								const ThreadExitController &thEC):
-	ThreadSocket(thEC, "socket", "serv_"), dbCredentials(dbc), cycleController(cc), sPort(port), sMaxConn(maxConn)
+								const GuardDataController<ThreadExitData> &gdcTED,
+								const GuardDataController<int> &gdcSockDesc):
+	ThreadSocket(gdcTED, gdcSockDesc, "socket", "serv_"), dbCredentials(dbc), cycleController(cc), sPort(port), sMaxConn(maxConn)
 {
 	// Process reader
 	pReader = new ProcessReader(pr);
 
 	// Process writer
 	pWriter = new ProcessWriter(pw);
-
-	// Thread exit controller
-	thExit = new ThreadExitController(thEC);
 
     // Socket
     sock = new Socket(port, maxConn);
@@ -52,9 +50,6 @@ SocketProgram::~SocketProgram()
 
 	if (pWriter)
 		delete pWriter;
-
-	if (thExit)
-		delete thExit;
 
     if (sock) {
     	getLogger().write("Close socket");
@@ -115,7 +110,7 @@ void SocketProgram::createConnectionThread(int connFD) {
 																*pWriter,
 																cycleController,
 																dbCredentials,
-																*thExit)));
+																getExitController())));
 
 	// Check connection vector
 	if (tConn.size() >= (THREADS_POOL-1)) {

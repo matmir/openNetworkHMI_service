@@ -29,17 +29,14 @@ ConnectionProgram::ConnectionProgram(int connDescriptor,
 										const ProcessWriter& pw,
 										const ThreadCycleControllers& cc,
 										const DBCredentials& db,
-										const ThreadExitController &thEC):
-	connDesc(connDescriptor), dbCredentials(db), cycleController(cc)
+										const GuardDataController<ThreadExitData> &gdcTED):
+	connDesc(connDescriptor), dbCredentials(db), thExit(gdcTED), cycleController(cc)
 {
 	// Process reader
 	pReader = new ProcessReader(pr);
 
 	// Process writer
 	pWriter = new ProcessWriter(pw);
-
-	// Thread exit controller
-	thExit = new ThreadExitController(thEC);
 
 	// Create logger
 	std::stringstream s;
@@ -51,21 +48,18 @@ ConnectionProgram::ConnectionProgram(int connDescriptor,
 								pw,
 								db,
 								cc,
-								thEC,
+								thExit,
 								connDescriptor);
 }
 
 ConnectionProgram::ConnectionProgram(const ConnectionProgram& rhs):
-	connDesc(rhs.connDesc), dbCredentials(rhs.dbCredentials), cycleController(rhs.cycleController)
+	connDesc(rhs.connDesc), dbCredentials(rhs.dbCredentials), thExit(rhs.thExit), cycleController(rhs.cycleController)
 {
 	// Process reader
 	pReader = new ProcessReader(*rhs.pReader);
 
 	// Process writer
 	pWriter = new ProcessWriter(*rhs.pWriter);
-
-	// Thread exit controller
-	thExit = new ThreadExitController(*rhs.thExit);
 
 	// Create logger
 	std::stringstream s;
@@ -77,7 +71,7 @@ ConnectionProgram::ConnectionProgram(const ConnectionProgram& rhs):
 								*pWriter,
 								dbCredentials,
 								cycleController,
-								*thExit,
+								thExit,
 								connDesc);
 }
 
@@ -88,9 +82,6 @@ ConnectionProgram::~ConnectionProgram() {
 
 	if (pWriter)
 		delete pWriter;
-
-	if (thExit)
-		delete thExit;
 
 	if (parser)
 		delete parser;

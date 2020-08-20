@@ -28,9 +28,9 @@ AlarmingProg::AlarmingProg(const ProcessReader& pr,
 							const ProcessWriter& pw,
 							const AlarmingDB& adb,
 							unsigned int updateInterval,
-							const ThreadExitController &thEC,
+							const GuardDataController<ThreadExitData> &gdcTED,
 							const GuardDataController<CycleTimeData> &gdcCTD):
-    ThreadProgram(thEC, gdcCTD, "alarming", "alarmLog_")
+    ThreadProgram(gdcTED, gdcCTD, "alarming", "alarmLog_")
 {
     // Process Reader
     prReader = new ProcessReader(pr);

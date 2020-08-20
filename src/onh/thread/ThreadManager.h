@@ -25,7 +25,7 @@
 #include "ThreadProgram.h"
 #include "ThreadSocket.h"
 #include "../utils/GuardDataContainer.h"
-#include "ThreadExit.h"
+#include "ThreadExitData.h"
 #include "../driver/DriverBufferUpdater.h"
 #include "../driver/ProcessUpdater.h"
 #include "../driver/ProcessReader.h"
@@ -186,7 +186,10 @@ namespace onh {
 			} threadProgramData;
 
             /// Thread exit
-            ThreadExit tmExit;
+			GuardDataContainer<ThreadExitData> tmExit;
+
+			/// Socket file descriptor
+			GuardDataContainer<int> tmSockDesc;
 
             /// Thread data for Process Updater
             threadProgramData thProcessUpdater;

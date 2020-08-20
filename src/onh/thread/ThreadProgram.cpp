@@ -21,15 +21,12 @@
 
 using namespace onh;
 
-ThreadProgram::ThreadProgram(const ThreadExitController &thEC,
+ThreadProgram::ThreadProgram(const GuardDataController<ThreadExitData> &gdcTED,
 								const GuardDataController<CycleTimeData> &gdcCTD,
 								const std::string& dirName,
 								const std::string& fPrefix):
-	thCycleTimeController(gdcCTD)
+	thExitController(gdcTED), thCycleTimeController(gdcCTD)
 {
-    // Thread exit controller
-	thExitControll = new ThreadExitController(thEC);
-
     // Create logger
     log = new Logger(dirName, fPrefix);
     log->write("Initialize thread logger");
@@ -40,9 +37,6 @@ ThreadProgram::ThreadProgram(const ThreadExitController &thEC,
 
 ThreadProgram::~ThreadProgram()
 {
-    if (thExitControll)
-        delete thExitControll;
-
     if (thCycle)
         delete thCycle;
 
@@ -72,21 +66,22 @@ void ThreadProgram::stopCycleMeasure() {
     thCycleTimeController.setData(thCycle->getCycle());
 }
 
-bool ThreadProgram::isExitFlag() const {
+bool ThreadProgram::isExitFlag() {
 
-	if (!thExitControll)
-		throw Exception("Thread exit controller object does not exist", "ThreadProgram::isExitFlag");
+	ThreadExitData ex;
+	thExitController.getData(ex);
 
-	return thExitControll->exitThread();
+	return ex.exit;
 }
 
 void ThreadProgram::exit(const std::string& info) {
 
-	if (!thExitControll)
-		throw Exception("Thread exit controller object does not exist", "ThreadProgram::exit");
+	ThreadExitData ex;
+	ex.exit = true;
+	ex.additionalInfo = info;
 
 	// Trigger application exit
-	thExitControll->exit(info);
+	thExitController.setData(ex);
 }
 
 Logger& ThreadProgram::getLogger() {

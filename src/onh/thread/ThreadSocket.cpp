@@ -21,13 +21,12 @@
 
 using namespace onh;
 
-ThreadSocket::ThreadSocket(const ThreadExitController &thEC,
-		const std::string& dirName,
-		const std::string& fPrefix)
+ThreadSocket::ThreadSocket(const GuardDataController<ThreadExitData> &gdcTED,
+							const GuardDataController<int> &gdcSockDesc,
+							const std::string& dirName,
+							const std::string& fPrefix):
+	thExitController(gdcTED), thSockDecsController(gdcSockDesc)
 {
-    // Thread exit controller
-	thExitControll = new ThreadExitController(thEC);
-
     // Create logger
     log = new Logger(dirName, fPrefix);
     log->write("Initialize thread logger");
@@ -35,9 +34,6 @@ ThreadSocket::ThreadSocket(const ThreadExitController &thEC,
 
 ThreadSocket::~ThreadSocket()
 {
-    if (thExitControll)
-        delete thExitControll;
-
     if (log) {
         log->write("Closing thread logger");
 
@@ -45,29 +41,32 @@ ThreadSocket::~ThreadSocket()
     }
 }
 
-bool ThreadSocket::isExitFlag() const {
+const GuardDataController<ThreadExitData>& ThreadSocket::getExitController() {
 
-	if (!thExitControll)
-		throw Exception("Thread exit controller object does not exist", "ThreadSocket::isExitFlag");
+	return thExitController;
+}
 
-	return thExitControll->exitThread();
+bool ThreadSocket::isExitFlag() {
+
+	ThreadExitData ex;
+	thExitController.getData(ex);
+
+	return ex.exit;
 }
 
 void ThreadSocket::exit(const std::string& info) {
 
-	if (!thExitControll)
-		throw Exception("Thread exit controller object does not exist", "ThreadSocket::exit");
+	ThreadExitData ex;
+	ex.exit = true;
+	ex.additionalInfo = info;
 
 	// Trigger application exit
-	thExitControll->exit(info);
+	thExitController.setData(ex);
 }
 
 void ThreadSocket::setSocketFD(int sockFD) {
 
-	if (!thExitControll)
-		throw Exception("Thread exit controller object does not exist", "ThreadSocket::setSocketFD");
-
-	thExitControll->setSocketFD(sockFD);
+	thSockDecsController.setData(sockFD);
 }
 
 Logger& ThreadSocket::getLogger() {

@@ -34,9 +34,9 @@ ScriptProg::ScriptProg(const ProcessReader& pr,
 						unsigned int updateInterval,
 						const std::string& execScript,
 						bool tstEnv,
-						const ThreadExitController &thEC,
+						const GuardDataController<ThreadExitData> &gdcTED,
 						const GuardDataController<CycleTimeData> &gdcCTD):
-    ThreadProgram(thEC, gdcCTD,"script", "scriptLog_"), executeScript(execScript), testEnv(tstEnv)
+    ThreadProgram(gdcTED, gdcCTD,"script", "scriptLog_"), executeScript(execScript), testEnv(tstEnv)
 {
     // Process reader
     prReader = new ProcessReader(pr);

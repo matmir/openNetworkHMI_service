@@ -19,7 +19,7 @@
 #ifndef THREADPROGRAM_H
 #define THREADPROGRAM_H
 
-#include "ThreadExitController.h"
+#include "ThreadExitData.h"
 #include "../utils/GuardDataController.h"
 #include "../utils/Logger.h"
 #include "../utils/CycleTime.h"
@@ -35,12 +35,12 @@ namespace onh {
             /**
              * Constructor
              *
-             * @param thEC Thread exit controller
+             * @param gdcTED Thread exit data controller
              * @param thCCC Thread cycle time controller
              * @param dirName Name of the directory where to write log files
              * @param fPrefix Log file name prefix
              */
-            ThreadProgram(const ThreadExitController &thEC,
+            ThreadProgram(const GuardDataController<ThreadExitData> &gdcTED,
             		const GuardDataController<CycleTimeData> &gdcCTD,
             		const std::string& dirName,
 					const std::string& fPrefix = "");
@@ -69,8 +69,8 @@ namespace onh {
             /// Thread program cycle time
             CycleTime* thCycle;
 
-			/// Thread exit controller
-			ThreadExitController *thExitControll;
+			/// Thread exit data controller
+            GuardDataController<ThreadExitData> thExitController;
 
 			/// Thread cycle time data controller
 			GuardDataController<CycleTimeData> thCycleTimeController;
@@ -95,7 +95,7 @@ namespace onh {
              *
              * @return True if thread need to be closed
              */
-            bool isExitFlag() const;
+            bool isExitFlag();
 
             /**
              * Trigger exit from thread

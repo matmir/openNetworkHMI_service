@@ -27,18 +27,15 @@ CommandParser::CommandParser(const ProcessReader& pr,
 								const ProcessWriter& pw,
 								const DBCredentials& dbc,
 								const ThreadCycleControllers& cc,
-								const ThreadExitController &thEC,
+								const GuardDataController<ThreadExitData> &gdcTED,
 								int connDescriptor):
-	cycleController(cc)
+	thExitController(gdcTED), cycleController(cc)
 {
     // Process reader
     prReader = new ProcessReader(pr);
 
     // Process writer
     prWriter = new ProcessWriter(pw);
-
-    // Thread controller
-    thExitController = new ThreadExitController(thEC);
 
     // DB access
     db = new ParserDB(dbc);
@@ -55,8 +52,6 @@ CommandParser::~CommandParser()
         delete prReader;
     if (prWriter)
         delete prWriter;
-    if (thExitController)
-        delete thExitController;
     if (db)
         delete db;
 
@@ -780,7 +775,12 @@ std::string CommandParser::CMD_EXIT_APP(const std::string& data) {
         throw CommandParserException(CommandParserException::WRONG_DATA, "Wrong data", "CommandParser::CMD_EXIT_APP");
 
     // Exit application
-    thExitController->exit("CMD_EXIT_APP from socket client");
+    ThreadExitData ex;
+	ex.exit = true;
+	ex.additionalInfo = "CMD_EXIT_APP from socket client";
+
+	// Trigger application exit
+	thExitController.setData(ex);
 
     return replyOK(EXIT_APP);
 }

@@ -43,7 +43,7 @@ namespace onh {
              * @param updateInterval Script system update interval (milliseconds)
              * @param execScript Full path to the main execute script
              * @param tstEnv Test environment flag
-             * @param thEC Thread exit controller
+             * @param gdcTED Thread exit data controller
              * @param gdcCTD Thread cycle time controller
              */
             ScriptProg(const ProcessReader& pr,
@@ -52,7 +52,7 @@ namespace onh {
 						unsigned int updateInterval,
 						const std::string& execScript,
 						bool tstEnv,
-						const ThreadExitController &thEC,
+						const GuardDataController<ThreadExitData> &gdcTED,
 						const GuardDataController<CycleTimeData> &gdcCTD);
 
             /**

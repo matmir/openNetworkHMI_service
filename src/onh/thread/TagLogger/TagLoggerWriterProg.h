@@ -41,13 +41,13 @@ namespace onh {
 			 * @param tldb Tag logger DB
 			 * @param tlbc Tag logger buffer controller
 			 * @param updateInterval Logger update interval (milliseconds)
-			 * @param thEC Thread exit controller
+			 * @param gdcTED Thread exit data controller
              * @param gdcCTD Thread cycle time controller
 			 */
 			TagLoggerWriterProg(const TagLoggerDB& tldb,
 								const TagLoggerBufferController& tlbc,
 								unsigned int updateInterval,
-								const ThreadExitController &thEC,
+								const GuardDataController<ThreadExitData> &gdcTED,
 								const GuardDataController<CycleTimeData> &gdcCTD);
 
 			/**
