@@ -151,18 +151,77 @@ TEST(GuardDataControllerTests, GuardSHM1) {
 TEST(GuardDataControllerTests, GuardException1) {
 
 	onh::GuardDataContainer<int> data;
-	onh::GuardDataController<int> c1(data.getController(false));
-	onh::GuardDataController<int> c2(data.getController());
+	onh::GuardDataController<int> c1(data.getController());
 
 	try {
 
-		c2.setData(13);
+		c1.setData(13);
 
 		FAIL() << "Expected onh::Exception";
 
 	} catch (onh::Exception &e) {
 
 		ASSERT_STREQ(e.what(), "GuardDataController::setData: Data controller is in read only state");
+
+	} catch(...) {
+		FAIL() << "Expected onh::Exception";
+	}
+}
+
+TEST(GuardDataControllerTests, GuardException2) {
+
+	onh::GuardDataContainer<int> data;
+	onh::GuardDataController<int> c1(data.getController());
+
+	try {
+
+		c1.lock();
+
+		FAIL() << "Expected onh::Exception";
+
+	} catch (onh::Exception &e) {
+
+		ASSERT_STREQ(e.what(), "GuardDataController::lock: Data controller is in read only state");
+
+	} catch(...) {
+		FAIL() << "Expected onh::Exception";
+	}
+}
+
+TEST(GuardDataControllerTests, GuardException3) {
+
+	onh::GuardDataContainer<int> data;
+	onh::GuardDataController<int> c1(data.getController());
+
+	try {
+
+		c1.getDataRef();
+
+		FAIL() << "Expected onh::Exception";
+
+	} catch (onh::Exception &e) {
+
+		ASSERT_STREQ(e.what(), "GuardDataController::getDataRef: Data controller is in read only state");
+
+	} catch(...) {
+		FAIL() << "Expected onh::Exception";
+	}
+}
+
+TEST(GuardDataControllerTests, GuardException4) {
+
+	onh::GuardDataContainer<int> data;
+	onh::GuardDataController<int> c1(data.getController(false));
+
+	try {
+
+		c1.getDataRef();
+
+		FAIL() << "Expected onh::Exception";
+
+	} catch (onh::Exception &e) {
+
+		ASSERT_STREQ(e.what(), "GuardDataController::getDataRef: Data are not locked");
 
 	} catch(...) {
 		FAIL() << "Expected onh::Exception";
