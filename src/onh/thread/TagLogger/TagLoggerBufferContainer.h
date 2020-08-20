@@ -23,8 +23,12 @@
 #include "../../utils/MutexContainer.h"
 #include "../../db/objs/TagLoggerItem.h"
 #include "TagLoggerBufferController.h"
+#include "../../utils/GuardDataContainer.h"
 
 namespace onh {
+
+	/// Guarded Tag logger buffer container
+	typedef GuardDataContainer<std::vector<TagLoggerItem>> loggerBufferContainer;
 
 	/**
 	 * Tag logger buffer controller class
@@ -53,7 +57,7 @@ namespace onh {
 			/**
 			 * Get tag logger buffer container controller object
 			 *
-			 * @param readOnly Read only flag
+			 * @param readOnly Read only flag (allowed only reading from buffer)
 			 *
 			 * @return Tag logger buffer container controller object
 			 */
@@ -61,17 +65,11 @@ namespace onh {
 
 		private:
 
-			/// Mutex for protecting buffer
-			MutexContainer buffLock;
-
 			/// Data buffer
-			std::vector<TagLoggerItem> buff;
-
-			/// Mutex for protecting finish flag
-			MutexContainer finishLock;
+			loggerBufferContainer buff;
 
 			/// Flag informs that controller finished inserting data
-			bool controllerInsertFinished;
+			GuardDataContainer<bool> controllerInsertFinished;
 	};
 }
 

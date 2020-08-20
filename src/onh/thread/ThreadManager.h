@@ -25,12 +25,12 @@
 #include "ThreadProgram.h"
 #include "ThreadSocket.h"
 #include "../utils/GuardDataContainer.h"
+#include "TagLogger/TagLoggerBufferContainer.h"
 #include "ThreadExitData.h"
 #include "../driver/DriverBufferUpdater.h"
 #include "../driver/ProcessUpdater.h"
 #include "../driver/ProcessReader.h"
 #include "../driver/ProcessWriter.h"
-#include "TagLogger/TagLoggerBufferController.h"
 #include "../db/AlarmingDB.h"
 #include "../db/TagLoggerDB.h"
 #include "../db/ScriptDB.h"
@@ -100,23 +100,19 @@ namespace onh {
              *
              * @param pr Process reader
              * @param tldb Tag logger DB
-             * @param tlbc Tag logger buffer controller
              * @param updateInterval Thread update interval (milliseconds)
              */
             void initTagLoggerThread(const ProcessReader& pr,
             							const TagLoggerDB& tldb,
-										const TagLoggerBufferController& tlbc,
 										unsigned int updateInterval);
 
             /**
              * Initialize Tag logger writer thread
              *
              * @param tldb Tag logger DB
-             * @param tlbc Tag logger buffer controller
              * @param updateInterval Thread update interval (milliseconds)
              */
             void initTagLoggerWriterThread(const TagLoggerDB& tldb,
-											const TagLoggerBufferController& tlbc,
 											unsigned int updateInterval);
 
             /**
@@ -205,6 +201,9 @@ namespace onh {
 
             /// Thread data for Tag logger writer system
             threadProgramData thLoggerWriter;
+
+            /// Tag logger buffer container
+			TagLoggerBufferContainer tagLoggerBuffer;
 
             /// Thread data for Script system
             threadProgramData thScript;

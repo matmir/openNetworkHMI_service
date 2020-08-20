@@ -73,6 +73,23 @@ namespace onh {
 			 */
 			void setData(GuardDataController& gdc);
 
+			/**
+			 * Lock access to the data
+			 */
+			void lock();
+
+			/**
+			 * Unlock access to the data
+			 */
+			void unlock();
+
+			/**
+			 * Get reference to the data
+			 *
+			 * @return Reference to the data
+			 */
+			T& getDataRef();
+
 		private:
 
 			/**
@@ -93,17 +110,20 @@ namespace onh {
 			/// Read only flag
 			bool readOnly;
 
+			/// Run lock function flag
+			bool lockCalled;
+
 	};
 
 	template <class T>
 	GuardDataController<T>::GuardDataController(const GuardDataController& gdc):
-		data(gdc.data), dataLock(gdc.dataLock), readOnly(gdc.readOnly)
+		data(gdc.data), dataLock(gdc.dataLock), readOnly(gdc.readOnly), lockCalled(gdc.lockCalled)
 	{
 	}
 
 	template <class T>
 	GuardDataController<T>::GuardDataController(T *dt, const MutexAccess &dtLock, bool readFlag):
-		data(dt), dataLock(dtLock), readOnly(readFlag)
+		data(dt), dataLock(dtLock), readOnly(readFlag), lockCalled(false)
 	{
 	}
 
@@ -165,6 +185,47 @@ namespace onh {
 		// Unlock access to the data
 		gdc.dataLock.unlock();
 		dataLock.unlock();
+	}
+
+	template <class T>
+	void GuardDataController<T>::lock() {
+
+		if (readOnly)
+			throw Exception("Data controller is in read only state", "GuardDataController::lock");
+
+		// Lock access to the data
+		dataLock.lock();
+
+		lockCalled = true;
+	}
+
+	template <class T>
+	void GuardDataController<T>::unlock() {
+
+		if (readOnly)
+			throw Exception("Data controller is in read only state", "GuardDataController::unlock");
+
+		if (lockCalled) {
+			// Lock access to the data
+			dataLock.unlock();
+
+			lockCalled = false;
+		}
+	}
+
+	template <class T>
+	T& GuardDataController<T>::getDataRef() {
+
+		if (readOnly)
+			throw Exception("Data controller is in read only state", "GuardDataController::getDataRef");
+
+		if (!data)
+			throw Exception("Data handle not initialized", "GuardDataController::getDataRef");
+
+		if (!lockCalled)
+			throw Exception("Data are not locked", "GuardDataController::getDataRef");
+
+		return *data;
 	}
 
 }

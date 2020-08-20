@@ -112,7 +112,6 @@ void ThreadManager::initAlarmingThread(const ProcessReader& pr,
 
 void ThreadManager::initTagLoggerThread(const ProcessReader& pr,
 										const TagLoggerDB& tldb,
-										const TagLoggerBufferController& tlbc,
 										unsigned int updateInterval)
 {
 	if (thLogger.thProgram)
@@ -120,21 +119,20 @@ void ThreadManager::initTagLoggerThread(const ProcessReader& pr,
 
 	thLogger.thProgram = new TagLoggerProg(pr,
 											tldb,
-											tlbc,
+											tagLoggerBuffer.getController(),
 											updateInterval,
 											tmExit.getController(false),
 											thLogger.cycleContainer.getController(false));
 }
 
 void ThreadManager::initTagLoggerWriterThread(const TagLoggerDB& tldb,
-												const TagLoggerBufferController& tlbc,
 												unsigned int updateInterval)
 {
 	if (thLoggerWriter.thProgram)
 		throw Exception("Tag logger writer thread already initialized", "ThreadManager::initTagLoggerWriterThread");
 
 	thLoggerWriter.thProgram = new TagLoggerWriterProg(tldb,
-														tlbc,
+														tagLoggerBuffer.getController(true),
 														updateInterval,
 														tmExit.getController(false),
 														thLoggerWriter.cycleContainer.getController(false));

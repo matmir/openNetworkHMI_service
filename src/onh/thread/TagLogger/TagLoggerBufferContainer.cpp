@@ -23,7 +23,10 @@ using namespace onh;
 TagLoggerBufferContainer::TagLoggerBufferContainer():
 	controllerInsertFinished(false)
 {
-	buff.clear();
+	std::vector<TagLoggerItem> v;
+	v.clear();
+
+	buff.getController(false).setData(v);
 }
 
 TagLoggerBufferContainer::~TagLoggerBufferContainer()
@@ -32,5 +35,5 @@ TagLoggerBufferContainer::~TagLoggerBufferContainer()
 
 TagLoggerBufferController TagLoggerBufferContainer::getController(bool readOnly) {
 
-	return TagLoggerBufferController(buffLock.getAccess(), &buff, finishLock.getAccess(), &controllerInsertFinished, readOnly);
+	return TagLoggerBufferController(buff.getController(false), controllerInsertFinished.getController(false), readOnly);
 }

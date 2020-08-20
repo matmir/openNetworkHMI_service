@@ -115,9 +115,6 @@ namespace onh {
             /// Config DB access
             Config *cfg;
 
-            /// Tag logger buffer container
-            TagLoggerBufferContainer *tagLoggerBuffer;
-
             /// Test environment flag
             bool testEnv;
     };

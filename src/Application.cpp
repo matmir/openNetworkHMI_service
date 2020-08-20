@@ -29,9 +29,6 @@ Application::Application(bool test):
 {
     // Create logger
     log = new Logger("mainProg","main_");
-
-    // Create tag logger buffer container
-    tagLoggerBuffer = new TagLoggerBufferContainer();
 }
 
 Application::~Application() {
@@ -53,9 +50,6 @@ Application::~Application() {
 	}
 	if (dbManager) {
         delete dbManager;
-	}
-	if (tagLoggerBuffer) {
-		delete tagLoggerBuffer;
 	}
 
 	log->write("Bye");
@@ -247,12 +241,10 @@ void Application::initThreadManager() {
     // Init tag logger thread
     thManager->initTagLoggerThread(pr->getReader(),
 									dbManager->getTagLoggerDB(),
-									tagLoggerBuffer->getController(),
 									cfg->getUIntValue("tagLoggerUpdateInterval"));
 
     // Init tag logger writer thread
     thManager->initTagLoggerWriterThread(dbManager->getTagLoggerWriterDB(),
-											tagLoggerBuffer->getController(true),
 											cfg->getUIntValue("tagLoggerUpdateInterval"));
 
     // Init script thread

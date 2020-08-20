@@ -22,11 +22,15 @@
 #include <vector>
 #include "../../utils/MutexAccess.h"
 #include "../../db/objs/TagLoggerItem.h"
+#include "../../utils/GuardDataController.h"
 
 namespace onh {
 
 	/// Forward declaration
 	class TagLoggerBufferContainer;
+
+	/// Guarded Tag logger buffer controller
+	typedef GuardDataController<std::vector<TagLoggerItem>> loggerBufferController;
 
 	/**
 	 * Tag logger buffer controller class
@@ -89,25 +93,17 @@ namespace onh {
 			/**
 			 * Constructor (allowed only from TagLoggerBufferContainer)
 			 *
-			 * @param bLock MutexAccess object for protecting buffer
-			 * @param b Buffer handle
-			 * @param fLock MutexAccess object for protecting finish flag
-			 * @param finishFlag Finish flag handle
+			 * @param lbc Data buffer controller
+			 * @param gdcf Finish flag controller
 			 * @param readOnlyFlag Read only flag
 			 */
-			TagLoggerBufferController(const MutexAccess &bLock, std::vector<TagLoggerItem> *b, const MutexAccess &fLock, bool *finishFlag, bool readOnlyFlag = false);
+			TagLoggerBufferController(const loggerBufferController &lbc, const GuardDataController<bool> &gdcf, bool readOnlyFlag=false);
 
-			/// Mutex for protecting buffer
-			MutexAccess buffLock;
-
-			/// Pointer to the Data buffer
-			std::vector<TagLoggerItem> *buff;
-
-			/// Mutex for protecting finish flag
-			MutexAccess finishLock;
+			/// Data buffer controller
+			loggerBufferController buff;
 
 			/// Flag informs that controller finished inserting data
-			bool *controllerInsertFinished;
+			GuardDataController<bool> controllerInsertFinished;
 
 			/// Read only flag
 			bool readOnly;
