@@ -46,6 +46,10 @@ ModbusUpdater::~ModbusUpdater() {
 
 void ModbusUpdater::updateBuffer() {
 
+	// Check driver
+	if (!driver)
+		throw DriverException("Missing driver instance", "ModbusUpdater::updateBuffer");
+
     // Clear temporary load buffers
     clearTempReg();
 
