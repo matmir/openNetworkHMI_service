@@ -21,7 +21,6 @@
 
 #include "../../driver/ProcessReader.h"
 #include "../../driver/ProcessWriter.h"
-#include "../../utils/Delay.h"
 #include "../../db/objs/AlarmDefinitionItem.h"
 #include "../../db/AlarmingDB.h"
 #include "../ThreadProgram.h"
@@ -73,9 +72,6 @@ namespace onh {
 
             /// Handle for process writer object
             ProcessWriter* prWriter;
-
-            /// Timer delay object
-            Delay* itsDelay;
 
             /// Alarmin DB access
             AlarmingDB *db;

@@ -29,22 +29,16 @@ DriverPollingProg::DriverPollingProg(const DriverBufferUpdater& dbu,
 										unsigned int updateInterval,
 										const GuardDataController<ThreadExitData> &gdcTED,
 										const GuardDataController<CycleTimeData> &gdcCTD):
-    ThreadProgram(gdcTED, gdcCTD, "driver", "polling_")
+    ThreadProgram(gdcTED, gdcCTD, updateInterval, "driver", "polling_")
 {
     // Driver updater
     drvUpdater = new DriverBufferUpdater(dbu);
-
-    // Create delay
-    itsDelay = new Delay(updateInterval);
 }
 
 DriverPollingProg::~DriverPollingProg()
 {
     if (drvUpdater)
         delete drvUpdater;
-
-    if (itsDelay)
-        delete itsDelay;
 }
 
 
@@ -66,7 +60,7 @@ void DriverPollingProg::operator()() {
             drvUpdater->update();
 
             // Wait
-            itsDelay->wait();
+            threadWait();
 
             // Stop thread cycle time measure
             stopCycleMeasure();

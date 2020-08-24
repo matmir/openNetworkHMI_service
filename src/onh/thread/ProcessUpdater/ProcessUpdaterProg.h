@@ -66,9 +66,6 @@ namespace onh {
 
             /// Handle for process updater object
             ProcessUpdater* prUpdater;
-
-            /// Timer delay object
-            Delay* itsDelay;
     };
 }
 

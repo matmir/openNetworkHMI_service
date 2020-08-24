@@ -66,9 +66,6 @@ namespace onh {
 
             /// Driver buffer updater
             DriverBufferUpdater *drvUpdater;
-
-            /// Timer delay object
-            Delay* itsDelay;
     };
 
 }

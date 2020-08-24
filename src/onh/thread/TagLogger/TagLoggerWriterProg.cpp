@@ -25,11 +25,8 @@ TagLoggerWriterProg::TagLoggerWriterProg(const TagLoggerDB& tldb,
 											unsigned int updateInterval,
 											const GuardDataController<ThreadExitData> &gdcTED,
 											const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(gdcTED, gdcCTD, "taglogger", "tagLogWriter_")
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "taglogger", "tagLogWriter_")
 {
-	// Create delay
-	itsDelay = new Delay(updateInterval);
-
 	// Create DB access
 	db = new TagLoggerDB(tldb);
 
@@ -46,9 +43,6 @@ TagLoggerWriterProg::~TagLoggerWriterProg() {
 		delete tagLoggerBuffer;
 
 	getLogger().write("Tag logger writer close");
-
-	if (itsDelay)
-		delete itsDelay;
 }
 
 void TagLoggerWriterProg::operator()() {
@@ -73,7 +67,7 @@ void TagLoggerWriterProg::operator()() {
             writeDataToDB();
 
             // Wait
-            itsDelay->wait();
+            threadWait();
 
             // Stop thread cycle time measure
             stopCycleMeasure();

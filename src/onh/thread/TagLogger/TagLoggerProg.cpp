@@ -32,13 +32,10 @@ TagLoggerProg::TagLoggerProg(const ProcessReader& pr,
 								unsigned int updateInterval,
 								const GuardDataController<ThreadExitData> &gdcTED,
 								const GuardDataController<CycleTimeData> &gdcCTD):
-    ThreadProgram(gdcTED, gdcCTD, "taglogger", "tagLog_")
+    ThreadProgram(gdcTED, gdcCTD, updateInterval, "taglogger", "tagLog_")
 {
     // Process reader
     prReader = new ProcessReader(pr);
-
-    // Create delay
-    itsDelay = new Delay(updateInterval);
 
     // Create DB access
     db = new TagLoggerDB(tldb);
@@ -59,9 +56,6 @@ TagLoggerProg::~TagLoggerProg()
     	delete tagLoggerBuffer;
 
     getLogger().write("Tag logger close");
-
-    if (itsDelay)
-        delete itsDelay;
 }
 
 void TagLoggerProg::operator()() {
@@ -82,7 +76,7 @@ void TagLoggerProg::operator()() {
         while(!isExitFlag()) {
 
         	// Start delay
-        	itsDelay->startDelay();
+        	threadWaitStart();
 
             // Start thread cycle time measure
             startCycleMeasure();
@@ -94,7 +88,7 @@ void TagLoggerProg::operator()() {
             updateTags();
 
             // Wait
-            itsDelay->waitAfterStart();
+            threadWaitAfterStart();
 
             // Stop thread cycle time measure
             stopCycleMeasure();

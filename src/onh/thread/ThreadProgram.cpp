@@ -23,23 +23,18 @@ using namespace onh;
 
 ThreadProgram::ThreadProgram(const GuardDataController<ThreadExitData> &gdcTED,
 								const GuardDataController<CycleTimeData> &gdcCTD,
+								unsigned int updateInterval,
 								const std::string& dirName,
 								const std::string& fPrefix):
-	thExitController(gdcTED), thCycleTimeController(gdcCTD)
+	thDelay(updateInterval), thExitController(gdcTED), thCycleTimeController(gdcCTD)
 {
     // Create logger
     log = new Logger(dirName, fPrefix);
     log->write("Initialize thread logger");
-
-    // Create cycle time
-    thCycle = new CycleTime();
 }
 
 ThreadProgram::~ThreadProgram()
 {
-    if (thCycle)
-        delete thCycle;
-
     if (log) {
         log->write("Closing thread logger");
 
@@ -49,21 +44,15 @@ ThreadProgram::~ThreadProgram()
 
 void ThreadProgram::startCycleMeasure() {
 
-    if (!thCycle)
-        throw Exception("Cycle time object does not exist", "ThreadProgram::startCycleMeasure");
-
-    thCycle->start();
+    thCycle.start();
 }
 
 void ThreadProgram::stopCycleMeasure() {
 
-    if (!thCycle)
-        throw Exception("Cycle time object does not exist", "ThreadProgram::stopCycleMeasure");
-
-    thCycle->stop();
+    thCycle.stop();
 
     // Pass counted value to the cycle time controller
-    thCycleTimeController.setData(thCycle->getCycle());
+    thCycleTimeController.setData(thCycle.getCycle());
 }
 
 bool ThreadProgram::isExitFlag() {
@@ -90,4 +79,19 @@ Logger& ThreadProgram::getLogger() {
 		throw Exception("Logger object does not exist", "ThreadProgram::getLogger");
 
 	return *log;
+}
+
+void ThreadProgram::threadWait() {
+
+	thDelay.wait();
+}
+
+void ThreadProgram::threadWaitStart() {
+
+	thDelay.startDelay();
+}
+
+void ThreadProgram::threadWaitAfterStart() {
+
+	thDelay.waitAfterStart();
 }

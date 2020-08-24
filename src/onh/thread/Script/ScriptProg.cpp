@@ -36,16 +36,13 @@ ScriptProg::ScriptProg(const ProcessReader& pr,
 						bool tstEnv,
 						const GuardDataController<ThreadExitData> &gdcTED,
 						const GuardDataController<CycleTimeData> &gdcCTD):
-    ThreadProgram(gdcTED, gdcCTD,"script", "scriptLog_"), executeScript(execScript), testEnv(tstEnv)
+    ThreadProgram(gdcTED, gdcCTD, updateInterval, "script", "scriptLog_"), executeScript(execScript), testEnv(tstEnv)
 {
     // Process reader
     prReader = new ProcessReader(pr);
 
     // Process writer
     prWriter = new ProcessWriter(pw);
-
-    // Create delay
-    itsDelay = new Delay(updateInterval);
 
     // Script DB access
     db = new ScriptDB(sdb);
@@ -72,9 +69,6 @@ ScriptProg::~ScriptProg()
         delete db;
 
     getLogger().write("Script system close");
-
-    if (itsDelay)
-        delete itsDelay;
 }
 
 void ScriptProg::operator()() {
@@ -106,7 +100,7 @@ void ScriptProg::operator()() {
             checkScripts();
 
             // Wait
-            itsDelay->wait();
+            threadWait();
 
             // Stop thread cycle time measure
             stopCycleMeasure();

@@ -23,6 +23,7 @@
 #include "../utils/GuardDataController.h"
 #include "../utils/Logger.h"
 #include "../utils/CycleTime.h"
+#include "../utils/Delay.h"
 
 namespace onh {
 
@@ -37,11 +38,13 @@ namespace onh {
              *
              * @param gdcTED Thread exit data controller
              * @param thCCC Thread cycle time controller
+             * @param updateInterval Thread wait time (ms)
              * @param dirName Name of the directory where to write log files
              * @param fPrefix Log file name prefix
              */
             ThreadProgram(const GuardDataController<ThreadExitData> &gdcTED,
             		const GuardDataController<CycleTimeData> &gdcCTD,
+					unsigned int updateInterval,
             		const std::string& dirName,
 					const std::string& fPrefix = "");
 
@@ -67,7 +70,10 @@ namespace onh {
 
         private:
             /// Thread program cycle time
-            CycleTime* thCycle;
+            CycleTime thCycle;
+
+            /// Timer delay object
+			Delay thDelay;
 
 			/// Thread exit data controller
             GuardDataController<ThreadExitData> thExitController;
@@ -103,6 +109,21 @@ namespace onh {
              * @param info Additional info about exit
              */
             void exit(const std::string& info);
+
+            /**
+             * Thread wait
+             */
+            void threadWait();
+
+            /**
+             * Thread wait (no blocking)
+             */
+            void threadWaitStart();
+
+            /**
+             * Thread wait after start called (blocking)
+             */
+            void threadWaitAfterStart();
 
             /**
 			 * Get logger instance

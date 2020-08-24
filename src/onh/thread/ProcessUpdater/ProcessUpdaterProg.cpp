@@ -28,22 +28,16 @@ ProcessUpdaterProg::ProcessUpdaterProg(const ProcessUpdater& pru,
 										unsigned int updateInterval,
 										const GuardDataController<ThreadExitData> &gdcTED,
 										const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(gdcTED, gdcCTD, "process", "procUpd_")
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "process", "procUpd_")
 {
     // Process updater
     prUpdater = new ProcessUpdater(pru);
-
-    // Create delay
-    itsDelay = new Delay(updateInterval);
 }
 
 ProcessUpdaterProg::~ProcessUpdaterProg()
 {
     if (prUpdater)
         delete prUpdater;
-
-    if (itsDelay)
-        delete itsDelay;
 }
 
 void ProcessUpdaterProg::operator()() {
@@ -64,7 +58,7 @@ void ProcessUpdaterProg::operator()() {
             prUpdater->update();
 
             // Wait
-            itsDelay->wait();
+            threadWait();
 
             // Stop thread cycle time measure
             stopCycleMeasure();

@@ -75,9 +75,6 @@ namespace onh {
             /// Handle for process reader object
             ProcessReader* prReader;
 
-            /// Timer delay object
-            Delay* itsDelay;
-
             /// Tag Logger DB access
             TagLoggerDB *db;
 

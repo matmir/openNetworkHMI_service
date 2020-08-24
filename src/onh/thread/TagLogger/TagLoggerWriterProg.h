@@ -69,9 +69,6 @@ namespace onh {
 
 		private:
 
-			/// Timer delay object
-			Delay* itsDelay;
-
 			/// Tag Logger DB access
 			TagLoggerDB *db;
 

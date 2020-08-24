@@ -30,16 +30,13 @@ AlarmingProg::AlarmingProg(const ProcessReader& pr,
 							unsigned int updateInterval,
 							const GuardDataController<ThreadExitData> &gdcTED,
 							const GuardDataController<CycleTimeData> &gdcCTD):
-    ThreadProgram(gdcTED, gdcCTD, "alarming", "alarmLog_")
+    ThreadProgram(gdcTED, gdcCTD, updateInterval, "alarming", "alarmLog_")
 {
     // Process Reader
     prReader = new ProcessReader(pr);
 
     // Process Writer
     prWriter = new ProcessWriter(pw);
-
-    // Create delay
-    itsDelay = new Delay(updateInterval);
 
     // Create Alarming DB
     db = new AlarmingDB(adb);
@@ -55,9 +52,6 @@ AlarmingProg::~AlarmingProg()
         delete db;
 
     getLogger().write("Alarming close");
-
-    if (itsDelay)
-        delete itsDelay;
 }
 
 void AlarmingProg::operator()() {
@@ -84,7 +78,7 @@ void AlarmingProg::operator()() {
             checkAlarms();
 
             // Wait
-            itsDelay->wait();
+            threadWait();
 
             // Stop thread cycle time measure
             stopCycleMeasure();

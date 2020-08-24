@@ -80,9 +80,6 @@ namespace onh {
             /// Handle for process writer object
             ProcessWriter* prWriter;
 
-            /// Timer delay object
-            Delay* itsDelay;
-
             /// Script DB access
             ScriptDB *db;
 
