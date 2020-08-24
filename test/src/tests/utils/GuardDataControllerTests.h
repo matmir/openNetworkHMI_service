@@ -29,7 +29,7 @@
 TEST(GuardDataControllerTests, Guard1) {
 
 	int d1, d2;
-	onh::GuardDataContainer<int> data;
+	onh::GuardDataContainer<int> data(0);
 	onh::GuardDataController<int> c1(data.getController(false));
 	onh::GuardDataController<int> c2(data.getController());
 
