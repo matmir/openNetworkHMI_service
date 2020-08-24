@@ -64,6 +64,13 @@ namespace onh {
 			 */
 			GuardDataController<T> getController(bool readOnly = true);
 
+			/**
+			 * Get internal controller object
+			 *
+			 * @return Internal controller object
+			 */
+			GuardDataController<T>& controll();
+
 		private:
 
 			/// Guarded data
@@ -71,24 +78,29 @@ namespace onh {
 
 			/// Mutex for protecting data
 			MutexContainer dataLock;
+
+			/// Internal controller object
+			GuardDataController<T> *itsController;
 	};
 
 	template <class T>
 	GuardDataContainer<T>::GuardDataContainer():
-		data(nullptr)
+		data(nullptr), itsController(nullptr)
 	{
 		data = new T;
 	}
 
 	template <class T>
 	GuardDataContainer<T>::GuardDataContainer(const T& newData):
-		data(nullptr)
+		data(nullptr), itsController(nullptr)
 	{
 		data = new T(newData);
 	}
 
 	template <class T>
 	GuardDataContainer<T>::~GuardDataContainer() {
+		if (itsController)
+			delete itsController;
 		if (data)
 			delete data;
 	}
@@ -97,6 +109,15 @@ namespace onh {
 	GuardDataController<T> GuardDataContainer<T>::getController(bool readOnly) {
 
 		return GuardDataController<T>(data, dataLock.getAccess(), readOnly);
+	}
+
+	template <class T>
+	GuardDataController<T>& GuardDataContainer<T>::controll() {
+
+		if (itsController == nullptr)
+			itsController = new GuardDataController<T>(data, dataLock.getAccess(), false);
+
+		return *itsController;
 	}
 
 }

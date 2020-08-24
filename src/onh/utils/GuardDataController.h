@@ -117,7 +117,7 @@ namespace onh {
 
 	template <class T>
 	GuardDataController<T>::GuardDataController(const GuardDataController& gdc):
-		data(gdc.data), dataLock(gdc.dataLock), readOnly(gdc.readOnly), lockCalled(gdc.lockCalled)
+		data(gdc.data), dataLock(gdc.dataLock), readOnly(gdc.readOnly), lockCalled(false)
 	{
 	}
 

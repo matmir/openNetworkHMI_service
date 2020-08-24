@@ -91,6 +91,32 @@ TEST(GuardDataControllerTests, Guard3) {
 	ASSERT_EQ(d2, 100);
 }
 
+TEST(GuardDataControllerTests, Guard4) {
+
+	int d1, d2;
+	onh::GuardDataContainer<int> data1(0);
+	onh::GuardDataController<int> c1(data1.getController(false));
+
+	c1.getData(d1);
+	ASSERT_EQ(d1, 0);
+
+	data1.controll().setData(45);
+
+	c1.getData(d1);
+	data1.controll().getData(d2);
+
+	ASSERT_EQ(d1, 45);
+	ASSERT_EQ(d2, 45);
+
+	c1.setData(32);
+
+	c1.getData(d1);
+	data1.controll().getData(d2);
+
+	ASSERT_EQ(d1, 32);
+	ASSERT_EQ(d2, 32);
+}
+
 TEST(GuardDataControllerTests, GuardSHM1) {
 
 	onh::ShmProcessData pd, pd1, pd2;
