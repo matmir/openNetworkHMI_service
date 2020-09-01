@@ -2,7 +2,7 @@ CC		:= g++
 CFLAGS	:= -Wall -std=c++17
 LDFLAGS	:= -lgtest -lpthread -lrt -lmodbus `mariadb_config --cflags --libs`
 INCLUDE	:= -I/usr/include/mariadb -I/usr/local/include/modbus
-INCLUDE += -I"../src/onh" -I"../test_server/src/controlBits"
+INCLUDE += -I"../../src/onh" -I"../test_server1/src/controlBits"
 
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
@@ -12,20 +12,20 @@ TARGET   := openNetworkHMI_test
 
 SRC :=														\
 	$(wildcard src/*.cpp)									\
-	$(wildcard ../src/onh/db/*.cpp) 						\
-	$(wildcard ../src/onh/db/objs/*.cpp) 					\
-	$(wildcard ../src/onh/driver/*.cpp) 					\
-	$(wildcard ../src/onh/driver/Modbus/*.cpp) 				\
-	$(wildcard ../src/onh/driver/SHM/*.cpp) 				\
-	$(wildcard ../src/onh/thread/Alarming/*.cpp) 			\
-	$(wildcard ../src/onh/thread/DriverPolling/*.cpp) 		\
-	$(wildcard ../src/onh/thread/ProcessUpdater/*.cpp) 		\
-	$(wildcard ../src/onh/thread/Script/*.cpp) 				\
-	$(wildcard ../src/onh/thread/Socket/Parser/*.cpp) 		\
-	$(wildcard ../src/onh/thread/Socket/*.cpp) 				\
-	$(wildcard ../src/onh/thread/TagLogger/*.cpp) 			\
-	$(wildcard ../src/onh/thread/*.cpp) 					\
-	$(wildcard ../src/onh/utils/*.cpp) 						\
+	$(wildcard ../../src/onh/db/*.cpp) 						\
+	$(wildcard ../../src/onh/db/objs/*.cpp) 				\
+	$(wildcard ../../src/onh/driver/*.cpp) 					\
+	$(wildcard ../../src/onh/driver/Modbus/*.cpp) 			\
+	$(wildcard ../../src/onh/driver/SHM/*.cpp) 				\
+	$(wildcard ../../src/onh/thread/Alarming/*.cpp) 		\
+	$(wildcard ../../src/onh/thread/DriverPolling/*.cpp) 	\
+	$(wildcard ../../src/onh/thread/ProcessUpdater/*.cpp)	\
+	$(wildcard ../../src/onh/thread/Script/*.cpp) 			\
+	$(wildcard ../../src/onh/thread/Socket/Parser/*.cpp) 	\
+	$(wildcard ../../src/onh/thread/Socket/*.cpp) 			\
+	$(wildcard ../../src/onh/thread/TagLogger/*.cpp) 		\
+	$(wildcard ../../src/onh/thread/*.cpp) 					\
+	$(wildcard ../../src/onh/utils/*.cpp) 					\
 
 VPATH := $(dir $(SRC))
 OBJECTS := $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRC)))
