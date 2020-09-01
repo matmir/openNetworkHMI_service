@@ -28,6 +28,7 @@ class alarmDefinitionItemTests: public ::testing::Test {
 
 			tg = new onh::Tag(
 					5,
+					1,
 					"TestTag1",
 					onh::TT_BIT,
 					{onh::PDA_MEMORY, 4, 6}
@@ -52,6 +53,7 @@ class alarmDefinitionItemTests: public ::testing::Test {
 
 			tgFeedback = new onh::Tag(
 					6,
+					1,
 					"tagFeedback",
 					onh::TT_BIT,
 					{onh::PDA_MEMORY, 4, 0}
@@ -59,6 +61,7 @@ class alarmDefinitionItemTests: public ::testing::Test {
 
 			tgHWAck = new onh::Tag(
 					7,
+					1,
 					"tagHWAck",
 					onh::TT_BIT,
 					{onh::PDA_MEMORY, 4, 1}
@@ -81,6 +84,7 @@ class alarmDefinitionItemTestsByte: public alarmDefinitionItemTests {
 
 			tg = new onh::Tag(
 					5,
+					1,
 					"TestTag1",
 					onh::TT_BYTE,
 					{onh::PDA_MEMORY, 4, 0}
@@ -100,6 +104,7 @@ class alarmDefinitionItemTestsWord: public alarmDefinitionItemTests {
 
 			tg = new onh::Tag(
 					5,
+					1,
 					"TestTag1",
 					onh::TT_WORD,
 					{onh::PDA_MEMORY, 4, 0}
@@ -119,6 +124,7 @@ class alarmDefinitionItemTestsDWord: public alarmDefinitionItemTests {
 
 			tg = new onh::Tag(
 					5,
+					1,
 					"TestTag1",
 					onh::TT_DWORD,
 					{onh::PDA_MEMORY, 4, 0}
@@ -138,6 +144,7 @@ class alarmDefinitionItemTestsInt: public alarmDefinitionItemTests {
 
 			tg = new onh::Tag(
 					5,
+					1,
 					"TestTag1",
 					onh::TT_INT,
 					{onh::PDA_MEMORY, 4, 0}
@@ -157,6 +164,7 @@ class alarmDefinitionItemTestsReal: public alarmDefinitionItemTests {
 
 			tg = new onh::Tag(
 					5,
+					1,
 					"TestTag1",
 					onh::TT_REAL,
 					{onh::PDA_MEMORY, 4, 0}

@@ -25,7 +25,7 @@
 using namespace onh;
 
 Application::Application(bool test):
-    drv(nullptr), drvBuffer(nullptr), pr(nullptr), thManager(nullptr), dbManager(nullptr), cfg(nullptr), testEnv(test)
+    drvManager(nullptr), thManager(nullptr), dbManager(nullptr), cfg(nullptr), testEnv(test)
 {
     // Create logger
     log = new Logger("mainProg","main_");
@@ -33,14 +33,8 @@ Application::Application(bool test):
 
 Application::~Application() {
 
-    if (drv) {
-        delete drv;
-	}
-	if (drvBuffer) {
-        delete drvBuffer;
-	}
-	if (pr) {
-        delete pr;
+	if (drvManager) {
+        delete drvManager;
 	}
 	if (thManager) {
         delete thManager;
@@ -70,14 +64,8 @@ int Application::start() {
         // Initialize database connection
         initDB();
 
-        // Initialize application driver
+        // Initialize drivers
         initDriver();
-
-        // Initialize application driver buffer
-        initDriverBuffer();
-
-        // Initialize process manager
-        initProcessManager();
 
         // Initialize thread manager
         initThreadManager();
@@ -143,77 +131,15 @@ void Application::initDB() {
 
 void Application::initDriver() {
 
-    // Get driver name
-    std::string driverName = cfg->getStringValue("connectionDriver");
-
-    // Create driver
-    if (driverName == "Modbus") {
-
-    	modbusM::ModbusCfg modbusCfg;
-    	std::string modbusMode = cfg->getStringValue("modbusMode");
-
-    	if (modbusMode == "TCP") {
-
-    		modbusCfg.mode = modbusM::MM_TCP;
-			modbusCfg.registerCount = cfg->getIntValue("modbusRegCount");
-			modbusCfg.slaveID = cfg->getIntValue("modbusSlaveID");
-
-			modbusCfg.TCP_addr = cfg->getStringValue("modbusTCP_addr");
-			modbusCfg.TCP_port = cfg->getIntValue("modbusTCP_port");
-
-    	} else if (modbusMode == "RTU") {
-
-    		modbusCfg.mode = modbusM::MM_RTU;
-			modbusCfg.registerCount = cfg->getIntValue("modbusRegCount");
-			modbusCfg.slaveID = cfg->getIntValue("modbusSlaveID");
-
-			modbusCfg.RTU_port = cfg->getStringValue("modbusRTU_port");
-			modbusCfg.RTU_baud = cfg->getIntValue("modbusRTU_baud");
-			modbusCfg.RTU_parity = cfg->getStringValue("modbusRTU_parity")[0];
-			modbusCfg.RTU_dataBit = cfg->getIntValue("modbusRTU_dataBit");
-			modbusCfg.RTU_stopBit = cfg->getIntValue("modbusRTU_stopBit");
-
-    	} else {
-    		throw Exception("Unknown modbus mode selected", "Application::initDriver");
-    	}
-
-        // Driver
-        drv = new ModbusDriver(modbusCfg);
-
-    } else if (driverName == "SHM") {
-
-    	// Shared memory segment name
-    	std::string shmName = cfg->getStringValue("shmSegmentName");
-
-    	// Driver
-        drv = new ShmDriver(shmName);
-
-    } else {
-        throw Exception("Unknown driver selected", "Application::initDriver");
-    }
-}
-
-void Application::initDriverBuffer() {
-
-    if (!drv) {
-        throw Exception("Can not create driver buffer - missing driver instance", "Application::initDriverBuffer");
-    }
-
-    // Driver buffer
-    drvBuffer = drv->getBuffer();
-}
-
-void Application::initProcessManager() {
-
-    // Initialize process manager
-    pr = new ProcessManager(drv, drvBuffer);
+	// Init driver manager
+    drvManager = new DriverManager(cfg->getDriverConnections());
 }
 
 void Application::initThreadManager() {
 
-	// Check process manager
-	if (!pr)
-		throw Exception("Process manager not initialized", "Application::initThreadManager");
+	// Check managers
+	if (!drvManager)
+		throw Exception("Driver manager not initialized", "Application::initThreadManager");
 
 	if (!dbManager)
 		throw Exception("Database manager not initialized", "Application::initThreadManager");
@@ -224,22 +150,20 @@ void Application::initThreadManager() {
     // Initialize thread manager
     thManager = new ThreadManager();
 
-    // Init process updater thread
-	thManager->initProcessUpdater(pr->getUpdater(), cfg->getUIntValue("processUpdateInterval"));
+    // Init process updater threads
+	thManager->initProcessUpdater(drvManager->getProcessUpdaters(), cfg->getUIntValue("processUpdateInterval"));
 
     // Init driver polling thread
-	if (drvBuffer) {
-		thManager->initDriverPolling(pr->getDriverBufferUpdater(), cfg->getUIntValue("modbusPollingInterval"));
-	}
+	thManager->initDriverPolling(drvManager->getDriverBufferUpdaters());
 
     // Init alarming thread
-    thManager->initAlarmingThread(pr->getReader(),
-									pr->getWriter(),
+    thManager->initAlarmingThread(drvManager->getProcessReader(),
+    								drvManager->getProcessWriter(),
 									dbManager->getAlarmingDB(),
 									cfg->getUIntValue("alarmingUpdateInterval"));
 
     // Init tag logger thread
-    thManager->initTagLoggerThread(pr->getReader(),
+    thManager->initTagLoggerThread(drvManager->getProcessReader(),
 									dbManager->getTagLoggerDB(),
 									cfg->getUIntValue("tagLoggerUpdateInterval"));
 
@@ -248,16 +172,16 @@ void Application::initThreadManager() {
 											cfg->getUIntValue("tagLoggerUpdateInterval"));
 
     // Init script thread
-    thManager->initScriptThread(pr->getReader(),
-								pr->getWriter(),
+    thManager->initScriptThread(drvManager->getProcessReader(),
+    							drvManager->getProcessWriter(),
 								dbManager->getScriptDB(),
 								cfg->getUIntValue("scriptSystemUpdateInterval"),
 								cfg->getStringValue("scriptSystemExecuteScript"),
 								testEnv);
 
     // Init socket thread
-    thManager->initSocketThread(pr->getReader(),
-								pr->getWriter(),
+    thManager->initSocketThread(drvManager->getProcessReader(),
+								drvManager->getProcessWriter(),
 								dbManager->getCredentials(),
 								cfg->getIntValue("socketPort"),
 								cfg->getIntValue("socketMaxConn"));

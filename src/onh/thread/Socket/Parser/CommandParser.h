@@ -201,21 +201,21 @@ namespace onh {
             /**
              * Prepare reply - OK
              *
-             * @param tpcUpdater Cycle time of the Process updater thread
              * @param tpcLogger Cycle time of the Tag logger thread
              * @param tpcLoggerWriter Cycle time of the Tag logger writer thread
              * @param tpcAlarming Cycle time of the Alarming thread
              * @param tpcScript Cycle time of the Script system thread
-             * @param tpcPolling Cycle time of the Driver polling thread
+             * @param tpcUpdater Cycle time of the Process updater threads
+             * @param tpcPolling Cycle time of the Driver polling threads
              *
              * @return String with reply
              */
-            std::string replyOK(CycleTimeData tpcUpdater,
-                                CycleTimeData tpcLogger,
+            std::string replyOK(CycleTimeData tpcLogger,
 								CycleTimeData tpcLoggerWriter,
                                 CycleTimeData tpcAlarming,
                                 CycleTimeData tpcScript,
-                                CycleTimeData tpcPolling);
+                                const std::map<std::string, CycleTimeData>& tpcUpdater,
+								const std::map<std::string, CycleTimeData>& tpcPolling);
 
             /**
              * Prepare reply - Error

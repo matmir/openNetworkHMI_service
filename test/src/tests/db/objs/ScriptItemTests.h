@@ -40,6 +40,7 @@ TEST_F(scriptItemTests, Create1) {
 	ASSERT_EQ((unsigned int)1, scItem.getId());
 
 	ASSERT_EQ((unsigned int)5, scItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", scItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, scItem.getTag().getArea());
@@ -47,6 +48,7 @@ TEST_F(scriptItemTests, Create1) {
 	ASSERT_EQ((unsigned int)6, scItem.getTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)9, scItem.getFeedbackRunTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getFeedbackRunTag().getConnId());
 	ASSERT_STREQ("TestTag2", scItem.getFeedbackRunTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getFeedbackRunTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, scItem.getFeedbackRunTag().getArea());
@@ -79,6 +81,7 @@ TEST_F(scriptItemTests, CreateSetId) {
 	ASSERT_EQ((unsigned int)87, scItem.getId());
 
 	ASSERT_EQ((unsigned int)5, scItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", scItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, scItem.getTag().getArea());
@@ -86,6 +89,7 @@ TEST_F(scriptItemTests, CreateSetId) {
 	ASSERT_EQ((unsigned int)6, scItem.getTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)9, scItem.getFeedbackRunTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getFeedbackRunTag().getConnId());
 	ASSERT_STREQ("TestTag2", scItem.getFeedbackRunTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getFeedbackRunTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, scItem.getFeedbackRunTag().getArea());
@@ -115,6 +119,7 @@ TEST_F(scriptItemTests, CreateSetTag) {
 
 	onh::Tag tg2(
 			500,
+			3,
 			"TestTag9",
 			onh::TT_BIT,
 			{onh::PDA_MEMORY, 789, 0}
@@ -125,6 +130,7 @@ TEST_F(scriptItemTests, CreateSetTag) {
 	ASSERT_EQ((unsigned int)1, scItem.getId());
 
 	ASSERT_EQ((unsigned int)500, scItem.getTag().getId());
+	ASSERT_EQ((unsigned int)3, scItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag9", scItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, scItem.getTag().getArea());
@@ -132,6 +138,7 @@ TEST_F(scriptItemTests, CreateSetTag) {
 	ASSERT_EQ((unsigned int)0, scItem.getTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)9, scItem.getFeedbackRunTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getFeedbackRunTag().getConnId());
 	ASSERT_STREQ("TestTag2", scItem.getFeedbackRunTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getFeedbackRunTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, scItem.getFeedbackRunTag().getArea());
@@ -164,6 +171,7 @@ TEST_F(scriptItemTests, CreateSetName) {
 	ASSERT_EQ((unsigned int)1, scItem.getId());
 
 	ASSERT_EQ((unsigned int)5, scItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", scItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, scItem.getTag().getArea());
@@ -171,6 +179,7 @@ TEST_F(scriptItemTests, CreateSetName) {
 	ASSERT_EQ((unsigned int)6, scItem.getTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)9, scItem.getFeedbackRunTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getFeedbackRunTag().getConnId());
 	ASSERT_STREQ("TestTag2", scItem.getFeedbackRunTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getFeedbackRunTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, scItem.getFeedbackRunTag().getArea());
@@ -203,6 +212,7 @@ TEST_F(scriptItemTests, CreateSetRun) {
 	ASSERT_EQ((unsigned int)1, scItem.getId());
 
 	ASSERT_EQ((unsigned int)5, scItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", scItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, scItem.getTag().getArea());
@@ -210,6 +220,7 @@ TEST_F(scriptItemTests, CreateSetRun) {
 	ASSERT_EQ((unsigned int)6, scItem.getTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)9, scItem.getFeedbackRunTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getFeedbackRunTag().getConnId());
 	ASSERT_STREQ("TestTag2", scItem.getFeedbackRunTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getFeedbackRunTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, scItem.getFeedbackRunTag().getArea());
@@ -242,6 +253,7 @@ TEST_F(scriptItemTests, CreateSetLock) {
 	ASSERT_EQ((unsigned int)1, scItem.getId());
 
 	ASSERT_EQ((unsigned int)5, scItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", scItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, scItem.getTag().getArea());
@@ -249,6 +261,7 @@ TEST_F(scriptItemTests, CreateSetLock) {
 	ASSERT_EQ((unsigned int)6, scItem.getTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)9, scItem.getFeedbackRunTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getFeedbackRunTag().getConnId());
 	ASSERT_STREQ("TestTag2", scItem.getFeedbackRunTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getFeedbackRunTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, scItem.getFeedbackRunTag().getArea());
@@ -278,6 +291,7 @@ TEST_F(scriptItemTests, CreateSetFeedbackTag) {
 
 	onh::Tag fbTg2(
 			500,
+			4,
 			"TestFB1",
 			onh::TT_BIT,
 			{onh::PDA_MEMORY, 40, 0}
@@ -288,6 +302,7 @@ TEST_F(scriptItemTests, CreateSetFeedbackTag) {
 	ASSERT_EQ((unsigned int)1, scItem.getId());
 
 	ASSERT_EQ((unsigned int)5, scItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", scItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, scItem.getTag().getArea());
@@ -295,6 +310,7 @@ TEST_F(scriptItemTests, CreateSetFeedbackTag) {
 	ASSERT_EQ((unsigned int)6, scItem.getTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)500, scItem.getFeedbackRunTag().getId());
+	ASSERT_EQ((unsigned int)4, scItem.getFeedbackRunTag().getConnId());
 	ASSERT_STREQ("TestFB1", scItem.getFeedbackRunTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getFeedbackRunTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, scItem.getFeedbackRunTag().getArea());
@@ -327,6 +343,7 @@ TEST_F(scriptItemTests, CreateSetEnable) {
 	ASSERT_EQ((unsigned int)1, scItem.getId());
 
 	ASSERT_EQ((unsigned int)5, scItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", scItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, scItem.getTag().getArea());
@@ -334,6 +351,7 @@ TEST_F(scriptItemTests, CreateSetEnable) {
 	ASSERT_EQ((unsigned int)6, scItem.getTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)9, scItem.getFeedbackRunTag().getId());
+	ASSERT_EQ((unsigned int)1, scItem.getFeedbackRunTag().getConnId());
 	ASSERT_STREQ("TestTag2", scItem.getFeedbackRunTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, scItem.getFeedbackRunTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, scItem.getFeedbackRunTag().getArea());
@@ -394,6 +412,7 @@ TEST_F(scriptItemTests, CreateException2) {
 
 		onh::Tag tg2(
 				500,
+				1,
 				"Test1",
 				onh::TT_BYTE,
 				{onh::PDA_MEMORY, 40, 0}
@@ -461,6 +480,7 @@ TEST_F(scriptItemTests, CreateException4) {
 
 		onh::Tag tg2(
 				500,
+				1,
 				"Test1",
 				onh::TT_BYTE,
 				{onh::PDA_MEMORY, 40, 0}

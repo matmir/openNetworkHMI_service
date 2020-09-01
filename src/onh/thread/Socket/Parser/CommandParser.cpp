@@ -18,6 +18,7 @@
 
 #include "CommandParser.h"
 #include <sstream>
+#include "../../../db/objs/DriverConnection.h"
 #include "../../../db/objs/Tag.h"
 #include "../../../utils/StringUtils.h"
 
@@ -291,18 +292,22 @@ std::string CommandParser::replyOK(std::vector<std::string> data) {
     return s.str();
 }
 
-std::string CommandParser::replyOK(CycleTimeData tpcUpdater,
-                                CycleTimeData tpcLogger,
-								CycleTimeData tpcLoggerWriter,
-                                CycleTimeData tpcAlarming,
-                                CycleTimeData tpcScript,
-                                CycleTimeData tpcPolling)
+std::string CommandParser::replyOK(CycleTimeData tpcLogger,
+									CycleTimeData tpcLoggerWriter,
+									CycleTimeData tpcAlarming,
+									CycleTimeData tpcScript,
+									const std::map<std::string, CycleTimeData>& tpcUpdater,
+									const std::map<std::string, CycleTimeData>& tpcPolling)
 {
     std::stringstream s;
 
     s << GET_THREAD_CYCLE_TIME << '|';
-    s << "Updater:"  << tpcUpdater.min << '?' << tpcUpdater.max << '?' << tpcUpdater.current << '!';
-    s << "Polling:"  << tpcPolling.min << '?' << tpcPolling.max << '?' << tpcPolling.current << '!';
+    for (const auto& updater : tpcUpdater) {
+    	s << updater.first << ":"  << updater.second.min << '?' << updater.second.max << '?' << updater.second.current << '!';
+    }
+    for (const auto& polling : tpcPolling) {
+		s << polling.first << ":"  << polling.second.min << '?' << polling.second.max << '?' << polling.second.current << '!';
+	}
     s << "Logger:"  << tpcLogger.min << '?' << tpcLogger.max << '?' << tpcLogger.current << '!';
     s << "LoggerWriter:"  << tpcLoggerWriter.min << '?' << tpcLoggerWriter.max << '?' << tpcLoggerWriter.current << '!';
     s << "Alarming:"  << tpcAlarming.min << '?' << tpcAlarming.max << '?' << tpcAlarming.current << '!';
@@ -752,17 +757,34 @@ std::string CommandParser::CMD_GET_THREAD_CYCLE_TIME(const std::string& data) {
         throw CommandParserException(CommandParserException::WRONG_DATA, "Wrong data", "CommandParser::CMD_GET_THREAD_CYCLE_TIME");
 
     // Cycle times structures
-    CycleTimeData UpdaterCT, LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, PollingCT;
+    CycleTimeData LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, tmp;
+    std::map<std::string, CycleTimeData> UpdaterCT, PollingCT;
 
-    // Get cycle times
-    cycleController.cUpdater.getData(UpdaterCT);
-    cycleController.cLogger.getData(LoggerCT);
-    cycleController.cLoggerWriter.getData(LoggerWriterCT);
-    cycleController.cAlarming.getData(AlarmingCT);
-    cycleController.cScript.getData(ScriptCT);
-    cycleController.cDriverPolling.getData(PollingCT);
+    // Get cycle time of the updaters and buffers
+    for (auto& cntr : cycleController) {
 
-    return replyOK(UpdaterCT, LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, PollingCT);
+    	// Updater?
+    	if (cntr.first.find("Updater_") != std::string::npos) {
+    		// Get cycle time
+    		cntr.second.getData(tmp);
+			UpdaterCT.insert(std::pair<std::string, CycleTimeData>(cntr.first, tmp));
+    	}
+
+    	// Driver buffer?
+		if (cntr.first.find("DriverBuffer_") != std::string::npos) {
+			// Get cycle time
+			cntr.second.getData(tmp);
+			PollingCT.insert(std::pair<std::string, CycleTimeData>(cntr.first, tmp));
+		}
+    }
+
+    // Get cycle times of the threads
+    cycleController.at("TagLogger").getData(LoggerCT);
+    cycleController.at("TagLoggerWriter").getData(LoggerWriterCT);
+    cycleController.at("Alarming").getData(AlarmingCT);
+    cycleController.at("Script").getData(ScriptCT);
+
+    return replyOK(LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, UpdaterCT, PollingCT);
 }
 
 std::string CommandParser::CMD_EXIT_APP(const std::string& data) {

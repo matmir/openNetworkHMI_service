@@ -18,6 +18,7 @@
 
 #include "Config.h"
 #include <sstream>
+#include "../driver/Modbus/modbusmasterCfg.h"
 
 using namespace onh;
 
@@ -175,4 +176,177 @@ void Config::setValue(const std::string& field, const std::string& val) {
         s << "Config::setValue (string) (" << field << ")";
         throw Exception(e.what(), s.str());
     }
+}
+
+std::string Config::getShmCfg(unsigned int id) {
+
+	// No data
+	bool noData = false;
+
+	// Query
+	std::stringstream q;
+
+	// Return value
+	std::string shm = "";
+
+	DBResult *result = 0;
+
+	try {
+
+		// Prepare query
+		q << "SELECT * FROM driver_shm WHERE dsId = "<< id << ";";
+
+		// Query
+		result = executeQuery(q.str());
+
+		if (result->rowsCount() == 1) {
+
+			// Read data
+			result->nextRow();
+
+			// Get SHM region name
+			shm = result->getString("dsSegment");
+
+			// Release memory
+			delete result;
+			result = nullptr;
+
+		} else {
+			noData = true;
+		}
+
+	} catch (DBException &e) {
+
+		if (result)
+			delete result;
+
+		throw Exception(e.what(), "Config::getShmCfg");
+	}
+
+	if (noData)
+		throw Exception("SHM configuration does not exist in DB", "Config::getShmCfg");
+
+	return shm;
+}
+
+modbusM::ModbusCfg Config::getModbusCfg(unsigned int id) {
+
+	// No data
+	bool noData = true;
+
+	// Query
+	std::stringstream q;
+
+	// Return value
+	modbusM::ModbusCfg mb;
+
+	DBResult *result = 0;
+
+	try {
+
+		// Prepare query
+		q << "SELECT * FROM driver_modbus WHERE dmId = "<< id << ";";
+
+		// Query
+		result = executeQuery(q.str());
+
+		if (result->rowsCount() == 1) {
+
+			// Read data
+			result->nextRow();
+
+			// Get data
+			mb.mode = ((result->getUInt("dmMode")==modbusM::MM_RTU)?(modbusM::MM_RTU):(modbusM::MM_TCP));
+			mb.slaveID = result->getInt("dmSlaveID");
+			mb.registerCount = result->getInt("dmRegCount");
+			mb.polling = result->getUInt("dmPollingInterval");
+
+			if (mb.mode == modbusM::MM_RTU) {
+				mb.RTU_port = result->getString("dmRTU_port");
+				mb.RTU_baud = result->getInt("dmRTU_baud");
+				mb.RTU_parity = result->getString("dmRTU_parity")[0];
+				mb.RTU_dataBit = result->getInt("dmRTU_dataBit");
+				mb.RTU_stopBit = result->getInt("dmRTU_stopBit");
+			} else {
+				mb.TCP_addr = result->getString("dmTCP_addr");
+				mb.TCP_port = result->getInt("dmTCP_port");
+			}
+
+			// Release memory
+			delete result;
+			result = 0;
+
+		} else {
+			noData = true;
+		}
+
+	} catch (DBException &e) {
+
+		if (result)
+			delete result;
+
+		throw Exception(e.what(), "Config::getModbusCfg");
+	}
+
+	if (noData)
+		throw Exception("SHM configuration does not exist in DB", "Config::getShmCfg");
+
+	return mb;
+}
+
+std::vector<DriverConnection> Config::getDriverConnections(bool enabled) {
+
+	// Query
+	std::stringstream q;
+
+	// Return vector
+	std::vector<DriverConnection> vConn;
+
+	// Return value
+	DriverConnection dc, dcp;
+
+	DBResult *result = 0;
+
+	try {
+
+		// Prepare query
+		q << "SELECT * FROM driver_connections WHERE dcEnable=" << ((enabled)?("1"):("0")) << ";";
+
+		// Query
+		result = executeQuery(q.str());
+
+		// Read data
+		while (result->nextRow()) {
+
+			// Clear put variable
+			dcp = dc;
+
+			dcp.setId(result->getUInt("dcId"));
+			dcp.setName(result->getString("dcName"));
+			dcp.setType(static_cast<DriverType>(result->getUInt("dcType")));
+			dcp.setEnable(((result->getInt("dcEnable")==1)?(true):(false)));
+
+			if (dcp.getType() == DriverType::DT_Modbus) {
+				dcp.setModbusCfg(getModbusCfg(result->getUInt("dcConfigModbus")));
+			} else {
+				dcp.setShmCfg(getShmCfg(result->getUInt("dcConfigSHM")));
+			}
+
+			// Put into the vector
+			vConn.push_back(dcp);
+		}
+
+		// Release memory
+		delete result;
+		result = 0;
+
+	} catch (DBException &e) {
+
+		if (result)
+			delete result;
+
+		throw Exception(e.what(), "Config::getDriverConnections");
+	}
+
+	return vConn;
 }

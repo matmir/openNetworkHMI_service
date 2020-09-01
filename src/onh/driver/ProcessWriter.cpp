@@ -18,32 +18,54 @@
 
 #include "ProcessWriter.h"
 #include "DriverException.h"
+#include "ProcessDataTypes.h"
 #include <sstream>
 
 using namespace onh;
 
 ProcessWriter::ProcessWriter(const ProcessWriter &pw)
 {
-	// Create new instance of the driver writer
-	driverWriter = pw.driverWriter->createNew();
+	driverWriter.clear();
+
+	for (auto& it : pw.driverWriter) {
+		driverWriter.insert(std::pair<unsigned int, DriverProcessWriter*>(it.first, it.second->createNew()));
+	}
 }
 
-ProcessWriter::ProcessWriter(DriverProcessWriter *dpw):
-	driverWriter(dpw)
+ProcessWriter::ProcessWriter()
 {
+	driverWriter.clear();
 }
 
 ProcessWriter::~ProcessWriter()
 {
-	if (driverWriter)
-		delete driverWriter;
+
+	for (auto& writer : driverWriter) {
+		delete writer.second;
+	}
+}
+
+void ProcessWriter::addWriter(unsigned int id, DriverProcessWriter *dpw) {
+
+	// Check identifier
+	if (id == 0) {
+		throw Exception("Wrong driver process writer identifier", "ProcessWriter::addWriter");
+	}
+
+	// Check reader
+	if (dpw == nullptr) {
+		throw Exception("Missing driver process reader instance", "ProcessWriter::addWriter");
+	}
+
+	// Add reader
+	driverWriter.insert(std::pair<unsigned int, DriverProcessWriter*>(id, dpw));
 }
 
 void ProcessWriter::setBit(const Tag& tg) {
 
 	// Check driver writer
-	if (!driverWriter) {
-		throw Exception("Missing driver writer instance", "ProcessWriter::setBit");
+	if (driverWriter.size()==0) {
+		throw Exception("Driver writer is empty", "ProcessWriter::setBit");
 	}
 
     // Check Tag type
@@ -57,19 +79,24 @@ void ProcessWriter::setBit(const Tag& tg) {
     try {
 
         // Modify bit
-    	driverWriter->setBit(addr);
+    	driverWriter.at(tg.getConnId())->setBit(addr);
 
     } catch(DriverException &e) {
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::setBit");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process writer with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessWriter::setBit");
     }
 }
 
 void ProcessWriter::resetBit(const Tag& tg) {
 
 	// Check driver writer
-	if (!driverWriter) {
-		throw Exception("Missing driver writer instance", "ProcessWriter::resetBit");
+	if (driverWriter.size()==0) {
+		throw Exception("Driver writer is empty", "ProcessWriter::resetBit");
 	}
 
     // Check Tag type
@@ -83,11 +110,16 @@ void ProcessWriter::resetBit(const Tag& tg) {
     try {
 
         // Modify bit
-    	driverWriter->resetBit(addr);
+    	driverWriter.at(tg.getConnId())->resetBit(addr);
 
     } catch(DriverException &e) {
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::resetBit");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process writer with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessWriter::resetBit");
     }
 
 }
@@ -95,8 +127,8 @@ void ProcessWriter::resetBit(const Tag& tg) {
 void ProcessWriter::invertBit(const Tag& tg) {
 
 	// Check driver writer
-	if (!driverWriter) {
-		throw Exception("Missing driver writer instance", "ProcessWriter::invertBit");
+	if (driverWriter.size()==0) {
+		throw Exception("Driver writer is empty", "ProcessWriter::invertBit");
 	}
 
     // Check Tag type
@@ -110,44 +142,75 @@ void ProcessWriter::invertBit(const Tag& tg) {
     try {
 
         // Modify bit
-    	driverWriter->invertBit(addr);
+    	driverWriter.at(tg.getConnId())->invertBit(addr);
 
     } catch(DriverException &e) {
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::invertBit");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process writer with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessWriter::invertBit");
     }
 }
 
 void ProcessWriter::setBits(const std::vector<Tag>& tags) {
 
 	// Check driver writer
-	if (!driverWriter) {
-		throw Exception("Missing driver writer instance", "ProcessWriter::setBits");
+	if (driverWriter.size()==0) {
+		throw Exception("Driver writer is empty", "ProcessWriter::setBits");
 	}
 
     // Check input values
     if (tags.size() == 0)
         throw Exception("Tags array is empty", "ProcessWriter::setBits");
 
-    std::vector<processDataAddress> addr;
+    std::vector<processDataAddress> vAddr;
+    std::multimap<unsigned int, processDataAddress> addrs;
 
     // Prepare Tag addresses
-    for (unsigned int i=0; i<tags.size(); ++i) {
+    for (const Tag& tag : tags) {
 
         // Check Tag type
-        if (tags[i].getType() != TT_BIT) {
+        if (tag.getType() != TT_BIT) {
 
-        	ProcessUtils::triggerTagTypeError(tags[i].getName(), "ProcessWriter::setBits");
+        	ProcessUtils::triggerTagTypeError(tag.getName(), "ProcessWriter::setBits");
         }
 
-        addr.push_back(tags[i].getAddress());
-
+        addrs.insert(std::pair<unsigned int, processDataAddress>(tag.getConnId(), tag.getAddress()));
     }
 
     try {
 
-        // Set bits
-    	driverWriter->setBits(addr);
+    	vAddr.clear();
+    	unsigned int oldId = 0;
+    	for (auto& it : addrs) {
+    		// First iteration
+    		if (oldId == 0) {
+
+    			vAddr.push_back(it.second);
+
+    		} else {
+    			// Change driver id
+    			if (it.first != oldId) {
+    				// Set bits
+					driverWriter.at(oldId)->setBits(vAddr);
+					vAddr.clear();
+					// Add new address to the vector
+					vAddr.push_back(it.second);
+				} else { // Driver id is the same as old
+					// Put address to the vector
+					vAddr.push_back(it.second);
+				}
+    		}
+
+    		oldId = it.first;
+    	}
+
+    	if (vAddr.size() != 0) {
+    		driverWriter.at(oldId)->setBits(vAddr);
+    	}
 
     } catch(DriverException &e) {
 
@@ -158,8 +221,8 @@ void ProcessWriter::setBits(const std::vector<Tag>& tags) {
 void ProcessWriter::writeByte(const Tag& tg, BYTE val) {
 
 	// Check driver writer
-	if (!driverWriter) {
-		throw Exception("Missing driver writer instance", "ProcessWriter::writeByte");
+	if (driverWriter.size()==0) {
+		throw Exception("Driver writer is empty", "ProcessWriter::writeByte");
 	}
 
     // Check Tag type
@@ -173,19 +236,24 @@ void ProcessWriter::writeByte(const Tag& tg, BYTE val) {
     try {
 
         // Write byte
-    	driverWriter->writeByte(addr, val);
+    	driverWriter.at(tg.getConnId())->writeByte(addr, val);
 
     } catch(DriverException &e) {
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeByte");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process writer with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessWriter::writeByte");
     }
 }
 
 void ProcessWriter::writeWord(const Tag& tg, WORD val) {
 
 	// Check driver writer
-	if (!driverWriter) {
-		throw Exception("Missing driver writer instance", "ProcessWriter::writeWord");
+	if (driverWriter.size()==0) {
+		throw Exception("Driver writer is empty", "ProcessWriter::writeWord");
 	}
 
     // Check Tag type
@@ -199,19 +267,24 @@ void ProcessWriter::writeWord(const Tag& tg, WORD val) {
     try {
 
         // Write word
-    	driverWriter->writeWord(addr, val);
+    	driverWriter.at(tg.getConnId())->writeWord(addr, val);
 
     } catch(DriverException &e) {
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeWord");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process writer with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessWriter::writeWord");
     }
 }
 
 void ProcessWriter::writeDWord(const Tag& tg, DWORD val) {
 
 	// Check driver writer
-	if (!driverWriter) {
-		throw Exception("Missing driver writer instance", "ProcessWriter::writeDWord");
+	if (driverWriter.size()==0) {
+		throw Exception("Driver writer is empty", "ProcessWriter::writeDWord");
 	}
 
     // Check Tag type
@@ -225,19 +298,24 @@ void ProcessWriter::writeDWord(const Tag& tg, DWORD val) {
     try {
 
         // Write word
-    	driverWriter->writeDWord(addr, val);
+    	driverWriter.at(tg.getConnId())->writeDWord(addr, val);
 
     } catch(DriverException &e) {
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeDWord");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process writer with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessWriter::writeDWord");
     }
 }
 
 void ProcessWriter::writeInt(const Tag& tg, int val) {
 
 	// Check driver writer
-	if (!driverWriter) {
-		throw Exception("Missing driver writer instance", "ProcessWriter::writeInt");
+	if (driverWriter.size()==0) {
+		throw Exception("Driver writer is empty", "ProcessWriter::writeInt");
 	}
 
     // Check Tag type
@@ -251,19 +329,24 @@ void ProcessWriter::writeInt(const Tag& tg, int val) {
     try {
 
         // Write word
-    	driverWriter->writeInt(addr, val);
+    	driverWriter.at(tg.getConnId())->writeInt(addr, val);
 
     } catch(DriverException &e) {
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeInt");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process writer with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessWriter::writeInt");
     }
 }
 
 void ProcessWriter::writeReal(const Tag& tg, float val) {
 
 	// Check driver writer
-	if (!driverWriter) {
-		throw Exception("Missing driver writer instance", "ProcessWriter::writeReal");
+	if (driverWriter.size()==0) {
+		throw Exception("Driver writer is empty", "ProcessWriter::writeReal");
 	}
 
     // Check Tag type
@@ -277,10 +360,15 @@ void ProcessWriter::writeReal(const Tag& tg, float val) {
     try {
 
         // Write word
-    	driverWriter->writeReal(addr, val);
+    	driverWriter.at(tg.getConnId())->writeReal(addr, val);
 
     } catch(DriverException &e) {
 
         ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessWriter::writeReal");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process writer with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessWriter::writeReal");
     }
 }

@@ -30,36 +30,17 @@
 using namespace onh;
 
 ThreadManager::ThreadManager():
-	threadSocket(nullptr)
+	thSocket(nullptr), threadSocket(nullptr), updatersInited(false), driverBuffersInited(false)
 {
-	thProcessUpdater.thProgram = nullptr;
-	thDriverPolling.thProgram = nullptr;
-	thAlarming.thProgram = nullptr;
-	thLogger.thProgram = nullptr;
-	thLoggerWriter.thProgram = nullptr;
-	thScript.thProgram = nullptr;
-	thSocket = nullptr;
+	thProgramData.clear();
+	threadProgs.clear();
 }
 
 ThreadManager::~ThreadManager()
 {
-	if (thProcessUpdater.thProgram)
-		delete thProcessUpdater.thProgram;
-
-	if (thDriverPolling.thProgram)
-		delete thDriverPolling.thProgram;
-
-	if (thAlarming.thProgram)
-		delete thAlarming.thProgram;
-
-	if (thLogger.thProgram)
-		delete thLogger.thProgram;
-
-	if (thLoggerWriter.thProgram)
-		delete thLoggerWriter.thProgram;
-
-	if (thScript.thProgram)
-		delete thScript.thProgram;
+	for (auto& th : thProgramData) {
+		delete th.second.thProgram;
+	}
 
 	if (thSocket)
 		delete thSocket;
@@ -67,31 +48,55 @@ ThreadManager::~ThreadManager()
 	if (threadSocket)
 		delete threadSocket;
 
-	for (auto thProg : threadProgs) {
+	for (auto& thProg : threadProgs) {
 		delete thProg;
 	}
 }
 
-void ThreadManager::initProcessUpdater(const ProcessUpdater& pu, unsigned int updateInterval) {
+void ThreadManager::initProcessUpdater(const std::vector<ProcessUpdaterData>& pu, unsigned int updateInterval) {
 
-	if (thProcessUpdater.thProgram)
-		throw Exception("Process updater thread already initialized", "ThreadManager::initProcessUpdater");
+	if (updatersInited)
+		throw Exception("Process updater threads already initialized", "ThreadManager::initProcessUpdater");
 
-	thProcessUpdater.thProgram = new ProcessUpdaterProg(pu,
-														updateInterval,
-														tmExit.getController(false),
-														thProcessUpdater.cycleContainer.getController(false));
+	std::string nm = "";
+
+	// Prepare all updaters thread program data
+	for (unsigned int i=0; i<pu.size(); ++i) {
+		// Prepare updater name
+		nm = "Updater_"+pu[i].connId;
+
+		thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
+
+		thProgramData.at(nm).thProgram = new ProcessUpdaterProg(pu[i].procUpdater,
+															updateInterval,
+															tmExit.getController(false),
+															thProgramData.at(nm).cycleContainer.getController(false));
+	}
+
+	updatersInited = true;
 }
 
-void ThreadManager::initDriverPolling(const DriverBufferUpdater& dbu, unsigned int updateInterval) {
+void ThreadManager::initDriverPolling(const std::vector<DriverBufferUpdaterData>& dbu) {
 
-	if (thDriverPolling.thProgram)
+	if (driverBuffersInited)
 		throw Exception("Driver polling thread already initialized", "ThreadManager::initDriverPolling");
 
-	thDriverPolling.thProgram = new DriverPollingProg(dbu,
-														updateInterval,
+	std::string nm = "";
+
+	// Prepare all buffers thread program data
+	for (unsigned int i=0; i<dbu.size(); ++i) {
+		// Prepare buffer name
+		nm = "DriverBuffer_"+dbu[i].connId;
+
+		thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
+
+		thProgramData.at(nm).thProgram = new DriverPollingProg(dbu[i].buffUpdater,
+														dbu[i].updateInterval,
 														tmExit.getController(false),
-														thDriverPolling.cycleContainer.getController(false));
+														thProgramData.at(nm).cycleContainer.getController(false));
+	}
+
+	driverBuffersInited = true;
 }
 
 void ThreadManager::initAlarmingThread(const ProcessReader& pr,
@@ -99,43 +104,55 @@ void ThreadManager::initAlarmingThread(const ProcessReader& pr,
 										const AlarmingDB& adb,
 										unsigned int updateInterval)
 {
-	if (thAlarming.thProgram)
+	std::string nm = "Alarming";
+
+	if (thProgramData.count(nm) != 0)
 		throw Exception("Alarming thread already initialized", "ThreadManager::initAlarmingThread");
 
-	thAlarming.thProgram = new AlarmingProg(pr,
+	thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
+
+	thProgramData.at(nm).thProgram = new AlarmingProg(pr,
 											pw,
 											adb,
 											updateInterval,
 											tmExit.getController(false),
-											thAlarming.cycleContainer.getController(false));
+											thProgramData.at(nm).cycleContainer.getController(false));
 }
 
 void ThreadManager::initTagLoggerThread(const ProcessReader& pr,
 										const TagLoggerDB& tldb,
 										unsigned int updateInterval)
 {
-	if (thLogger.thProgram)
+	std::string nm = "TagLogger";
+
+	if (thProgramData.count(nm) != 0)
 		throw Exception("Tag logger thread already initialized", "ThreadManager::initTagLoggerThread");
 
-	thLogger.thProgram = new TagLoggerProg(pr,
+	thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
+
+	thProgramData.at(nm).thProgram = new TagLoggerProg(pr,
 											tldb,
 											tagLoggerBuffer.getController(),
 											updateInterval,
 											tmExit.getController(false),
-											thLogger.cycleContainer.getController(false));
+											thProgramData.at(nm).cycleContainer.getController(false));
 }
 
 void ThreadManager::initTagLoggerWriterThread(const TagLoggerDB& tldb,
 												unsigned int updateInterval)
 {
-	if (thLoggerWriter.thProgram)
+	std::string nm = "TagLoggerWriter";
+
+	if (thProgramData.count(nm) != 0)
 		throw Exception("Tag logger writer thread already initialized", "ThreadManager::initTagLoggerWriterThread");
 
-	thLoggerWriter.thProgram = new TagLoggerWriterProg(tldb,
-														tagLoggerBuffer.getController(true),
-														updateInterval,
-														tmExit.getController(false),
-														thLoggerWriter.cycleContainer.getController(false));
+	thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
+
+	thProgramData.at(nm).thProgram = new TagLoggerWriterProg(tldb,
+																tagLoggerBuffer.getController(true),
+																updateInterval,
+																tmExit.getController(false),
+																thProgramData.at(nm).cycleContainer.getController(false));
 }
 
 void ThreadManager::initScriptThread(const ProcessReader& pr,
@@ -145,17 +162,21 @@ void ThreadManager::initScriptThread(const ProcessReader& pr,
 										const std::string& executeScript,
 										bool testEnv)
 {
-	if (thScript.thProgram)
+	std::string nm = "Script";
+
+	if (thProgramData.count(nm) != 0)
 		throw Exception("Script thread already initialized", "ThreadManager::initScriptThread");
 
-	thScript.thProgram = new ScriptProg(pr,
-										pw,
-										sdb,
-										updateInterval,
-										executeScript,
-										testEnv,
-										tmExit.getController(false),
-										thScript.cycleContainer.getController(false));
+	thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
+
+	thProgramData.at(nm).thProgram = new ScriptProg(pr,
+													pw,
+													sdb,
+													updateInterval,
+													executeScript,
+													testEnv,
+													tmExit.getController(false),
+													thProgramData.at(nm).cycleContainer.getController(false));
 }
 
 void ThreadManager::initSocketThread(const ProcessReader& pr,
@@ -167,14 +188,11 @@ void ThreadManager::initSocketThread(const ProcessReader& pr,
 	if (thSocket)
 		throw Exception("Socket thread already initialized", "ThreadManager::initSocketThread");
 
-	ThreadCycleControllers cc = {
-		thProcessUpdater.cycleContainer.getController(),
-		thAlarming.cycleContainer.getController(),
-		thLogger.cycleContainer.getController(),
-		thLoggerWriter.cycleContainer.getController(),
-		thScript.cycleContainer.getController(),
-		thDriverPolling.cycleContainer.getController(),
-	};
+	ThreadCycleControllers cc;
+
+	for (auto& thProg : thProgramData) {
+		cc.insert(CycleControllerPair(thProg.first, thProg.second.cycleContainer.getController()));
+	}
 
 	thSocket = new SocketProgram(pr,
 									pw,
@@ -189,19 +207,19 @@ void ThreadManager::initSocketThread(const ProcessReader& pr,
 void ThreadManager::run() {
 
 	// Check thread initialization
-	if (!thProcessUpdater.thProgram)
+	if (!updatersInited)
 		throw Exception("Process updater thread not initialized", "ThreadManager::run");
 
-	if (!thAlarming.thProgram)
+	if (thProgramData.count("Alarming") == 0)
 		throw Exception("Alarming thread not initialized", "ThreadManager::run");
 
-	if (!thLogger.thProgram)
-		throw Exception("Logger thread not initialized", "ThreadManager::run");
+	if (thProgramData.count("TagLogger") == 0)
+		throw Exception("TagLogger thread not initialized", "ThreadManager::run");
 
-	if (!thLoggerWriter.thProgram)
+	if (thProgramData.count("TagLoggerWriter") == 0)
 		throw Exception("Logger writer thread not initialized", "ThreadManager::run");
 
-	if (!thScript.thProgram)
+	if (thProgramData.count("Script") == 0)
 		throw Exception("Script thread not initialized", "ThreadManager::run");
 
 	if (!thSocket)
@@ -210,16 +228,10 @@ void ThreadManager::run() {
 	if (!threadProgs.empty())
 		throw Exception("Thread vector is not empty", "ThreadManager::run");
 
-	// Check driver polling
-	if (thDriverPolling.thProgram) {
-		threadProgs.push_back(new std::thread(std::ref(*thDriverPolling.thProgram)));
+	// Start threads
+	for (auto& thData : thProgramData) {
+		threadProgs.push_back(new std::thread(std::ref(*thData.second.thProgram)));
 	}
-	// Run rest of the threads
-	threadProgs.push_back(new std::thread(std::ref(*thProcessUpdater.thProgram)));
-	threadProgs.push_back(new std::thread(std::ref(*thAlarming.thProgram)));
-	threadProgs.push_back(new std::thread(std::ref(*thLogger.thProgram)));
-	threadProgs.push_back(new std::thread(std::ref(*thLoggerWriter.thProgram)));
-	threadProgs.push_back(new std::thread(std::ref(*thScript.thProgram)));
 
 	// Run socket thread
 	threadSocket = new std::thread(std::ref(*thSocket));

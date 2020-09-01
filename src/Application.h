@@ -19,7 +19,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include "onh/driver/ProcessManager.h"
+#include "onh/driver/DriverManager.h"
 #include "onh/driver/SHM/ShmDriver.h"
 #include "onh/driver/Modbus/ModbusDriver.h"
 #include "onh/thread/ThreadManager.h"
@@ -76,16 +76,6 @@ namespace onh {
             void initDriver();
 
             /**
-             * Initialize driver buffer
-             */
-            void initDriverBuffer();
-
-            /**
-             * Initialize Process Manager
-             */
-            void initProcessManager();
-
-            /**
              * Initialize Thread manager
              */
             void initThreadManager();
@@ -98,13 +88,8 @@ namespace onh {
             /// Main program logger
             Logger *log;
 
-            /// Controller driver
-            Driver *drv;
-            /// Controller driver buffer
-            DriverBuffer *drvBuffer;
-
-            /// Process data manager
-            ProcessManager *pr;
+            /// Driver manager
+            DriverManager *drvManager;
 
             /// Thread manager
             ThreadManager *thManager;

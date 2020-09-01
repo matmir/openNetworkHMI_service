@@ -20,6 +20,7 @@
 #define SRC_DRIVER_PROCESSREADER_H_
 
 #include <vector>
+#include <map>
 #include "ProcessUtils.h"
 #include "../db/objs/Tag.h"
 #include "DriverProcessReader.h"
@@ -27,7 +28,7 @@
 namespace onh {
 
 	/// Forward declaration
-	class ProcessManager;
+	class DriverManager;
 
 	/**
 	 * Process reader class
@@ -36,7 +37,7 @@ namespace onh {
 
         public:
 
-            friend class ProcessManager;
+            friend class DriverManager;
 
             /**
              * Copy constructor
@@ -123,14 +124,20 @@ namespace onh {
         private:
 
             /**
-             * Constructor with parameters (allowed only from ProcessManager)
-             *
-             * @param dpr Pointer to the driver process data reader
+             * Constructor (allowed only from DriverManager)
              */
-            ProcessReader(DriverProcessReader *dpr);
+            ProcessReader();
+
+            /**
+             * Add Driver process reader to process reader (allowed only from DriverManager)
+             *
+             * @param id Driver process reader identifier
+             * @param dpr Driver process reader
+             */
+            void addReader(unsigned int id, DriverProcessReader *dpr);
 
             /// Driver process data reader
-            DriverProcessReader *driverReader;
+            std::map<unsigned int, DriverProcessReader*> driverReader;
 	};
 
 }

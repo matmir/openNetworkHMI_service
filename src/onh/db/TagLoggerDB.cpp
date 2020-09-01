@@ -54,7 +54,7 @@ std::vector<TagLoggerItem> TagLoggerDB::getLoggers(bool enabled) {
     try {
 
         // Prepare query
-        q << "SELECT * FROM log_tags lt, tags t WHERE lt.lttid=t.tid ";
+        q << "SELECT * FROM log_tags lt, tags t, driver_connections dc WHERE lt.lttid=t.tid AND t.tConnId=dc.dcId ";
         q << "AND lt.ltEnable=" << ((enabled)?("1"):("0")) << ";";
 
         // Query
@@ -71,6 +71,7 @@ std::vector<TagLoggerItem> TagLoggerDB::getLoggers(bool enabled) {
 
             // Update tag object values
             tg.setId(result->getUInt("tid"));
+            tg.setConnId(result->getUInt("tConnId"));
             tg.setName(result->getString("tName"));
             tg.setType(tt);
             tg.setArea(ta);

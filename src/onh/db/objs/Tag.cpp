@@ -22,13 +22,18 @@
 using namespace onh;
 
 Tag::Tag():
-    tid(0), tName(""), tType(TT_BIT), tAddress({PDA_INPUT, 0, 0})
+    tid(0), tConnId(0), tName(""), tType(TT_BIT), tAddress({PDA_INPUT, 0, 0})
 {
 }
 
-Tag::Tag(unsigned int id, const std::string& name, const TagType& type, const processDataAddress& address) {
+Tag::Tag(unsigned int id,
+		unsigned int cId,
+		const std::string& name,
+		const TagType& type,
+		const processDataAddress& address) {
 
 	setId(id);
+	setConnId(cId);
 	setName(name);
 	setType(type);
 	setAddress(address);
@@ -42,6 +47,12 @@ void Tag::checkId(unsigned int id) const {
 
 	if (id == 0)
 		throw TagException(TagException::WRONG_ID, "Invalid tag identifier", "Tag::checkId");
+}
+
+void Tag::checkConnId(unsigned int id) const {
+
+	if (id == 0)
+		throw TagException(TagException::WRONG_ID, "Invalid driver connection identifier", "Tag::checkConnId");
 }
 
 void Tag::checkName(const std::string& nm) const {
@@ -107,6 +118,20 @@ void Tag::setId(unsigned int id) {
     checkId(id);
 
     tid = id;
+}
+
+unsigned int Tag::getConnId() const {
+
+	checkConnId(tConnId);
+
+    return tConnId;
+}
+
+void Tag::setConnId(unsigned int id) {
+
+	checkConnId(id);
+
+    tConnId = id;
 }
 
 std::string Tag::getName() const {

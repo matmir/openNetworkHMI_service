@@ -88,7 +88,7 @@ const Tag ParserDB::getTag(const std::string& tagName)
     try {
 
         // Prepare query
-        q << "SELECT * FROM tags WHERE tName=";
+        q << "SELECT * FROM tags t, driver_connections dc WHERE t.tConnId=dc.dcId AND t.tName=";
         q << "'" << tagName << "';";
 
         // Query
@@ -200,8 +200,8 @@ std::vector<Tag> ParserDB::getTags(std::vector<std::string> tagNames) {
     try {
 
         // Prepare query
-        q << "SELECT * FROM tags WHERE tName IN (";
-        q << sTags.str() << ") ORDER BY FIELD(tName, " << sTags.str() << ");";
+        q << "SELECT * FROM tags t, driver_connections dc WHERE t.tConnId=dc.dcId AND tName IN (";
+        q << sTags.str() << ") ORDER BY FIELD(t.tName, " << sTags.str() << ");";
 
         // Query
         result = executeQuery(q.str());
@@ -256,6 +256,7 @@ Tag ParserDB::getTagFromResultset(DBResult *res) {
 
     // Update tag object values
     tg.setId(res->getUInt("tid"));
+    tg.setConnId(res->getUInt("tConnId"));
     tg.setName(res->getString("tName"));
     tg.setType(tt);
     tg.setArea(ta);

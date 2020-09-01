@@ -40,6 +40,7 @@ TEST_F(tagLoggerItemTests, Create1) {
 	ASSERT_EQ((unsigned int)1, tgLog.getId());
 
 	ASSERT_EQ((unsigned int)5, tgLog.getTag().getId());
+	ASSERT_EQ((unsigned int)1, tgLog.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", tgLog.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tgLog.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, tgLog.getTag().getArea());
@@ -73,6 +74,7 @@ TEST_F(tagLoggerItemTests, CreateSetId) {
 	ASSERT_EQ((unsigned int)65, tgLog.getId());
 
 	ASSERT_EQ((unsigned int)5, tgLog.getTag().getId());
+	ASSERT_EQ((unsigned int)1, tgLog.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", tgLog.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tgLog.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, tgLog.getTag().getArea());
@@ -103,6 +105,7 @@ TEST_F(tagLoggerItemTests, CreateSetTag) {
 
 	onh::Tag tg2(
 			500,
+			3,
 			"TestTag9",
 			onh::TT_BYTE,
 			{onh::PDA_MEMORY, 789, 0}
@@ -113,6 +116,7 @@ TEST_F(tagLoggerItemTests, CreateSetTag) {
 	ASSERT_EQ((unsigned int)1, tgLog.getId());
 
 	ASSERT_EQ((unsigned int)500, tgLog.getTag().getId());
+	ASSERT_EQ((unsigned int)3, tgLog.getTag().getConnId());
 	ASSERT_STREQ("TestTag9", tgLog.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BYTE, tgLog.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, tgLog.getTag().getArea());
@@ -146,6 +150,7 @@ TEST_F(tagLoggerItemTests, CreateSetInterval) {
 	ASSERT_EQ((unsigned int)1, tgLog.getId());
 
 	ASSERT_EQ((unsigned int)5, tgLog.getTag().getId());
+	ASSERT_EQ((unsigned int)1, tgLog.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", tgLog.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tgLog.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, tgLog.getTag().getArea());
@@ -179,6 +184,7 @@ TEST_F(tagLoggerItemTests, CreateSetIntervalSec) {
 	ASSERT_EQ((unsigned int)1, tgLog.getId());
 
 	ASSERT_EQ((unsigned int)5, tgLog.getTag().getId());
+	ASSERT_EQ((unsigned int)1, tgLog.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", tgLog.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tgLog.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, tgLog.getTag().getArea());
@@ -212,6 +218,7 @@ TEST_F(tagLoggerItemTests, CreateSetLastUpdate) {
 	ASSERT_EQ((unsigned int)1, tgLog.getId());
 
 	ASSERT_EQ((unsigned int)5, tgLog.getTag().getId());
+	ASSERT_EQ((unsigned int)1, tgLog.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", tgLog.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tgLog.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, tgLog.getTag().getArea());
@@ -245,6 +252,7 @@ TEST_F(tagLoggerItemTests, CreateSetLastValue) {
 	ASSERT_EQ((unsigned int)1, tgLog.getId());
 
 	ASSERT_EQ((unsigned int)5, tgLog.getTag().getId());
+	ASSERT_EQ((unsigned int)1, tgLog.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", tgLog.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tgLog.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, tgLog.getTag().getArea());
@@ -278,6 +286,7 @@ TEST_F(tagLoggerItemTests, CreateSetEnable) {
 	ASSERT_EQ((unsigned int)1, tgLog.getId());
 
 	ASSERT_EQ((unsigned int)5, tgLog.getTag().getId());
+	ASSERT_EQ((unsigned int)1, tgLog.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", tgLog.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tgLog.getTag().getType());
 	ASSERT_EQ(onh::PDA_INPUT, tgLog.getTag().getArea());

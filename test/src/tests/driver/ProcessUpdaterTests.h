@@ -29,9 +29,9 @@ TEST_F(driverTests, processUpdaterUpdate) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	// Change bit
@@ -40,7 +40,6 @@ TEST_F(driverTests, processUpdaterUpdate) {
 	// Update local process data (copy from server)
 	procUpdater->update();
 	procReader->updateProcessData();
-	shmReader->updateProcessData();
 	// Check bit to be 1
 	while (!procReader->getBitValue(*testTag)) {
 		// Sleep 1.5ms
@@ -50,17 +49,15 @@ TEST_F(driverTests, processUpdaterUpdate) {
 		procReader->updateProcessData();
 	}
 
-	shmReader->updateProcessData();
-
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
 		if (i == 0) {
-			ASSERT_EQ(1, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(1, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		} else {
-			ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		}
 
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
 	}
 }
 

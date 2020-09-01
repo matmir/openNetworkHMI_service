@@ -16,43 +16,25 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ProcessManager.h"
+#ifndef SRC_ONH_DRIVER_DRIVERBUFFERUPDATERDATA_H_
+#define SRC_ONH_DRIVER_DRIVERBUFFERUPDATERDATA_H_
 
-using namespace onh;
+#include "DriverBufferUpdater.h"
 
-ProcessManager::ProcessManager(Driver* drv, DriverBuffer* drvBuffHandle):
-	driver(drv), driverBuffer(drvBuffHandle)
-{
+namespace onh {
+
+	/**
+	 * Driver buffer updater data structure
+	 */
+	typedef struct {
+		/// Buffer updater connection driver id
+		unsigned int connId;
+		/// Buffer update interval
+		unsigned int updateInterval;
+		/// Driver buffer updater
+		DriverBufferUpdater buffUpdater;
+	} DriverBufferUpdaterData;
+
 }
 
-ProcessManager::~ProcessManager()
-{
-}
-
-ProcessUpdater ProcessManager::getUpdater() {
-
-	ProcessUpdater pr(driver->getUpdater());
-
-	return pr;
-}
-
-ProcessReader ProcessManager::getReader() {
-
-	ProcessReader pr(driver->getReader());
-
-	return pr;
-}
-
-ProcessWriter ProcessManager::getWriter() {
-
-	ProcessWriter pr(driver->getWriter());
-
-	return pr;
-}
-
-DriverBufferUpdater ProcessManager::getDriverBufferUpdater() {
-
-    DriverBufferUpdater dbu(driverBuffer);
-
-    return dbu;
-}
+#endif /* SRC_ONH_DRIVER_DRIVERBUFFERUPDATERDATA_H_ */

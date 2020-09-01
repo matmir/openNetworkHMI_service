@@ -45,6 +45,7 @@ TEST_F(alarmDefinitionItemTests, Create1) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -63,6 +64,7 @@ TEST_F(alarmDefinitionItemTests, Create1) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -70,6 +72,7 @@ TEST_F(alarmDefinitionItemTests, Create1) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -104,6 +107,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetId) {
 	ASSERT_EQ((unsigned int)45, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -122,6 +126,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetId) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -129,6 +134,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetId) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -160,6 +166,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetTag) {
 
 	onh::Tag tg2(
 			500,
+			3,
 			"TestTag9",
 			onh::TT_BYTE,
 			{onh::PDA_MEMORY, 789, 0}
@@ -170,6 +177,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetTag) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)500, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)3, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag9", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BYTE, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -188,6 +196,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetTag) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -195,6 +204,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetTag) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -229,6 +239,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetPriority) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -247,6 +258,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetPriority) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -254,6 +266,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetPriority) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -288,6 +301,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetMessage) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -306,6 +320,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetMessage) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -313,6 +328,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetMessage) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -347,6 +363,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetTrigger) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -365,6 +382,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetTrigger) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -372,6 +390,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetTrigger) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -406,6 +425,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetTriggerValues) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -424,6 +444,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetTriggerValues) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -431,6 +452,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetTriggerValues) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -465,6 +487,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetAutoAck) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -483,6 +506,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetAutoAck) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -490,6 +514,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetAutoAck) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -524,6 +549,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetActive) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -542,6 +568,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetActive) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -549,6 +576,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetActive) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -583,6 +611,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetPending) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -601,6 +630,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetPending) {
 	ASSERT_TRUE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -608,6 +638,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetPending) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -639,6 +670,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetFeedbackNotAck) {
 
 	onh::Tag tgFeedback2(
 			68,
+			5,
 			"tagFeedback68",
 			onh::TT_BIT,
 			{onh::PDA_OUTPUT, 434, 4}
@@ -649,6 +681,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetFeedbackNotAck) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -667,6 +700,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetFeedbackNotAck) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)68, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)5, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback68", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_OUTPUT, aItem.getFeedbackNotAckTag().getArea());
@@ -674,6 +708,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetFeedbackNotAck) {
 	ASSERT_EQ((unsigned int)4, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -705,6 +740,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetHWtag) {
 
 	onh::Tag tgHW2(
 			666,
+			14,
 			"tagDevil",
 			onh::TT_BIT,
 			{onh::PDA_OUTPUT, 666, 2}
@@ -715,6 +751,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetHWtag) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -733,6 +770,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetHWtag) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -740,6 +778,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetHWtag) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)666, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)14, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagDevil", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_OUTPUT, aItem.getHWAckTag().getArea());
@@ -774,6 +813,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetEnable) {
 	ASSERT_EQ((unsigned int)1, aItem.getId());
 
 	ASSERT_EQ((unsigned int)5, aItem.getTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getTag().getConnId());
 	ASSERT_STREQ("TestTag1", aItem.getTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getTag().getArea());
@@ -792,6 +832,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetEnable) {
 	ASSERT_FALSE(aItem.isPending());
 
 	ASSERT_EQ((unsigned int)6, aItem.getFeedbackNotAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getFeedbackNotAckTag().getConnId());
 	ASSERT_STREQ("tagFeedback", aItem.getFeedbackNotAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getFeedbackNotAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getFeedbackNotAckTag().getArea());
@@ -799,6 +840,7 @@ TEST_F(alarmDefinitionItemTests, CreateSetEnable) {
 	ASSERT_EQ((unsigned int)0, aItem.getFeedbackNotAckTag().getBitAddress());
 
 	ASSERT_EQ((unsigned int)7, aItem.getHWAckTag().getId());
+	ASSERT_EQ((unsigned int)1, aItem.getHWAckTag().getConnId());
 	ASSERT_STREQ("tagHWAck", aItem.getHWAckTag().getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, aItem.getHWAckTag().getType());
 	ASSERT_EQ(onh::PDA_MEMORY, aItem.getHWAckTag().getArea());
@@ -934,6 +976,7 @@ TEST_F(alarmDefinitionItemTests, CreateException4) {
 
 		onh::Tag tgFeedback2(
 				68,
+				1,
 				"tagFeedback68",
 				onh::TT_WORD,
 				{onh::PDA_OUTPUT, 434, 0}
@@ -977,6 +1020,7 @@ TEST_F(alarmDefinitionItemTests, CreateException5) {
 
 		onh::Tag tgHW2(
 				68,
+				1,
 				"tagHW68",
 				onh::TT_WORD,
 				{onh::PDA_MEMORY, 434, 0}

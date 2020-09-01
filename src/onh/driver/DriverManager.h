@@ -16,84 +16,98 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_DRIVER_PROCESSMANAGER_H_
-#define SRC_DRIVER_PROCESSMANAGER_H_
+#ifndef SRC_DRIVER_DRIVERMANAGER_H_
+#define SRC_DRIVER_DRIVERMANAGER_H_
 
 #include "Driver.h"
 #include "ProcessReader.h"
 #include "ProcessWriter.h"
-#include "ProcessUpdater.h"
+#include "ProcessUpdaterData.h"
 #include "DriverBufferUpdater.h"
+#include "DriverBufferUpdaterData.h"
 #include "../utils/Exception.h"
 #include "../utils/MutexContainer.h"
+#include "../db/objs/DriverConnection.h"
+#include <vector>
+#include <map>
 
 namespace onh {
 
 	/**
-	 * Process data manager class
+	 * Driver manager class
 	 */
-	class ProcessManager {
+	class DriverManager {
 
         public:
+
             /**
              * Constructor
              *
-             * @param drv Driver handle
-             * @param drvBuffHandle Driver buffer handle
+             * @param dcv Driver connection configuration
              */
-            ProcessManager(Driver* drv, DriverBuffer* drvBuffHandle);
+			DriverManager(const std::vector<DriverConnection>& dcv);
 
             /**
 			 * Copy constructor - inactive
 			 */
-            ProcessManager(const ProcessManager&) = delete;
+			DriverManager(const DriverManager&) = delete;
 
-            virtual ~ProcessManager();
+            virtual ~DriverManager();
 
             /**
 			 * Assign operator - inactive
 			 */
-            ProcessManager& operator=(const ProcessManager&) = delete;
+            DriverManager& operator=(const DriverManager&) = delete;
 
             /**
-             * Get updater object
+             * Get updater objects
              *
-             * @return ProcessUpdater object
+             * @return ProcessUpdater objects
              */
-            ProcessUpdater getUpdater();
+            std::vector<ProcessUpdaterData> getProcessUpdaters();
 
             /**
              * Get reader object
              *
              * @return ProcessReader object
              */
-            ProcessReader getReader();
+            ProcessReader getProcessReader();
 
             /**
              * Get writer object
              *
              * @return ProcessWriter object
              */
-            ProcessWriter getWriter();
+            ProcessWriter getProcessWriter();
 
             /**
-             * Get driver buffer updater object
+             * Get driver buffer updater data
              *
-             * @return DriverBufferUpdater object
+             * @return DriverBufferUpdater data
              */
-            DriverBufferUpdater getDriverBufferUpdater();
+            std::vector<DriverBufferUpdaterData> getDriverBufferUpdaters();
 
         private:
+
+            /**
+			 * Driver buffer data structure
+			 */
+			typedef struct {
+				/// Buffer updater connection driver id
+				unsigned int connId;
+				/// Buffer update interval
+				unsigned int updateInterval;
+				/// Driver buffer
+				DriverBuffer *buff;
+			} DriverBufferData;
+
             /// Driver handle
-            Driver* driver;
+            std::map<unsigned int, Driver*> driver;
 
             /// Driver buffer handle
-            DriverBuffer* driverBuffer;
-
-            /// Mutex for protecting driver
-            MutexContainer itsLock;
+            std::vector<DriverBufferData> driverBuffer;
 	};
 
 }
 
-#endif /* SRC_DRIVER_PROCESSMANAGER_H_ */
+#endif /* SRC_DRIVER_DRIVERMANAGER_H_ */

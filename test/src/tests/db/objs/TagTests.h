@@ -29,6 +29,7 @@ TEST(TagTests, Create1) {
 
 	onh::Tag tg(
 			1,
+			2,
 			"TestTag1",
 			onh::TT_BIT,
 			{onh::PDA_INPUT, 4, 6}
@@ -37,6 +38,7 @@ TEST(TagTests, Create1) {
 	onh::processDataAddress pda = tg.getAddress();
 
 	ASSERT_EQ((unsigned int)1, tg.getId());
+	ASSERT_EQ((unsigned int)2, tg.getConnId());
 	ASSERT_STREQ("TestTag1", tg.getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tg.getType());
 	ASSERT_EQ(onh::PDA_INPUT, tg.getArea());
@@ -54,6 +56,7 @@ TEST(TagTests, CreateSetId) {
 
 	onh::Tag tg(
 			1,
+			2,
 			"TestTag1",
 			onh::TT_BIT,
 			{onh::PDA_INPUT, 4, 6}
@@ -64,6 +67,36 @@ TEST(TagTests, CreateSetId) {
 	onh::processDataAddress pda = tg.getAddress();
 
 	ASSERT_EQ((unsigned int)666, tg.getId());
+	ASSERT_EQ((unsigned int)2, tg.getConnId());
+	ASSERT_STREQ("TestTag1", tg.getName().c_str());
+	ASSERT_EQ(onh::TT_BIT, tg.getType());
+	ASSERT_EQ(onh::PDA_INPUT, tg.getArea());
+	ASSERT_EQ((unsigned int)4, tg.getByteAddress());
+	ASSERT_EQ((unsigned int)6, tg.getBitAddress());
+	ASSERT_EQ(onh::PDA_INPUT, pda.area);
+	ASSERT_EQ((unsigned int)4, pda.byteAddr);
+	ASSERT_EQ((unsigned int)6, pda.bitAddr);
+}
+
+/**
+ * Check tag creation set conn id
+ */
+TEST(TagTests, CreateSetConnId) {
+
+	onh::Tag tg(
+			1,
+			2,
+			"TestTag1",
+			onh::TT_BIT,
+			{onh::PDA_INPUT, 4, 6}
+	);
+
+	tg.setConnId(45);
+
+	onh::processDataAddress pda = tg.getAddress();
+
+	ASSERT_EQ((unsigned int)1, tg.getId());
+	ASSERT_EQ((unsigned int)45, tg.getConnId());
 	ASSERT_STREQ("TestTag1", tg.getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tg.getType());
 	ASSERT_EQ(onh::PDA_INPUT, tg.getArea());
@@ -81,6 +114,7 @@ TEST(TagTests, CreateSetName) {
 
 	onh::Tag tg(
 			1,
+			2,
 			"TestTag1",
 			onh::TT_BIT,
 			{onh::PDA_INPUT, 4, 6}
@@ -91,6 +125,7 @@ TEST(TagTests, CreateSetName) {
 	onh::processDataAddress pda = tg.getAddress();
 
 	ASSERT_EQ((unsigned int)1, tg.getId());
+	ASSERT_EQ((unsigned int)2, tg.getConnId());
 	ASSERT_STREQ("Tag67", tg.getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tg.getType());
 	ASSERT_EQ(onh::PDA_INPUT, tg.getArea());
@@ -108,6 +143,7 @@ TEST(TagTests, CreateSetType) {
 
 	onh::Tag tg(
 			1,
+			2,
 			"TestTag1",
 			onh::TT_BIT,
 			{onh::PDA_INPUT, 4, 6}
@@ -118,6 +154,7 @@ TEST(TagTests, CreateSetType) {
 	onh::processDataAddress pda = tg.getAddress();
 
 	ASSERT_EQ((unsigned int)1, tg.getId());
+	ASSERT_EQ((unsigned int)2, tg.getConnId());
 	ASSERT_STREQ("TestTag1", tg.getName().c_str());
 	ASSERT_EQ(onh::TT_DWORD, tg.getType());
 	ASSERT_EQ(onh::PDA_INPUT, tg.getArea());
@@ -135,6 +172,7 @@ TEST(TagTests, CreateSetAddress) {
 
 	onh::Tag tg(
 			1,
+			2,
 			"TestTag1",
 			onh::TT_BIT,
 			{onh::PDA_INPUT, 4, 6}
@@ -145,6 +183,7 @@ TEST(TagTests, CreateSetAddress) {
 	onh::processDataAddress pda = tg.getAddress();
 
 	ASSERT_EQ((unsigned int)1, tg.getId());
+	ASSERT_EQ((unsigned int)2, tg.getConnId());
 	ASSERT_STREQ("TestTag1", tg.getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tg.getType());
 	ASSERT_EQ(onh::PDA_MEMORY, tg.getArea());
@@ -162,6 +201,7 @@ TEST(TagTests, CreateSetArea) {
 
 	onh::Tag tg(
 			1,
+			2,
 			"TestTag1",
 			onh::TT_BIT,
 			{onh::PDA_INPUT, 8, 2}
@@ -172,6 +212,7 @@ TEST(TagTests, CreateSetArea) {
 	onh::processDataAddress pda = tg.getAddress();
 
 	ASSERT_EQ((unsigned int)1, tg.getId());
+	ASSERT_EQ((unsigned int)2, tg.getConnId());
 	ASSERT_STREQ("TestTag1", tg.getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tg.getType());
 	ASSERT_EQ(onh::PDA_OUTPUT, tg.getArea());
@@ -189,6 +230,7 @@ TEST(TagTests, CreateSetByteAddr) {
 
 	onh::Tag tg(
 			1,
+			2,
 			"TestTag1",
 			onh::TT_BIT,
 			{onh::PDA_INPUT, 8, 2}
@@ -199,6 +241,7 @@ TEST(TagTests, CreateSetByteAddr) {
 	onh::processDataAddress pda = tg.getAddress();
 
 	ASSERT_EQ((unsigned int)1, tg.getId());
+	ASSERT_EQ((unsigned int)2, tg.getConnId());
 	ASSERT_STREQ("TestTag1", tg.getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tg.getType());
 	ASSERT_EQ(onh::PDA_INPUT, tg.getArea());
@@ -216,6 +259,7 @@ TEST(TagTests, CreateSetBitAddr) {
 
 	onh::Tag tg(
 			1,
+			2,
 			"TestTag1",
 			onh::TT_BIT,
 			{onh::PDA_INPUT, 8, 2}
@@ -226,6 +270,7 @@ TEST(TagTests, CreateSetBitAddr) {
 	onh::processDataAddress pda = tg.getAddress();
 
 	ASSERT_EQ((unsigned int)1, tg.getId());
+	ASSERT_EQ((unsigned int)2, tg.getConnId());
 	ASSERT_STREQ("TestTag1", tg.getName().c_str());
 	ASSERT_EQ(onh::TT_BIT, tg.getType());
 	ASSERT_EQ(onh::PDA_INPUT, tg.getArea());
@@ -245,6 +290,7 @@ TEST(TagTests, CreateException1) {
 
 		onh::Tag tg(
 				0,
+				2,
 				"TestTag1",
 				onh::TT_BIT,
 				{onh::PDA_INPUT, 4, 6}
@@ -263,6 +309,33 @@ TEST(TagTests, CreateException1) {
 }
 
 /**
+ * Check tag creation wrong conn id
+ */
+TEST(TagTests, CreateException1c) {
+
+	try {
+
+		onh::Tag tg(
+				1,
+				0,
+				"TestTag1",
+				onh::TT_BIT,
+				{onh::PDA_INPUT, 4, 6}
+		);
+
+		FAIL() << "Expected onh::TagException";
+
+	} catch (onh::TagException &e) {
+
+		ASSERT_STREQ(e.what(), "Tag::checkConnId: Invalid driver connection identifier");
+		ASSERT_EQ(onh::TagException::WRONG_ID, e.getType());
+
+	} catch(...) {
+		FAIL() << "Expected onh::TagException";
+	}
+}
+
+/**
  * Check tag creation wrong name
  */
 TEST(TagTests, CreateException2) {
@@ -271,6 +344,7 @@ TEST(TagTests, CreateException2) {
 
 		onh::Tag tg(
 				45,
+				2,
 				"",
 				onh::TT_BIT,
 				{onh::PDA_INPUT, 4, 6}
@@ -297,6 +371,7 @@ TEST(TagTests, CreateException3) {
 
 		onh::Tag tg(
 				45,
+				2,
 				"Test-Tag5",
 				onh::TT_BIT,
 				{onh::PDA_INPUT, 4, 6}
@@ -323,6 +398,7 @@ TEST(TagTests, CreateException4) {
 
 		onh::Tag tg(
 				45,
+				2,
 				"TestTag5",
 				(onh::TagType)70,
 				{onh::PDA_INPUT, 4, 6}
@@ -349,6 +425,7 @@ TEST(TagTests, CreateException5) {
 
 		onh::Tag tg(
 				45,
+				2,
 				"TestTag5",
 				onh::TT_BIT,
 				{(onh::processDataArea)80, 4, 6}
@@ -375,6 +452,7 @@ TEST(TagTests, CreateException6) {
 
 		onh::Tag tg(
 				45,
+				2,
 				"TestTag5",
 				onh::TT_BIT,
 				{onh::PDA_INPUT, 4, 9}

@@ -30,6 +30,7 @@ class tagLoggerItemTests: public ::testing::Test {
 
 			tg = new onh::Tag(
 					5,
+					1,
 					"TestTag1",
 					onh::TT_BIT,
 					{onh::PDA_INPUT, 4, 6}

@@ -22,13 +22,15 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <map>
 #include "ThreadProgram.h"
 #include "ThreadSocket.h"
 #include "../utils/GuardDataContainer.h"
 #include "TagLogger/TagLoggerBufferContainer.h"
 #include "ThreadExitData.h"
 #include "../driver/DriverBufferUpdater.h"
-#include "../driver/ProcessUpdater.h"
+#include "../driver/DriverBufferUpdaterData.h"
+#include "../driver/ProcessUpdaterData.h"
 #include "../driver/ProcessReader.h"
 #include "../driver/ProcessWriter.h"
 #include "../db/AlarmingDB.h"
@@ -69,18 +71,17 @@ namespace onh {
             /**
 			 * Initialize Process updater thread
 			 *
-			 * @param pu Process updater
+			 * @param pu Process updaters
 			 * @param updateInterval Thread update interval (milliseconds)
 			 */
-			void initProcessUpdater(const ProcessUpdater& pu, unsigned int updateInterval);
+			void initProcessUpdater(const std::vector<ProcessUpdaterData>& pu, unsigned int updateInterval);
 
             /**
-             * Initialize driver buffer thread
+             * Initialize driver buffer threads
              *
-             * @param dbu Driver buffer updater
-             * @param updateInterval Thread update interval (milliseconds)
+             * @param dbu Driver buffer updaters
              */
-            void initDriverPolling(const DriverBufferUpdater& dbu, unsigned int updateInterval);
+            void initDriverPolling(const std::vector<DriverBufferUpdaterData>& dbu);
 
             /**
              * Initialize Alarming thread
@@ -174,11 +175,13 @@ namespace onh {
             /**
              * Thread program data structure
              */
-            typedef struct {
+            typedef struct threadProgramData {
             	/// Cycle time container
             	GuardDataContainer<CycleTimeData> cycleContainer;
             	/// Thread program
             	ThreadProgram *thProgram;
+
+            	threadProgramData(): thProgram(nullptr) {}
 			} threadProgramData;
 
             /// Thread exit
@@ -187,26 +190,11 @@ namespace onh {
 			/// Socket file descriptor
 			GuardDataContainer<int> tmSockDesc;
 
-            /// Thread data for Process Updater
-            threadProgramData thProcessUpdater;
+			/// Program threads data
+			std::map<std::string, threadProgramData> thProgramData;
 
-            /// Thread data for Driver polling
-            threadProgramData thDriverPolling;
-
-            /// Thread data for Alarming system
-            threadProgramData thAlarming;
-
-            /// Thread data for Tag logger system
-            threadProgramData thLogger;
-
-            /// Thread data for Tag logger writer system
-            threadProgramData thLoggerWriter;
-
-            /// Tag logger buffer container
+			/// Tag logger buffer container
 			TagLoggerBufferContainer tagLoggerBuffer;
-
-            /// Thread data for Script system
-            threadProgramData thScript;
 
             /// Thread data for Socket
 			ThreadSocket *thSocket;
@@ -216,6 +204,12 @@ namespace onh {
 
 			/// Program threads
 			std::vector<std::thread*> threadProgs;
+
+			/// Process updater init flag
+			bool updatersInited;
+
+			/// Driver buffers init flag
+			bool driverBuffersInited;
     };
 
 }

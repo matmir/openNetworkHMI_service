@@ -23,47 +23,11 @@
 #include <sys/types.h>
 #include <modbus.h>
 
+#include "modbusmasterCfg.h"
 #include "modbusexception.h"
 #include "../DriverRegisterTypes.h"
 
 namespace modbusM {
-
-	/**
-	 * Modbus driver mode (TCP/RTU)
-	 */
-	typedef enum {
-		MM_TCP,
-		MM_RTU
-	} ModbusMode;
-
-	/**
-	 * Modbus configuration structure
-	 */
-	typedef struct {
-
-		/**
-		 * Common modbus configuration
-		 */
-		ModbusMode mode;
-		BYTE slaveID;
-		WORD registerCount;
-
-		/**
-		 * Modbus TCP configuration
-		 */
-		std::string TCP_addr;
-		int TCP_port;
-
-		/**
-		 * Modbus RTU configuration
-		 */
-		std::string RTU_port;
-		int RTU_baud;
-		char RTU_parity;
-		int RTU_dataBit;
-		int RTU_stopBit;
-
-	} ModbusCfg;
 
     /**
      * ModbusMaster class

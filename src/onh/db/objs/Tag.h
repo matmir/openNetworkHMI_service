@@ -49,11 +49,16 @@ namespace onh {
              * Tag constructor
              *
              * @param id Tag identifier
+             * @param cId Driver connection identifier
              * @param name Tag name
              * @param type Tag type
              * @param address Tag address
              */
-            Tag(unsigned int id, const std::string& name, const TagType& type, const processDataAddress& address);
+            Tag(unsigned int id,
+            		unsigned int cId,
+            		const std::string& name,
+					const TagType& type,
+					const processDataAddress& address);
 
             /**
 			 * Copy constructor - default
@@ -80,6 +85,20 @@ namespace onh {
 			 * @param id Tag identifier
 			 */
 			void setId(unsigned int id);
+
+			/**
+			 * Get Driver connection identifier
+			 *
+			 * @return Driver connection id
+			 */
+			unsigned int getConnId() const;
+
+			/**
+			 * Set Driver connection identifier
+			 *
+			 * @param id Driver connection identifier
+			 */
+			void setConnId(unsigned int id);
 
 			/**
 			 * Get Tag name
@@ -170,6 +189,9 @@ namespace onh {
             /// Tag identifier
 			unsigned int tid;
 
+			/// Driver connection identifier
+			unsigned int tConnId;
+
 			/// Tag name
 			std::string tName;
 
@@ -185,6 +207,13 @@ namespace onh {
              * @param id Identifier
              */
             void checkId(unsigned int id) const;
+
+            /**
+			 * Check Driver connection identifier
+			 *
+			 * @param id Identifier
+			 */
+			void checkConnId(unsigned int id) const;
 
             /**
              * Check Tag name

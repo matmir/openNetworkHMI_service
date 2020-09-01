@@ -29,16 +29,16 @@ TEST_F(driverTests, processReaderGetBit) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	// Check test bit
 	ASSERT_FALSE(procReader->getBitValue(*testTag));
 
 	// Change bit
-	shmWriter->setBit(testTag->getAddress());
+	procWriter->setBit(*testTag);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -49,13 +49,13 @@ TEST_F(driverTests, processReaderGetBit) {
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
 		if (i == 0) {
-			ASSERT_EQ(1, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(1, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		} else {
-			ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		}
 
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 }
 
@@ -66,9 +66,9 @@ TEST_F(driverTests, processReaderGetBitException1) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setType(onh::TT_BYTE);
@@ -100,9 +100,9 @@ TEST_F(driverTests, processReaderGetBitException2) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setAddress({onh::PDA_INPUT, PROCESS_DT_SIZE+10, 0});
@@ -133,13 +133,14 @@ TEST_F(driverTests, processReaderGetBits) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	onh::Tag tag2(
 		15,
+		dc.getId(),
 		"TestTag2",
 		onh::TT_BIT,
 		{onh::PDA_INPUT, 0, 2}
@@ -147,6 +148,7 @@ TEST_F(driverTests, processReaderGetBits) {
 
 	onh::Tag tag3(
 		16,
+		dc.getId(),
 		"TestTag3",
 		onh::TT_BIT,
 		{onh::PDA_INPUT, 0, 6}
@@ -168,9 +170,9 @@ TEST_F(driverTests, processReaderGetBits) {
 	ASSERT_FALSE(vRet[2]);
 
 	// Change bit
-	shmWriter->setBit(testTag->getAddress());
-	shmWriter->setBit(tag2.getAddress());
-	shmWriter->setBit(tag3.getAddress());
+	procWriter->setBit(*testTag);
+	procWriter->setBit(tag2);
+	procWriter->setBit(tag3);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -187,13 +189,13 @@ TEST_F(driverTests, processReaderGetBits) {
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
 		if (i == 0) {
-			ASSERT_EQ(69, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(69, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		} else {
-			ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		}
 
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 }
 
@@ -204,9 +206,9 @@ TEST_F(driverTests, processReaderGetBitsException1) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	std::vector<onh::Tag> vTags;
@@ -233,13 +235,14 @@ TEST_F(driverTests, processReaderGetBitsException2) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	onh::Tag tag2(
 		15,
+		dc.getId(),
 		"TestTag2",
 		onh::TT_BYTE,
 		{onh::PDA_INPUT, 5, 0}
@@ -259,7 +262,7 @@ TEST_F(driverTests, processReaderGetBitsException2) {
 	} catch (onh::TagException &e) {
 
 		std::stringstream s;
-		s << "ProcessReader::getBitsValue: ";
+		s << "ProcessReader::getBitValue: ";
 		s << "Tag: " << tag2.getName() << " has wrong type";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
@@ -277,13 +280,14 @@ TEST_F(driverTests, processReaderGetBitsException3) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	onh::Tag tag2(
 		15,
+		dc.getId(),
 		"TestTag2",
 		onh::TT_BIT,
 		{onh::PDA_INPUT, PROCESS_DT_SIZE+10, 0}
@@ -303,7 +307,7 @@ TEST_F(driverTests, processReaderGetBitsException3) {
 	} catch (onh::Exception &e) {
 
 		std::stringstream s;
-		s << "ProcessReader::getBitsValue: ";
+		s << "ProcessReader::getBitValue: (" << tag2.getName() << "): ";
 		s << "ShmProcessData::getBitValue: Byte address is out of range";
 
 		ASSERT_STREQ(e.what(), s.str().c_str());
@@ -320,9 +324,9 @@ TEST_F(driverTests, processReaderGetByte) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setType(onh::TagType::TT_BYTE);
@@ -331,7 +335,7 @@ TEST_F(driverTests, processReaderGetByte) {
 	ASSERT_EQ(0, procReader->getByte(*testTag));
 
 	// Change byte
-	shmWriter->writeByte(testTag->getAddress(), 154);
+	procWriter->writeByte(*testTag, 154);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -342,13 +346,13 @@ TEST_F(driverTests, processReaderGetByte) {
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
 		if (i == 0) {
-			ASSERT_EQ(154, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(154, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		} else {
-			ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		}
 
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 }
 
@@ -359,9 +363,9 @@ TEST_F(driverTests, processReaderGetByteException1) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	try {
@@ -391,9 +395,9 @@ TEST_F(driverTests, processReaderGetByteException2) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setType(onh::TagType::TT_BYTE);
@@ -425,9 +429,9 @@ TEST_F(driverTests, processReaderGetWord) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setType(onh::TagType::TT_WORD);
@@ -436,7 +440,7 @@ TEST_F(driverTests, processReaderGetWord) {
 	ASSERT_EQ(0, procReader->getWord(*testTag));
 
 	// Change word
-	shmWriter->writeWord(testTag->getAddress(), 45801);
+	procWriter->writeWord(*testTag, 45801);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -447,16 +451,16 @@ TEST_F(driverTests, processReaderGetWord) {
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
 		if (i == 0) {
-			ASSERT_EQ(45801, shmReader->getWord({onh::PDA_INPUT, i, 0}));
-			ASSERT_EQ(233, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(45801, procReader->getWord(createWordTag({onh::PDA_INPUT, i, 0})));
+			ASSERT_EQ(233, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		} else if (i == 1) {
-			ASSERT_EQ(178, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(178, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		} else {
-			ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		}
 
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 }
 
@@ -467,9 +471,9 @@ TEST_F(driverTests, processReaderGetWordException1) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	try {
@@ -499,9 +503,9 @@ TEST_F(driverTests, processReaderGetWordException2) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setType(onh::TagType::TT_WORD);
@@ -533,9 +537,9 @@ TEST_F(driverTests, processReaderGetDWord) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setType(onh::TagType::TT_DWORD);
@@ -544,7 +548,7 @@ TEST_F(driverTests, processReaderGetDWord) {
 	ASSERT_EQ((DWORD)0, procReader->getDWord(*testTag));
 
 	// Change dword (1110 0010 1100 0110 0101 0001 1101 1100)
-	shmWriter->writeDWord(testTag->getAddress(), 3804647900);
+	procWriter->writeDWord(*testTag, 3804647900);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -556,27 +560,27 @@ TEST_F(driverTests, processReaderGetDWord) {
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
 		switch (i) {
 			case 0: {
-					ASSERT_EQ((DWORD)3804647900, shmReader->getDWord({onh::PDA_INPUT, i, 0}));
-					ASSERT_EQ(20956, shmReader->getWord({onh::PDA_INPUT, i, 0}));
-					ASSERT_EQ(220, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+					ASSERT_EQ((DWORD)3804647900, procReader->getDWord(createDWordTag({onh::PDA_INPUT, i, 0})));
+					ASSERT_EQ(20956, procReader->getWord(createWordTag({onh::PDA_INPUT, i, 0})));
+					ASSERT_EQ(220, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 				}; break;
 			case 1: {
-					ASSERT_EQ(50769, shmReader->getWord({onh::PDA_INPUT, i, 0}));
-					ASSERT_EQ(81, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+					ASSERT_EQ(50769, procReader->getWord(createWordTag({onh::PDA_INPUT, i, 0})));
+					ASSERT_EQ(81, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 				}; break;
 			case 2: {
-					ASSERT_EQ(58054, shmReader->getWord({onh::PDA_INPUT, i, 0}));
-					ASSERT_EQ(198, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+					ASSERT_EQ(58054, procReader->getWord(createWordTag({onh::PDA_INPUT, i, 0})));
+					ASSERT_EQ(198, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 				}; break;
 			case 3: {
-					ASSERT_EQ(226, shmReader->getWord({onh::PDA_INPUT, i, 0}));
-					ASSERT_EQ(226, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+					ASSERT_EQ(226, procReader->getWord(createWordTag({onh::PDA_INPUT, i, 0})));
+					ASSERT_EQ(226, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 				}; break;
-			default: ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0})); break;
+			default: ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0}))); break;
 		}
 
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 }
 
@@ -587,9 +591,9 @@ TEST_F(driverTests, processReaderGetDWordException1) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	try {
@@ -619,9 +623,9 @@ TEST_F(driverTests, processReaderGetDWordException2) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setType(onh::TagType::TT_DWORD);
@@ -653,9 +657,9 @@ TEST_F(driverTests, processReaderGetInt) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setType(onh::TagType::TT_INT);
@@ -664,7 +668,7 @@ TEST_F(driverTests, processReaderGetInt) {
 	ASSERT_EQ(0, procReader->getInt(*testTag));
 
 	// Change int
-	shmWriter->writeInt(testTag->getAddress(), -548);
+	procWriter->writeInt(*testTag, -548);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -675,16 +679,16 @@ TEST_F(driverTests, processReaderGetInt) {
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
 		if (i == 0) {
-			ASSERT_EQ(-548, shmReader->getInt({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(-548, procReader->getInt(createIntTag({onh::PDA_INPUT, i, 0})));
 			// Skip checking bytes in int
 			i += 3;
 		} else {
-			ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		}
 	}
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 }
 
@@ -695,9 +699,9 @@ TEST_F(driverTests, processReaderGetIntException1) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	try {
@@ -727,9 +731,9 @@ TEST_F(driverTests, processReaderGetIntException2) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setType(onh::TagType::TT_INT);
@@ -761,9 +765,9 @@ TEST_F(driverTests, processReaderGetReal) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setType(onh::TagType::TT_REAL);
@@ -772,7 +776,7 @@ TEST_F(driverTests, processReaderGetReal) {
 	ASSERT_EQ((float)0, procReader->getReal(*testTag));
 
 	// Change real
-	shmWriter->writeReal(testTag->getAddress(), -1589.74);
+	procWriter->writeReal(*testTag, -1589.74);
 
 	// Wait on synchronization
 	waitOnSyncBit();
@@ -783,16 +787,16 @@ TEST_F(driverTests, processReaderGetReal) {
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
 		if (i == 0) {
-			ASSERT_EQ((float)-1589.74, shmReader->getReal({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ((float)-1589.74, procReader->getReal(createRealTag({onh::PDA_INPUT, i, 0})));
 			// Skip checking bytes in real
 			i += 3;
 		} else {
-			ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
+			ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
 		}
 	}
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 }
 
@@ -803,9 +807,9 @@ TEST_F(driverTests, processReaderGetRealException1) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	try {
@@ -835,9 +839,9 @@ TEST_F(driverTests, processReaderGetRealException2) {
 
 	// Check all process data
 	for (unsigned int i=0; i<PROCESS_DT_SIZE; ++i) {
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_INPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_OUTPUT, i, 0}));
-		ASSERT_EQ(0, shmReader->getByte({onh::PDA_MEMORY, i, 0}));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0})));
+		ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0})));
 	}
 
 	testTag->setType(onh::TagType::TT_REAL);

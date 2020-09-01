@@ -24,26 +24,46 @@ using namespace onh;
 
 ProcessReader::ProcessReader(const ProcessReader &pr)
 {
-	// Create new instance of the driver reader
-	driverReader = pr.driverReader->createNew();
+	driverReader.clear();
+
+	for (auto& it : pr.driverReader) {
+		driverReader.insert(std::pair<unsigned int, DriverProcessReader*>(it.first, it.second->createNew()));
+	}
 }
 
-ProcessReader::ProcessReader(DriverProcessReader *dpr):
-	driverReader(dpr)
+ProcessReader::ProcessReader()
 {
+	driverReader.clear();
 }
 
 ProcessReader::~ProcessReader()
 {
-	if (driverReader)
-		delete driverReader;
+	for (auto& reader : driverReader) {
+		delete reader.second;
+	}
+}
+
+void ProcessReader::addReader(unsigned int id, DriverProcessReader *dpr) {
+
+	// Check identifier
+	if (id == 0) {
+		throw Exception("Wrong driver process reader identifier", "ProcessReader::addReader");
+	}
+
+	// Check reader
+	if (dpr == nullptr) {
+		throw Exception("Missing driver process reader instance", "ProcessReader::addReader");
+	}
+
+	// Add reader
+	driverReader.insert(std::pair<unsigned int, DriverProcessReader*>(id, dpr));
 }
 
 bool ProcessReader::getBitValue(const Tag& tg) {
 
 	// Check driver reader
-	if (!driverReader) {
-		throw Exception("Missing driver reader instance", "ProcessReader::getBitValue");
+	if (driverReader.size()==0) {
+		throw Exception("Driver reader is empty", "ProcessReader::getBitValue");
 	}
 
     // Check Tag type
@@ -59,11 +79,16 @@ bool ProcessReader::getBitValue(const Tag& tg) {
     try {
 
         // Read bit
-        v = driverReader->getBitValue(addr);
+        v = driverReader.at(tg.getConnId())->getBitValue(addr);
 
     } catch(DriverException &e) {
 
     	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getBitValue");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process reader with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getBitValue");
     }
 
     return v;
@@ -72,8 +97,8 @@ bool ProcessReader::getBitValue(const Tag& tg) {
 std::vector<bool> ProcessReader::getBitsValue(const std::vector<Tag>& tags) {
 
 	// Check driver reader
-	if (!driverReader) {
-		throw Exception("Missing driver reader instance", "ProcessReader::getBitsValue");
+	if (driverReader.size()==0) {
+		throw Exception("Driver reader is empty", "ProcessReader::getBitsValue");
 	}
 
     // Check input values
@@ -81,30 +106,13 @@ std::vector<bool> ProcessReader::getBitsValue(const std::vector<Tag>& tags) {
         throw Exception("Tags array is empty", "ProcessReader::getBitsValue");
 
     std::vector<bool> ret;
-    std::vector<processDataAddress> addr;
 
-    // Check tags
-    for (unsigned int i=0; i<tags.size(); ++i) {
+	// Get values
+	for (const Tag& tag : tags) {
 
-        // Check Tag type
-        if (tags[i].getType() != TT_BIT) {
-
-        	ProcessUtils::triggerTagTypeError(tags[i].getName(), "ProcessReader::getBitsValue");
-        }
-
-        // Prepare address
-        addr.push_back(tags[i].getAddress());
-    }
-
-    try {
-
-        // Read bits
-        ret = driverReader->getBitsValue(addr);
-
-    } catch(DriverException &e) {
-
-    	ProcessUtils::triggerError(e.what(), "", "ProcessReader::getBitsValue");
-    }
+		// Add value
+		ret.push_back(getBitValue(tag));
+	}
 
     if (ret.size() == 0)
         throw Exception("Output array is empty", "ProcessReader::getBitsValue");
@@ -115,8 +123,8 @@ std::vector<bool> ProcessReader::getBitsValue(const std::vector<Tag>& tags) {
 BYTE ProcessReader::getByte(const Tag& tg) {
 
 	// Check driver reader
-	if (!driverReader) {
-		throw Exception("Missing driver reader instance", "ProcessReader::getByte");
+	if (driverReader.size()==0) {
+		throw Exception("Driver reader is empty", "ProcessReader::getByte");
 	}
 
     // Check Tag type
@@ -132,11 +140,16 @@ BYTE ProcessReader::getByte(const Tag& tg) {
     try {
 
         // Read byte
-        b = driverReader->getByte(addr);
+        b = driverReader.at(tg.getConnId())->getByte(addr);
 
     } catch(DriverException &e) {
 
     	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getByte");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process reader with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getBitValue");
     }
 
     return b;
@@ -145,8 +158,8 @@ BYTE ProcessReader::getByte(const Tag& tg) {
 WORD ProcessReader::getWord(const Tag& tg) {
 
 	// Check driver reader
-	if (!driverReader) {
-		throw Exception("Missing driver reader instance", "ProcessReader::getWord");
+	if (driverReader.size()==0) {
+		throw Exception("Driver reader is empty", "ProcessReader::getByte");
 	}
 
     // Check Tag type
@@ -162,11 +175,16 @@ WORD ProcessReader::getWord(const Tag& tg) {
     try {
 
         // Read word
-        w = driverReader->getWord(addr);
+        w = driverReader.at(tg.getConnId())->getWord(addr);
 
     } catch(DriverException &e) {
 
     	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getWord");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process reader with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getBitValue");
     }
 
     return w;
@@ -175,8 +193,8 @@ WORD ProcessReader::getWord(const Tag& tg) {
 DWORD ProcessReader::getDWord(const Tag& tg) {
 
 	// Check driver reader
-	if (!driverReader) {
-		throw Exception("Missing driver reader instance", "ProcessReader::getDWord");
+	if (driverReader.size()==0) {
+		throw Exception("Driver reader is empty", "ProcessReader::getDWord");
 	}
 
     // Check Tag type
@@ -192,11 +210,16 @@ DWORD ProcessReader::getDWord(const Tag& tg) {
     try {
 
         // Read double word
-        dw = driverReader->getDWord(addr);
+        dw = driverReader.at(tg.getConnId())->getDWord(addr);
 
     } catch(DriverException &e) {
 
     	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getDWord");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process reader with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getBitValue");
     }
 
     return dw;
@@ -205,8 +228,8 @@ DWORD ProcessReader::getDWord(const Tag& tg) {
 int ProcessReader::getInt(const Tag& tg) {
 
 	// Check driver reader
-	if (!driverReader) {
-		throw Exception("Missing driver reader instance", "ProcessReader::getInt");
+	if (driverReader.size()==0) {
+		throw Exception("Driver reader is empty", "ProcessReader::getInt");
 	}
 
     // Check Tag type
@@ -222,11 +245,16 @@ int ProcessReader::getInt(const Tag& tg) {
     try {
 
         // Read int
-        v = driverReader->getInt(addr);
+        v = driverReader.at(tg.getConnId())->getInt(addr);
 
     } catch(DriverException &e) {
 
     	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getInt");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process reader with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getBitValue");
     }
 
     return v;
@@ -235,8 +263,8 @@ int ProcessReader::getInt(const Tag& tg) {
 float ProcessReader::getReal(const Tag& tg) {
 
 	// Check driver reader
-	if (!driverReader) {
-		throw Exception("Missing driver reader instance", "ProcessReader::getReal");
+	if (driverReader.size()==0) {
+		throw Exception("Driver reader is empty", "ProcessReader::getInt");
 	}
 
     // Check Tag type
@@ -252,11 +280,16 @@ float ProcessReader::getReal(const Tag& tg) {
     try {
 
         // Read real
-        f = driverReader->getReal(addr);
+        f = driverReader.at(tg.getConnId())->getReal(addr);
 
     } catch(DriverException &e) {
 
     	ProcessUtils::triggerError(e.what(), tg.getName(), "ProcessReader::getReal");
+    } catch(const std::out_of_range &e) {
+
+    	std::stringstream s;
+    	s << "Driver process reader with id: " << tg.getConnId() << " does not exist";
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getBitValue");
     }
 
     return f;
@@ -264,5 +297,7 @@ float ProcessReader::getReal(const Tag& tg) {
 
 void ProcessReader::updateProcessData() {
 
-	driverReader->updateProcessData();
+	for (auto& reader : driverReader) {
+		reader.second->updateProcessData();
+	}
 }

@@ -24,7 +24,7 @@
 namespace onh {
 
     /// Forward declaration
-	class ProcessManager;
+	class DriverManager;
 
 	/**
 	 * Process updater class
@@ -33,7 +33,7 @@ namespace onh {
 
         public:
 
-            friend class ProcessManager;
+            friend class DriverManager;
 
             /**
              * Copy constructor

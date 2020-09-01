@@ -60,7 +60,7 @@ std::vector<AlarmDefinitionItem> AlarmingDB::getAlarms(bool enabled) {
 	DBResult *result2 = 0;
 
     // Prepare query
-    q << "SELECT * FROM alarms_definition ad, tags t WHERE ad.adtid=t.tid ";
+    q << "SELECT * FROM alarms_definition ad, tags t, driver_connections dc WHERE ad.adtid=t.tid AND t.tConnId=dc.dcId ";
     q << "AND ad.adEnable=" << ((enabled)?("1"):("0")) << ";";
 
     try {
@@ -80,6 +80,7 @@ std::vector<AlarmDefinitionItem> AlarmingDB::getAlarms(bool enabled) {
 
             // Update tag object values
             tg.setId(result->getUInt("tid"));
+            tg.setConnId(result->getUInt("tConnId"));
             tg.setName(result->getString("tName"));
             tg.setType(tt);
             tg.setArea(ta);
@@ -126,7 +127,7 @@ std::vector<AlarmDefinitionItem> AlarmingDB::getAlarms(bool enabled) {
 
             if (tagIDs.str() != "") {
                 tagIDs << ");";
-                q1 = "SELECT * FROM tags WHERE tid IN ( "+tagIDs.str();
+                q1 = "SELECT * FROM tags t, driver_connections dc WHERE t.tConnId=dc.dcId AND t.tid IN ( "+tagIDs.str();
 
                 // Call additional query
                 result2 = executeQuery(q1);
@@ -143,6 +144,7 @@ std::vector<AlarmDefinitionItem> AlarmingDB::getAlarms(bool enabled) {
 
                     // Update tag object values
                     tg.setId(result2->getUInt("tid"));
+                    tg.setConnId(result2->getUInt("tConnId"));
                     tg.setName(result2->getString("tName"));
                     tg.setType(tt);
                     tg.setArea(ta);
@@ -165,6 +167,7 @@ std::vector<AlarmDefinitionItem> AlarmingDB::getAlarms(bool enabled) {
 
                     // Update tag object values
                     tg.setId(result2->getUInt("tid"));
+                    tg.setConnId(result2->getUInt("tConnId"));
                     tg.setName(result2->getString("tName"));
                     tg.setType(tt);
                     tg.setArea(ta);
@@ -188,6 +191,7 @@ std::vector<AlarmDefinitionItem> AlarmingDB::getAlarms(bool enabled) {
 
                     // Update tag object values
                     tg.setId(result2->getUInt("tid"));
+                    tg.setConnId(result2->getUInt("tConnId"));
                     tg.setName(result2->getString("tName"));
                     tg.setType(tt);
                     tg.setArea(ta);

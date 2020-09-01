@@ -20,7 +20,8 @@
 #define CONFIG_H
 
 #include <string>
-
+#include "objs/DriverConnection.h"
+#include <vector>
 #include "DB.h"
 
 namespace onh {
@@ -86,6 +87,15 @@ namespace onh {
              */
             void setValue(const std::string& field, const std::string& val);
 
+            /**
+             * Get Driver connections
+             *
+             * @param enabled Get only enabled connections
+             *
+             * @return Driver connections
+             */
+            std::vector<DriverConnection> getDriverConnections(bool enabled=true);
+
         private:
 
             /**
@@ -94,6 +104,22 @@ namespace onh {
              * @param connection Connection handle
              */
             Config(MYSQL *connDB);
+
+            /**
+             * Get SHM driver configuration
+             *
+             * @param id SHM driver identifier
+             * @return SHM driver configuration
+             */
+            std::string getShmCfg(unsigned int id);
+
+            /**
+             * Get Modbus driver configuration
+             *
+             * @param id Modbus driver identifier
+             * @return Modbus driver identifier
+             */
+            modbusM::ModbusCfg getModbusCfg(unsigned int id);
     };
 
 }

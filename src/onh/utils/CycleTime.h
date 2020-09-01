@@ -20,6 +20,7 @@
 #define ONH_UTILS_CYCLETIME_H
 
 #include <time.h>
+#include <string>
 
 namespace onh {
 

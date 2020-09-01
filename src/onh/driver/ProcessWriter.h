@@ -20,6 +20,7 @@
 #define PROCESSWRITER_H
 
 #include <vector>
+#include <map>
 #include "ProcessUtils.h"
 #include "../utils/MutexAccess.h"
 #include "../db/objs/Tag.h"
@@ -28,7 +29,7 @@
 namespace onh {
 
     /// Forward declaration
-	class ProcessManager;
+	class DriverManager;
 
 	/**
 	 * Process writer class
@@ -37,7 +38,7 @@ namespace onh {
 
         public:
 
-            friend class ProcessManager;
+            friend class DriverManager;
 
             /**
              * Copy constructor
@@ -124,14 +125,20 @@ namespace onh {
         private:
 
             /**
-             * Constructor with parameters (allowed only from ProcessManager)
-             *
-             * @param dpw Pointer to the driver process data writer
+             * Constructor (allowed only from DriverManager)
              */
-            ProcessWriter(DriverProcessWriter *dpw);
+            ProcessWriter();
+
+            /**
+			 * Add Driver process writer to process writer (allowed only from DriverManager)
+			 *
+			 * @param id Driver process writer identifier
+			 * @param dpw Driver process writer
+			 */
+			void addWriter(unsigned int id, DriverProcessWriter *dpw);
 
             /// Driver process data writer
-			DriverProcessWriter *driverWriter;
+            std::map<unsigned int, DriverProcessWriter*> driverWriter;
     };
 
 }

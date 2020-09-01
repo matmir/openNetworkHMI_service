@@ -16,46 +16,23 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TESTS_DB_OBJS_SCRIPTITEMTESTSFIXTURES_H_
-#define TESTS_DB_OBJS_SCRIPTITEMTESTSFIXTURES_H_
+#ifndef SRC_ONH_DRIVER_PROCESSUPDATERDATA_H_
+#define SRC_ONH_DRIVER_PROCESSUPDATERDATA_H_
 
-#include <gtest/gtest.h>
-#include <db/objs/ScriptItem.h>
+#include "ProcessUpdater.h"
 
-class scriptItemTests: public ::testing::Test {
-	protected:
-		void SetUp() override {
+namespace onh {
 
-			tg = new onh::Tag(
-					5,
-					1,
-					"TestTag1",
-					onh::TT_BIT,
-					{onh::PDA_INPUT, 4, 6}
-			);
+	/**
+	 * Process updater data structure
+	 */
+	typedef struct {
+		/// Process updater connection driver id
+		unsigned int connId;
+		/// Process updater
+		ProcessUpdater procUpdater;
+	} ProcessUpdaterData;
 
-			fbTg = new onh::Tag(
-					9,
-					1,
-					"TestTag2",
-					onh::TT_BIT,
-					{onh::PDA_MEMORY, 70, 0}
-			);
-		}
+}
 
-		void TearDown() override {
-			if (tg)
-				delete tg;
-
-			if (fbTg)
-				delete fbTg;
-		}
-
-		// Script tag
-		onh::Tag *tg;
-
-		// Feedback tag
-		onh::Tag *fbTg;
-};
-
-#endif /* TESTS_DB_OBJS_SCRIPTITEMTESTSFIXTURES_H_ */
+#endif /* SRC_ONH_DRIVER_PROCESSUPDATERDATA_H_ */

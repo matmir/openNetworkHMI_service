@@ -58,7 +58,7 @@ std::vector<ScriptItem> ScriptDB::getScripts(bool enabled) {
 	DBResult *result2 = 0;
 
     // Prepare query
-    q << "SELECT * FROM scripts sc, tags t WHERE sc.scTagId=t.tid ";
+    q << "SELECT * FROM scripts sc, tags t, driver_connections dc WHERE sc.scTagId=t.tid AND t.tConnId=dc.dcId ";
     q << "AND sc.scEnable=" << ((enabled)?("1"):("0")) << ";";
 
     try {
@@ -79,6 +79,7 @@ std::vector<ScriptItem> ScriptDB::getScripts(bool enabled) {
 
             // Update tag object values
             tg.setId(result->getUInt("tid"));
+            tg.setConnId(result->getUInt("tConnId"));
             tg.setName(result->getString("tName"));
             tg.setType(tt);
             tg.setArea(ta);
@@ -96,7 +97,7 @@ std::vector<ScriptItem> ScriptDB::getScripts(bool enabled) {
             if (!result->isNull("scFeedbackRun")) {
 
                 tagID << result->getUInt("scFeedbackRun");
-                q1 = "SELECT * FROM tags WHERE tid="+tagID.str();
+                q1 = "SELECT * FROM tags t, driver_connections dc WHERE t.tConnId=dc.dcId AND tid="+tagID.str();
 
                 // Call additional query
                 result2 = executeQuery(q1);
@@ -113,6 +114,7 @@ std::vector<ScriptItem> ScriptDB::getScripts(bool enabled) {
 
                     // Update tag object values
                     tg.setId(result2->getUInt("tid"));
+                    tg.setConnId(result2->getUInt("tConnId"));
                     tg.setName(result2->getString("tName"));
                     tg.setType(tt);
                     tg.setArea(ta);

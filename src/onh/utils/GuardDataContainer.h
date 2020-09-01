@@ -46,9 +46,11 @@ namespace onh {
 			GuardDataContainer(const T& newData);
 
 			/**
-			 * Copy constructor - inactive
+			 * Copy constructor
+			 *
+			 * @param gdc Data container object to copy
 			 */
-			GuardDataContainer(const GuardDataContainer&) = delete;
+			GuardDataContainer(const GuardDataContainer& gdc);
 
 			virtual ~GuardDataContainer();
 
@@ -95,6 +97,13 @@ namespace onh {
 		data(nullptr), itsController(nullptr)
 	{
 		data = new T(newData);
+	}
+
+	template <class T>
+	GuardDataContainer<T>::GuardDataContainer(const GuardDataContainer& gdc):
+		data(nullptr), itsController(nullptr)
+	{
+		data = new T(*gdc.data);
 	}
 
 	template <class T>
