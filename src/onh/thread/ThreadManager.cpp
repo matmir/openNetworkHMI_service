@@ -237,7 +237,7 @@ void ThreadManager::run() {
 	threadSocket = new std::thread(std::ref(*thSocket));
 
 	// Join threads
-	for (auto thProg : threadProgs) {
+	for (auto& thProg : threadProgs) {
 		thProg->join();
 	}
 
