@@ -160,6 +160,9 @@ void DriverConnection::setModbusCfg(const modbusM::ModbusCfg& cfg) {
 
 void DriverConnection::checkShmCfg(const std::string& cfg) const {
 
+	if (dcType != DriverType::DT_SHM)
+		throw Exception("Driver connection wrong driver type", "DriverConnection::checkShmCfg");
+
 	// Check empty
 	if (cfg.size() == 0)
 		throw Exception("Driver SHM name is empty", "DriverConnection::checkShmCfg");

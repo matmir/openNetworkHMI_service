@@ -43,6 +43,7 @@
 #include "tests/db/objs/AlarmDefinitionItemTestsInt.h"
 #include "tests/db/objs/AlarmDefinitionItemTestsReal.h"
 #include "tests/db/objs/ScriptItemTests.h"
+#include "tests/db/objs/DriverConnectionTests.h"
 
 #include "tests/driver/SHM/ShmDriverBitTests.h"
 #include "tests/driver/SHM/ShmDriverByteTests.h"
