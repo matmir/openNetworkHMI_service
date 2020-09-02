@@ -26,10 +26,11 @@
 using namespace onh;
 
 DriverPollingProg::DriverPollingProg(const DriverBufferUpdater& dbu,
+										unsigned int connId,
 										unsigned int updateInterval,
 										const GuardDataController<ThreadExitData> &gdcTED,
 										const GuardDataController<CycleTimeData> &gdcCTD):
-    ThreadProgram(gdcTED, gdcCTD, updateInterval, "driver", "polling_")
+    ThreadProgram(gdcTED, gdcCTD, updateInterval, "driver", "polling_"+std::to_string(connId)+"_")
 {
     // Driver updater
     drvUpdater = new DriverBufferUpdater(dbu);

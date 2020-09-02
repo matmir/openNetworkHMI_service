@@ -25,10 +25,11 @@
 using namespace onh;
 
 ProcessUpdaterProg::ProcessUpdaterProg(const ProcessUpdater& pru,
+										unsigned int connId,
 										unsigned int updateInterval,
 										const GuardDataController<ThreadExitData> &gdcTED,
 										const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(gdcTED, gdcCTD, updateInterval, "process", "procUpd_")
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "process", "procUpd_"+std::to_string(connId)+"_")
 {
     // Process updater
     prUpdater = new ProcessUpdater(pru);

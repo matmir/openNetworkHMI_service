@@ -36,11 +36,13 @@ namespace onh {
              * Constructor
              *
              * @param pru Process updater
+             * @param connId Driver connection identifier
              * @param updateInterval Process update interval (milliseconds)
              * @param gdcTED Thread exit data controller
              * @param gdcCTD Thread cycle time controller
              */
             ProcessUpdaterProg(const ProcessUpdater& pru,
+            					unsigned int connId,
             					unsigned int updateInterval,
 								const GuardDataController<ThreadExitData> &gdcTED,
 								const GuardDataController<CycleTimeData> &gdcCTD);

@@ -68,6 +68,7 @@ void ThreadManager::initProcessUpdater(const std::vector<ProcessUpdaterData>& pu
 		thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
 
 		thProgramData.at(nm).thProgram = new ProcessUpdaterProg(pu[i].procUpdater,
+															pu[i].connId,
 															updateInterval,
 															tmExit.getController(false),
 															thProgramData.at(nm).cycleContainer.getController(false));
@@ -91,6 +92,7 @@ void ThreadManager::initDriverPolling(const std::vector<DriverBufferUpdaterData>
 		thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
 
 		thProgramData.at(nm).thProgram = new DriverPollingProg(dbu[i].buffUpdater,
+														dbu[i].connId,
 														dbu[i].updateInterval,
 														tmExit.getController(false),
 														thProgramData.at(nm).cycleContainer.getController(false));
