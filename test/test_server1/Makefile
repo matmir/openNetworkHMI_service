@@ -7,7 +7,7 @@ BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/app
 
-TARGET   := openNetworkHMI_cpp_test_server1
+TARGET   := onh_test_server1
 
 SRC :=														\
 	$(wildcard src/*.cpp)									\
