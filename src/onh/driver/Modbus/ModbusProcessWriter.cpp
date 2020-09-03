@@ -20,6 +20,7 @@
 #include "../DriverUtils.h"
 #include "ModbusUtils.h"
 #include "../DriverException.h"
+#include <iostream>
 
 using namespace onh;
 
@@ -243,17 +244,42 @@ void ModbusProcessWriter::writeWord(processDataAddress addr, WORD val) {
 		// Reg address
 		WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
+		// Check register overlapping
+		bool regOverlap = (addr.byteAddr % 2)?(true):(false);
+
 		// Modbus register
-		WORD reg = 0;
+		WORD reg[2] = {0};
+
+		// Temp BYTE registers
+		BYTE tmp[4] = {0};
+
+		// Pointer to WORD value
+		WORD *pWord = nullptr;
 
         // Read current status of the register
-        modbus->READ_HOLDING_REGISTERS(regAddr, 1, &reg);
+		if (regOverlap) {
+			modbus->READ_HOLDING_REGISTERS(regAddr, 2, reg);
 
-        // Update register
-        reg = val;
+			// Copy registers to temp BYTE array
+			memcpy(tmp, reg, 4);
 
-        // Write register
-        modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
+			// Set pointer to hi BYTE of the first WORD register
+			pWord = (WORD*)&tmp[1];
+
+			// Set value
+			*pWord = val;
+
+			// Copy temp BYTE array to the registers
+			memcpy(reg, tmp, 4);
+
+			// Write registers
+			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
+
+		} else {
+
+			// Write register
+			modbus->WRITE_SINGLE_REGISTER(regAddr, val);
+		}
 
         driverLock.unlock();
 
@@ -284,15 +310,46 @@ void ModbusProcessWriter::writeDWord(processDataAddress addr, DWORD val) {
 		// Reg address
 		WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
+		// Check register overlapping
+		bool regOverlap = (addr.byteAddr % 2)?(true):(false);
+
 		// Modbus registers
-		WORD reg[2] = {0};
+		WORD reg[3] = {0};
 
-        // Update registers
-        reg[0] = val & 0x0000FFFF;
-        reg[1] = ((val & 0xFFFF0000) >> 16);
+		// Temp BYTE registers
+		BYTE tmp[6] = {0};
 
-        // Write register
-        modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
+		// Pointer to DWORD value
+		DWORD *pDWord = nullptr;
+
+		// Read current status of the register
+		if (regOverlap) {
+			modbus->READ_HOLDING_REGISTERS(regAddr, 3, reg);
+
+			// Copy registers to temp BYTE array
+			memcpy(tmp, reg, 6);
+
+			// Set pointer to hi BYTE of the first WORD register
+			pDWord = (DWORD*)&tmp[1];
+
+			// Set value
+			*pDWord = val;
+
+			// Copy temp BYTE array to the registers
+			memcpy(reg, tmp, 6);
+
+			// Write registers
+			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 3, reg);
+
+		} else {
+
+			// Update registers
+			reg[0] = val & 0x0000FFFF;
+			reg[1] = ((val & 0xFFFF0000) >> 16);
+
+			// Write register
+			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
+		}
 
         driverLock.unlock();
 
@@ -323,19 +380,48 @@ void ModbusProcessWriter::writeInt(processDataAddress addr, int val) {
 		// Reg address
 		WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
+		// Check register overlapping
+		bool regOverlap = (addr.byteAddr % 2)?(true):(false);
+
 		// Modbus registers
-		WORD reg[2] = {0};
+		WORD reg[3] = {0};
+
+		// Temp BYTE registers
+		BYTE tmp[6] = {0};
 
 		// Pointer to int
-		int* v = 0;
-		// Point to the register area
-		v = (int *)&reg[0];
+		int* pInt = nullptr;
 
-		// Update register value
-		*v = val;
+		// Read current status of the register
+		if (regOverlap) {
+			modbus->READ_HOLDING_REGISTERS(regAddr, 3, reg);
 
-        // Write registers
-        modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
+			// Copy registers to temp BYTE array
+			memcpy(tmp, reg, 6);
+
+			// Set pointer to hi BYTE of the first WORD register
+			pInt = (int*)&tmp[1];
+
+			// Set value
+			*pInt = val;
+
+			// Copy temp BYTE array to the registers
+			memcpy(reg, tmp, 6);
+
+			// Write registers
+			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 3, reg);
+
+		} else {
+
+			// Point to the register area
+			pInt = (int*)&reg[0];
+
+			// Update register value
+			*pInt = val;
+
+			// Write registers
+			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
+		}
 
         driverLock.unlock();
 
@@ -366,19 +452,48 @@ void ModbusProcessWriter::writeReal(processDataAddress addr, float val) {
 		// Reg address
 		WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
+		// Check register overlapping
+		bool regOverlap = (addr.byteAddr % 2)?(true):(false);
+
 		// Modbus registers
-		WORD reg[2] = {0};
+		WORD reg[3] = {0};
+
+		// Temp BYTE registers
+		BYTE tmp[6] = {0};
 
 		// Pointer to float
-		float* v = 0;
-		// Point to the register area
-		v = (float *)&reg[0];
+		float* pFloat = nullptr;
 
-		// Update register value
-		memcpy(v, &val, sizeof val);
+		// Read current status of the register
+		if (regOverlap) {
+			modbus->READ_HOLDING_REGISTERS(regAddr, 3, reg);
 
-        // Write registers
-        modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
+			// Copy registers to temp BYTE array
+			memcpy(tmp, reg, 6);
+
+			// Set pointer to hi BYTE of the first WORD register
+			pFloat = (float*)&tmp[1];
+
+			// Set value
+			memcpy(pFloat, &val, sizeof val);
+
+			// Copy temp BYTE array to the registers
+			memcpy(reg, tmp, 6);
+
+			// Write registers
+			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 3, reg);
+
+		} else {
+
+			// Point to the register area
+			pFloat = (float*)&reg[0];
+
+			// Update register value
+			memcpy(pFloat, &val, sizeof val);
+
+			// Write registers
+			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
+		}
 
         driverLock.unlock();
 

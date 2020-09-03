@@ -28,10 +28,7 @@
 class driverTests: public ::testing::Test {
 	protected:
 
-		void SetUp() override {
-
-			// Remove all log files
-			system("rm -r -f logs");
+		static void SetUpTestSuite() {
 
 			// Driver connection
 			dcv.clear();
@@ -53,6 +50,24 @@ class driverTests: public ::testing::Test {
 
 			// Process Updater
 			procUpdater = new onh::ProcessUpdater(drvM->getProcessUpdaters()[0].procUpdater);
+		}
+
+		static void TearDownTestSuite() {
+
+			if (procUpdater)
+				delete procUpdater;
+
+			if (procWriter)
+				delete procWriter;
+
+			if (procReader)
+				delete procReader;
+
+			if (drvM)
+				delete drvM;
+		}
+
+		void SetUp() override {
 
 			// Test Tag
 			testTag = new onh::Tag(
@@ -91,21 +106,6 @@ class driverTests: public ::testing::Test {
 				delete clearTag;
 			if (syncTag)
 				delete syncTag;
-
-			if (procUpdater)
-				delete procUpdater;
-
-			if (procWriter)
-				delete procWriter;
-
-			if (procReader)
-				delete procReader;
-
-			if (drvM)
-				delete drvM;
-
-			// Remove all logger files
-			system("rm -r logs");
 		}
 
 		/**
@@ -249,25 +249,32 @@ class driverTests: public ::testing::Test {
 		}
 
 		// Driver connection
-		std::vector<onh::DriverConnection> dcv;
-		onh::DriverConnection dc;
+		static std::vector<onh::DriverConnection> dcv;
+		static onh::DriverConnection dc;
 
 		// Driver manager instance
-		onh::DriverManager *drvM;
+		static onh::DriverManager *drvM;
 
 		// Process reader instance
-		onh::ProcessReader *procReader;
+		static onh::ProcessReader *procReader;
 
 		// Process writer instance
-		onh::ProcessWriter *procWriter;
+		static onh::ProcessWriter *procWriter;
 
 		// Process updater instance
-		onh::ProcessUpdater *procUpdater;
+		static onh::ProcessUpdater *procUpdater;
 
 		// Test tag
 		onh::Tag *testTag;
 		onh::Tag *clearTag;
 		onh::Tag *syncTag;
 };
+
+std::vector<onh::DriverConnection> driverTests::dcv = {};
+onh::DriverConnection driverTests::dc = onh::DriverConnection();
+onh::DriverManager* driverTests::drvM = nullptr;
+onh::ProcessReader* driverTests::procReader = nullptr;
+onh::ProcessWriter* driverTests::procWriter = nullptr;
+onh::ProcessUpdater* driverTests::procUpdater = nullptr;
 
 #endif /* TESTS_DRIVER_DRIVERTESTSFIXTURES_H_ */

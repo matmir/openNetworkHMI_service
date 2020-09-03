@@ -28,6 +28,7 @@
 // Tag Logger
 #define TEST_LOG_SIM1 {onh::PDA_INPUT, 99, 0}
 #define TEST_LOG_DATA1 {onh::PDA_INPUT, 99, 1}
+
 #define TEST_LOG_BIT1 {onh::PDA_INPUT, 100, 0}
 #define TEST_LOG_BIT2 {onh::PDA_INPUT, 200, 0}
 #define TEST_LOG_BYTE1 {onh::PDA_INPUT, 101, 0}

@@ -52,12 +52,41 @@
 #include "tests/driver/SHM/ShmDriverIntTests.h"
 #include "tests/driver/SHM/ShmDriverRealTests.h"
 
+#include "tests/driver/Modbus/ModbusDriverBitTests.h"
+#include "tests/driver/Modbus/ModbusDriverByteTests.h"
+#include "tests/driver/Modbus/ModbusDriverWordTests.h"
+#include "tests/driver/Modbus/ModbusDriverDWordTests.h"
+#include "tests/driver/Modbus/ModbusDriverIntTests.h"
+#include "tests/driver/Modbus/ModbusDriverRealTests.h"
+
 #include "tests/driver/ProcessReaderTests.h"
 #include "tests/driver/ProcessWriterTests.h"
 #include "tests/driver/ProcessUpdaterTests.h"
 #include <driver/SHM/ShmProcessWriter.h>
 
 using namespace std;
+
+void closeModbusServer() {
+
+	modbusM::ModbusCfg mbc;
+	mbc.mode = modbusM::MM_TCP;
+	mbc.slaveID = 10;
+	mbc.registerCount = MODBUS_REGS;
+	mbc.TCP_addr = MODBUS_ADDR;
+	mbc.TCP_port = MODBUS_PORT;
+
+	// Create Modbus driver instance
+	onh::ModbusDriver *mbDriver = new onh::ModbusDriver(mbc);
+
+	// driver process writer
+	onh::DriverProcessWriter *mbWriter = mbDriver->getWriter();
+
+	// Send exit command
+	mbWriter->setBit(MB_BIT_EXIT);
+
+	delete mbWriter;
+	delete mbDriver;
+}
 
 int main(int argc, char **argv) {
 
@@ -78,6 +107,9 @@ int main(int argc, char **argv) {
 		sWriter->sendServerExitCommand();
 
 		delete sWriter;
+
+		closeModbusServer();
+
 	} catch (onh::Exception &e) {
 		cout << e.what() << endl;
 	}

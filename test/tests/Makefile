@@ -2,7 +2,7 @@ CC		:= g++
 CFLAGS	:= -Wall -std=c++17
 LDFLAGS	:= -lgtest -lpthread -lrt -lmodbus `mariadb_config --cflags --libs`
 INCLUDE	:= -I/usr/include/mariadb -I/usr/local/include/modbus
-INCLUDE += -I"../../src/onh" -I"../test_server1/src/controlBits"
+INCLUDE += -I"../../src/onh" -I"../test_server1/src/controlBits" -I"../test_server2/src/controlBits"
 
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects

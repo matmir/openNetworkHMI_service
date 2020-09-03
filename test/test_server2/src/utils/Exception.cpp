@@ -16,15 +16,32 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TESTS_TESTGLOBALDATA_H_
-#define TESTS_TESTGLOBALDATA_H_
+#include "Exception.h"
 
-// Shared memory segment name
-#define SHM_SEGMENT_NAME "onh_SHM_segment_test1"
+using namespace onh;
 
-// Modbus
-#define MODBUS_ADDR "127.0.0.1"
-#define MODBUS_PORT 1502
-#define MODBUS_REGS 50
+Exception::Exception():
+    errorMessage(""), functionName(""), allMessage("none")
+{
+}
 
-#endif /* TESTS_TESTGLOBALDATA_H_ */
+Exception::Exception(const std::string& exceptionMSG):
+    errorMessage(exceptionMSG), functionName(""), allMessage(exceptionMSG)
+{
+}
+
+Exception::Exception(const std::string& exceptionMSG, const std::string& funcName):
+    errorMessage(exceptionMSG), functionName(funcName)
+{
+	allMessage = functionName + ": ";
+	allMessage += errorMessage;
+}
+
+Exception::~Exception() noexcept
+{
+}
+
+const char* Exception::what() const noexcept {
+
+    return allMessage.c_str();
+}

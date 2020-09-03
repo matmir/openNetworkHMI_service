@@ -41,7 +41,7 @@ int main() {
 
 	exitSignal = false;
 
-	cout << "C++ SHM test server program!\n" << endl;
+	cout << "C++ SHM test server 1 program!\n" << endl;
 	// Remove init file
 	system("rm -f shmInited");
 
@@ -55,5 +55,5 @@ int main() {
 	Application app("onh_SHM_segment_test1", &exitSignal);
 	app.run();
 
-	cout << "Test server program closed!" << endl;
+	cout << "Test server 1 program closed!" << endl;
 }

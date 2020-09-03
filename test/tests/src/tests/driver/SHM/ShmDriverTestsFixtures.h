@@ -27,10 +27,8 @@
 
 class shmDriverTests: public ::testing::Test {
 	protected:
-		void SetUp() override {
 
-			// Remove all log files
-			system("rm -r -f logs");
+		static void SetUpTestSuite() {
 
 			// Create SHM driver instance
 			shmDriver = new onh::ShmDriver(SHM_SEGMENT_NAME);
@@ -39,12 +37,10 @@ class shmDriverTests: public ::testing::Test {
 			shmReader = shmDriver->getReader();
 			shmWriter = shmDriver->getWriter();
 			shmUpdater = shmDriver->getUpdater();
-
-			// Clear server process data
-			clearServerProcessData();
 		}
 
-		void TearDown() override {
+		static void TearDownTestSuite() {
+
 			if (shmReader)
 				delete shmReader;
 
@@ -56,9 +52,16 @@ class shmDriverTests: public ::testing::Test {
 
 			if (shmDriver)
 				delete shmDriver;
+		}
 
-			// Remove all logger files
-			system("rm -r logs");
+		void SetUp() override {
+
+			// Clear server process data
+			clearServerProcessData();
+		}
+
+		void TearDown() override {
+
 		}
 
 		/**
@@ -112,14 +115,19 @@ class shmDriverTests: public ::testing::Test {
 		}
 
 		// SHM driver instance
-		onh::ShmDriver *shmDriver;
+		static onh::ShmDriver *shmDriver;
 
 		// driver process reader
-		onh::DriverProcessReader *shmReader;
+		static onh::DriverProcessReader *shmReader;
 		// driver process writer
-		onh::DriverProcessWriter *shmWriter;
+		static onh::DriverProcessWriter *shmWriter;
 		// driver process updater
-		onh::DriverProcessUpdater *shmUpdater;
+		static onh::DriverProcessUpdater *shmUpdater;
 };
+
+onh::ShmDriver* shmDriverTests::shmDriver = nullptr;
+onh::DriverProcessReader* shmDriverTests::shmReader = nullptr;
+onh::DriverProcessWriter* shmDriverTests::shmWriter = nullptr;
+onh::DriverProcessUpdater* shmDriverTests::shmUpdater = nullptr;
 
 #endif /* TESTS_DRIVER_SHM_SHMDRIVERTESTSFIXTURES_H_ */

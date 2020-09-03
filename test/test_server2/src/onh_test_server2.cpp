@@ -16,15 +16,40 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TESTS_TESTGLOBALDATA_H_
-#define TESTS_TESTGLOBALDATA_H_
+#include <iostream>
+#include <unistd.h>
+#include <signal.h>
+#include <string.h>
 
-// Shared memory segment name
-#define SHM_SEGMENT_NAME "onh_SHM_segment_test1"
+#include "Application.h"
 
-// Modbus
-#define MODBUS_ADDR "127.0.0.1"
-#define MODBUS_PORT 1502
-#define MODBUS_REGS 50
+using namespace std;
 
-#endif /* TESTS_TESTGLOBALDATA_H_ */
+bool exitSignal;
+
+// Exit signal function
+void term(int signum) {
+
+	exitSignal = true;
+}
+
+int main() {
+
+	exitSignal = false;
+
+	cout << "C++ Modbus test server program!\n" << endl;
+	// Remove init file
+	system("rm -f modbusInited");
+
+	// --------------------- PROGRAM TERMINATION --------------------------
+	struct sigaction action;
+	memset(&action, 0, sizeof(struct sigaction));
+	action.sa_handler = term;
+	sigaction(SIGTERM, &action, NULL);
+
+	// Run app
+	Application app("127.0.0.1", 1502, 50, &exitSignal);
+	app.run();
+
+	cout << "Modbus test server program closed!" << endl;
+}

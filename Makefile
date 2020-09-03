@@ -43,6 +43,7 @@ $(APP_DIR)/$(TARGET): $(OBJECTS)
 all: build $(APP_DIR)/$(TARGET)
 	cd test/tests; make all
 	cd test/test_server1; make all
+	cd test/test_server2; make all
 
 build:
 	@mkdir -p $(APP_DIR)
@@ -52,16 +53,19 @@ debug: CFLAGS += -DDEBUG -g
 debug: build $(APP_DIR)/$(TARGET)
 	cd test/tests; make debug
 	cd test/test_server1; make debug
+	cd test/test_server2; make debug
 
 release: CFLAGS += -O2
 release: build $(APP_DIR)/$(TARGET)
 	cd test/tests; make release
 	cd test/test_server1; make release
+	cd test/test_server2; make release
 
 clean:
 	-@rm -rf $(BUILD)
 	cd test/tests; make clean
 	cd test/test_server1; make clean
+	cd test/test_server2; make clean
 	
 .PHONY: all build clean debug release
 

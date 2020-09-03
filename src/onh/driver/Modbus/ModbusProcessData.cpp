@@ -176,13 +176,43 @@ WORD ModbusProcessData::getWord(processDataAddress addr) const {
     // Reg address
     WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
+    // Check register overlapping
+	bool regOverlap = (addr.byteAddr % 2)?(true):(false);
+
+	// Temp BYTE registers
+	BYTE tmp[4] = {0};
+
+	// Pointer to WORD value
+	WORD *pWord = nullptr;
+
     // Modbus register
     WORD reg = 0;
-    switch (addr.area) {
-        case PDA_INPUT: reg = mreg.inputReg[regAddr]; break;
-        case PDA_OUTPUT: reg = mreg.holdingReg[regAddr]; break;
-        default: reg = 0;
-    }
+
+    // Get registers
+    if (regOverlap) {
+
+    	if (addr.area == PDA_INPUT) {
+    		// Copy registers to temp BYTE array
+			memcpy(tmp, &mreg.inputReg[regAddr], 4);
+    	} else {
+    		// Copy registers to temp BYTE array
+			memcpy(tmp, &mreg.holdingReg[regAddr], 4);
+    	}
+
+		// Set pointer to hi BYTE of the first WORD register
+		pWord = (WORD*)&tmp[1];
+
+		// Get value
+		reg = *pWord;
+
+	} else {
+
+		if (addr.area == PDA_INPUT) {
+			reg = mreg.inputReg[regAddr];
+		} else {
+			reg = mreg.holdingReg[regAddr];
+		}
+	}
 
     return reg;
 }
@@ -195,30 +225,50 @@ DWORD ModbusProcessData::getDWord(processDataAddress addr) const {
     // Reg address
     WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
+    // Check register overlapping
+	bool regOverlap = (addr.byteAddr % 2)?(true):(false);
+
+	// Temp BYTE registers
+	BYTE tmp[6] = {0};
+
+	// Pointer to DWORD value
+	DWORD *pDWord = nullptr;
+
     DWORD reg = 0;
 
-    // Modbus registers
-    WORD regLo = 0;
-    WORD regHi = 0;
-    switch (addr.area) {
-        case PDA_INPUT: {
-            regLo = mreg.inputReg[regAddr];
-            regHi = mreg.inputReg[regAddr+1];
-        } break;
-        case PDA_OUTPUT: {
-            regLo = mreg.holdingReg[regAddr];
-            regHi = mreg.holdingReg[regAddr+1];
-        } break;
-        default: {
-            regLo = 0;
-            regHi = 0;
-        }
-    }
+    // Get registers
+	if (regOverlap) {
 
-    // DWord
-    reg = regHi;
-    reg = reg << 16;
-    reg = (reg | regLo);
+		if (addr.area == PDA_INPUT) {
+			// Copy registers to temp BYTE array
+			memcpy(tmp, &mreg.inputReg[regAddr], 6);
+		} else {
+			// Copy registers to temp BYTE array
+			memcpy(tmp, &mreg.holdingReg[regAddr], 6);
+		}
+
+		// Set pointer to hi BYTE of the first WORD register
+		pDWord = (DWORD*)&tmp[1];
+
+		// Get value
+		reg = *pDWord;
+
+	} else {
+
+		if (addr.area == PDA_INPUT) {
+			// Set pointer to hi BYTE of the first WORD register
+			pDWord = (DWORD*)&mreg.inputReg[regAddr];
+
+			// Get value
+			reg = *pDWord;
+		} else {
+			// Set pointer to hi BYTE of the first WORD register
+			pDWord = (DWORD*)&mreg.holdingReg[regAddr];
+
+			// Get value
+			reg = *pDWord;
+		}
+	}
 
     return reg;
 }
@@ -231,18 +281,51 @@ int ModbusProcessData::getInt(processDataAddress addr) const {
     // Reg address
     WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
+    // Check register overlapping
+	bool regOverlap = (addr.byteAddr % 2)?(true):(false);
+
+	// Temp BYTE registers
+	BYTE tmp[6] = {0};
+
     // Get int
-    int* v = 0;
-    int def = 0;
+    int* pInt = nullptr;
+    int ret = 0;
 
-    // Read Modbus registers
-    switch (addr.area) {
-        case PDA_INPUT: v = (int*)&mreg.inputReg[regAddr]; break;
-        case PDA_OUTPUT: v = (int*)&mreg.holdingReg[regAddr]; break;
-        default: v = &def;
-    }
+    // Get registers
+	if (regOverlap) {
 
-    return *v;
+		if (addr.area == PDA_INPUT) {
+			// Copy registers to temp BYTE array
+			memcpy(tmp, &mreg.inputReg[regAddr], 6);
+		} else {
+			// Copy registers to temp BYTE array
+			memcpy(tmp, &mreg.holdingReg[regAddr], 6);
+		}
+
+		// Set pointer to hi BYTE of the first WORD register
+		pInt = (int*)&tmp[1];
+
+		// Get value
+		ret = *pInt;
+
+	} else {
+
+		if (addr.area == PDA_INPUT) {
+			// Set pointer to hi BYTE of the first WORD register
+			pInt = (int*)&mreg.inputReg[regAddr];
+
+			// Get value
+			ret = *pInt;
+		} else {
+			// Set pointer to hi BYTE of the first WORD register
+			pInt = (int*)&mreg.holdingReg[regAddr];
+
+			// Get value
+			ret = *pInt;
+		}
+	}
+
+    return ret;
 }
 
 float ModbusProcessData::getReal(processDataAddress addr) const {
@@ -253,18 +336,51 @@ float ModbusProcessData::getReal(processDataAddress addr) const {
     // Reg address
     WORD regAddr = ModbusUtils::getRegisterAddress(addr);
 
+    // Check register overlapping
+	bool regOverlap = (addr.byteAddr % 2)?(true):(false);
+
+	// Temp BYTE registers
+	BYTE tmp[6] = {0};
+
     // Get float
-    float v = 0;
-    float def = 0;
+    float *pFloat = nullptr;
+    float ret = 0;
 
-    // Read Modbus registers
-    switch (addr.area) {
-    	case PDA_INPUT: memcpy(&v, &mreg.inputReg[regAddr], sizeof v); break;
-    	case PDA_OUTPUT: memcpy(&v, &mreg.holdingReg[regAddr], sizeof v); break;
-        default: v = def;
-    }
+    // Get registers
+	if (regOverlap) {
 
-    return v;
+		if (addr.area == PDA_INPUT) {
+			// Copy registers to temp BYTE array
+			memcpy(tmp, &mreg.inputReg[regAddr], 6);
+		} else {
+			// Copy registers to temp BYTE array
+			memcpy(tmp, &mreg.holdingReg[regAddr], 6);
+		}
+
+		// Set pointer to hi BYTE of the first WORD register
+		pFloat = (float*)&tmp[1];
+
+		// Set value
+		memcpy(&ret, pFloat, sizeof ret);
+
+	} else {
+
+		if (addr.area == PDA_INPUT) {
+			// Set pointer to hi BYTE of the first WORD register
+			pFloat = (float*)&mreg.inputReg[regAddr];
+
+			// Set value
+			memcpy(&ret, pFloat, sizeof ret);
+		} else {
+			// Set pointer to hi BYTE of the first WORD register
+			pFloat = (float*)&mreg.holdingReg[regAddr];
+
+			// Set value
+			memcpy(&ret, pFloat, sizeof ret);
+		}
+	}
+
+    return ret;
 }
 
 unsigned int ModbusProcessData::getMaxByte() const {

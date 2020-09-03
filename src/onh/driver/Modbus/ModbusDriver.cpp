@@ -26,7 +26,7 @@
 using namespace onh;
 
 ModbusDriver::ModbusDriver(const modbusM::ModbusCfg& cfg):
-	Driver("modbus_"), regCount(cfg.registerCount), maxByteCount(0), process(nullptr), buff(nullptr)
+	Driver("modbus_"), regCount(cfg.registerCount), maxByteCount(0), process(nullptr), buff(nullptr), modbus(nullptr)
 {
 	// Check registers count
 	if (regCount < 1) {
@@ -53,8 +53,10 @@ ModbusDriver::~ModbusDriver()
 {
 	getLog().write("ModbusDriver driver closed");
 
-    if (modbus)
-        delete modbus;
+    if (modbus) {
+    	modbus->disconnect();
+    	delete modbus;
+    }
 
     if (buff)
         delete buff;
