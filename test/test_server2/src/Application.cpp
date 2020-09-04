@@ -26,6 +26,8 @@
 #include "controlBits/modbusControlBits_test.h"
 #include "utils/Exception.h"
 
+//#define debugMSG
+
 Application::Application(const std::string &addr, const unsigned int& port, const unsigned int& regCount, bool *exSignal):
 	ctx(nullptr), mb_mapping(nullptr), exitProg(false), exitSignal(exSignal), clearProcess(false), exit(false), simData(false), simData1(false)
 {
@@ -63,36 +65,56 @@ void Application::run() {
 	bool down = true;
 	bool firstLoop = true;
 
+	#ifdef debugMSG
+		std::cout << "before listen\n";
+	#endif
+	s = modbus_tcp_listen(ctx, 1);
+	#ifdef debugMSG
+		std::cout << "after listen\n";
+	#endif
+	if (firstLoop) {
+		// Create file informs that Modbus is ready
+		system("touch modbusInited");
+		firstLoop = false;
+	}
+
 	while (!exitProg && !(*exitSignal)) {
 
 		try {
 
 			if (down) {
-				s = modbus_tcp_listen(ctx, 1);
 
-				if (firstLoop) {
-					// Create file informs that Modbus is ready
-					system("touch modbusInited");
-					firstLoop = false;
-				}
-
+				#ifdef debugMSG
+					std::cout << "before accept\n";
+				#endif
 				modbus_tcp_accept(ctx, &s);
+				#ifdef debugMSG
+					std::cout << "after accept\n";
+				#endif
 				down = false;
 			}
 
+			#ifdef debugMSG
+				std::cout << "before receive\n";
+			#endif
 			rc = modbus_receive(ctx, query);
 			if (rc > 0) {
+				#ifdef debugMSG
+					std::cout << "receive ok\n";
+				#endif
 				/* rc is the query size */
 				modbus_reply(ctx, query, rc, mb_mapping);
+			#ifdef debugMSG
+				std::cout << "reply\n";
+			#endif
 
 				clearQuery();
 			} else { // client disconnected or error
 
-				if (s != -1) {
-					close(s);
-					s = -1;
-				}
 				down = true;
+			#ifdef debugMSG
+				std::cout << "client down\n";
+			#endif
 			}
 
 			// Update control flags
@@ -106,6 +128,10 @@ void Application::run() {
 
 			// Wait
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+			#ifdef debugMSG
+				std::cout << "-----------------\n";
+			#endif
 
 		} catch(std::exception &e) {
 

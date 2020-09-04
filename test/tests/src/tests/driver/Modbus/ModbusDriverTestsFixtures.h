@@ -38,7 +38,7 @@ class modbusDriverTests: public ::testing::Test {
 			mbc.TCP_port = MODBUS_PORT;
 
 			// Create Modbus driver instance
-			mbDriver = new onh::ModbusDriver(mbc);
+			mbDriver = new onh::ModbusDriver(mbc, 1);
 
 			// Buffer updater
 			mbUpd = mbDriver->getBuffer();

@@ -149,7 +149,7 @@ BYTE ProcessReader::getByte(const Tag& tg) {
 
     	std::stringstream s;
     	s << "Driver process reader with id: " << tg.getConnId() << " does not exist";
-    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getBitValue");
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getByte");
     }
 
     return b;
@@ -184,7 +184,7 @@ WORD ProcessReader::getWord(const Tag& tg) {
 
     	std::stringstream s;
     	s << "Driver process reader with id: " << tg.getConnId() << " does not exist";
-    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getBitValue");
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getWord");
     }
 
     return w;
@@ -219,7 +219,7 @@ DWORD ProcessReader::getDWord(const Tag& tg) {
 
     	std::stringstream s;
     	s << "Driver process reader with id: " << tg.getConnId() << " does not exist";
-    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getBitValue");
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getDWord");
     }
 
     return dw;
@@ -254,7 +254,7 @@ int ProcessReader::getInt(const Tag& tg) {
 
     	std::stringstream s;
     	s << "Driver process reader with id: " << tg.getConnId() << " does not exist";
-    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getBitValue");
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getInt");
     }
 
     return v;
@@ -289,7 +289,7 @@ float ProcessReader::getReal(const Tag& tg) {
 
     	std::stringstream s;
     	s << "Driver process reader with id: " << tg.getConnId() << " does not exist";
-    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getBitValue");
+    	ProcessUtils::triggerError(s.str(), tg.getName(), "ProcessReader::getReal");
     }
 
     return f;

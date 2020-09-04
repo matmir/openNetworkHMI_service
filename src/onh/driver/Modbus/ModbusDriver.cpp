@@ -25,8 +25,8 @@
 
 using namespace onh;
 
-ModbusDriver::ModbusDriver(const modbusM::ModbusCfg& cfg):
-	Driver("modbus_"), regCount(cfg.registerCount), maxByteCount(0), process(nullptr), buff(nullptr), modbus(nullptr)
+ModbusDriver::ModbusDriver(const modbusM::ModbusCfg& cfg, unsigned int connId):
+	Driver("modbus_"+std::to_string(connId)+"_"), regCount(cfg.registerCount), maxByteCount(0), process(nullptr), buff(nullptr), modbus(nullptr)
 {
 	// Check registers count
 	if (regCount < 1) {

@@ -37,8 +37,9 @@ namespace onh {
              * Default Shared memory client constructor
              *
              * @param segmentName Shared memory segment name
+             * @param connId Driver connection identifier
              */
-            ShmDriver(const std::string& segmentName);
+            ShmDriver(const std::string& segmentName, unsigned int connId);
 
             /**
 			 * Copy constructor - inactive

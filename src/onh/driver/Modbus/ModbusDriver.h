@@ -37,8 +37,9 @@ namespace onh {
              * ModbusDriver Constructor
              *
              * @param cfg Modbus configuration structure
+             * @param connId Driver connection identifier
              */
-            ModbusDriver(const modbusM::ModbusCfg& cfg);
+            ModbusDriver(const modbusM::ModbusCfg& cfg, unsigned int connId);
 
             /**
 			 * Copy constructor - inactive

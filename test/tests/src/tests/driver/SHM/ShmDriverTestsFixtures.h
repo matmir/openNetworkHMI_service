@@ -31,7 +31,7 @@ class shmDriverTests: public ::testing::Test {
 		static void SetUpTestSuite() {
 
 			// Create SHM driver instance
-			shmDriver = new onh::ShmDriver(SHM_SEGMENT_NAME);
+			shmDriver = new onh::ShmDriver(SHM_SEGMENT_NAME, 1);
 
 			// Create reader/writer/updater
 			shmReader = shmDriver->getReader();

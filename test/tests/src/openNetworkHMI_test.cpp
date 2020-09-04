@@ -61,7 +61,6 @@
 
 #include "tests/driver/ProcessReaderTests.h"
 #include "tests/driver/ProcessWriterTests.h"
-#include "tests/driver/ProcessUpdaterTests.h"
 #include <driver/SHM/ShmProcessWriter.h>
 
 using namespace std;
@@ -76,7 +75,7 @@ void closeModbusServer() {
 	mbc.TCP_port = MODBUS_PORT;
 
 	// Create Modbus driver instance
-	onh::ModbusDriver *mbDriver = new onh::ModbusDriver(mbc);
+	onh::ModbusDriver *mbDriver = new onh::ModbusDriver(mbc, 666);
 
 	// driver process writer
 	onh::DriverProcessWriter *mbWriter = mbDriver->getWriter();
@@ -92,6 +91,9 @@ int main(int argc, char **argv) {
 
 	cout << "openNetworkHMI tests" << endl;
 
+	// Remove all log files
+	system("rm -r -f logs");
+
 	// Run tests
 	testing::InitGoogleTest(&argc, argv);
 	int tstRes = RUN_ALL_TESTS();
@@ -99,7 +101,7 @@ int main(int argc, char **argv) {
 	try {
 
 		// Create SHM driver instance
-		onh::ShmDriver sDriver(SHM_SEGMENT_NAME);
+		onh::ShmDriver sDriver(SHM_SEGMENT_NAME, 666);
 		onh::DriverProcessWriter *dWriter = sDriver.getWriter();
 		onh::ShmProcessWriter *sWriter = dynamic_cast<onh::ShmProcessWriter*>(dWriter);
 
@@ -113,9 +115,6 @@ int main(int argc, char **argv) {
 	} catch (onh::Exception &e) {
 		cout << e.what() << endl;
 	}
-
-	// Remove all log files
-	system("rm -r -f logs");
 
 	return tstRes;
 }

@@ -34,12 +34,12 @@ DriverManager::DriverManager(const std::vector<DriverConnection>& dcv)
 		if (driverConn.getType() == DriverType::DT_SHM) {
 
 			// Create SHM driver
-			driver.insert(std::pair<unsigned int, Driver*>(driverConn.getId(), new ShmDriver(driverConn.getShmCfg())));
+			driver.insert(std::pair<unsigned int, Driver*>(driverConn.getId(), new ShmDriver(driverConn.getShmCfg(), driverConn.getId())));
 
 		} else if (driverConn.getType() == DriverType::DT_Modbus) {
 
 			// Create Modbus driver
-			Driver* drv = new ModbusDriver(driverConn.getModbusCfg());
+			Driver* drv = new ModbusDriver(driverConn.getModbusCfg(), driverConn.getId());
 			driver.insert(std::pair<unsigned int, Driver*>(driverConn.getId(), drv));
 
 			// Create Modbus driver buffer

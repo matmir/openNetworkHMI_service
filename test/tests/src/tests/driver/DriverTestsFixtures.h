@@ -21,23 +21,52 @@
 
 #include <gtest/gtest.h>
 #include <serverControlBits_test.h>
+#include <modbusControlBits_test.h>
 #include <unistd.h>
 #include "../testGlobalData.h"
 #include <driver/DriverManager.h>
 
 class driverTests: public ::testing::Test {
+
+	public:
+		driverTests(): testShmTag(), testModbusTag(),
+						clearShmTag(15, dcSHM.getId(), "ClearShmTag1", onh::TT_BIT, BIT_CLEAR_PROCESS),
+						syncShmTag(16, dcSHM.getId(), "SyncShmTag1", onh::TT_BIT, BIT_SYNC),
+						clearModbusTag(15, dcModbus.getId(), "ClearModbusTag1", onh::TT_BIT, MB_BIT_CLEAR_PROCESS),
+						syncModbusTag(16, dcModbus.getId(), "SyncModbusTag1", onh::TT_BIT, MB_BIT_SYNC)
+
+		{
+		}
+
 	protected:
 
 		static void SetUpTestSuite() {
 
 			// Driver connection
-			dcv.clear();
-			dc.setId(1);
-			dc.setName("TestConn");
-			dc.setType(onh::DriverType::DT_SHM);
-			dc.setEnable(true);
-			dc.setShmCfg(SHM_SEGMENT_NAME);
-			dcv.push_back(dc);
+			std::vector<onh::DriverConnection> dcv;
+
+			// SHM driver
+			dcSHM.setId(1);
+			dcSHM.setName("TestConn1");
+			dcSHM.setType(onh::DriverType::DT_SHM);
+			dcSHM.setEnable(true);
+			dcSHM.setShmCfg(SHM_SEGMENT_NAME);
+			dcv.push_back(dcSHM);
+
+			// Modbus driver
+			dcModbus.setId(2);
+			dcModbus.setName("TestConn2");
+			dcModbus.setType(onh::DriverType::DT_Modbus);
+			dcModbus.setEnable(true);
+			// Modbus configuration
+			modbusM::ModbusCfg mbc;
+			mbc.mode = modbusM::MM_TCP;
+			mbc.slaveID = 10;
+			mbc.registerCount = MODBUS_REGS;
+			mbc.TCP_addr = MODBUS_ADDR;
+			mbc.TCP_port = MODBUS_PORT;
+			dcModbus.setModbusCfg(mbc);
+			dcv.push_back(dcModbus);
 
 			// Driver Manager
 			drvM = new onh::DriverManager(dcv);
@@ -49,13 +78,25 @@ class driverTests: public ::testing::Test {
 			procWriter = new onh::ProcessWriter(drvM->getProcessWriter());
 
 			// Process Updater
-			procUpdater = new onh::ProcessUpdater(drvM->getProcessUpdaters()[0].procUpdater);
+			std::vector<onh::ProcessUpdaterData> pu = drvM->getProcessUpdaters();
+			procUpdaterSHM = new onh::ProcessUpdater(pu[0].procUpdater);
+			procUpdaterModbus = new onh::ProcessUpdater(pu[1].procUpdater);
+
+			// Driver buffers
+			std::vector<onh::DriverBufferUpdaterData> buff = drvM->getDriverBufferUpdaters();
+			buffUpdaterModbus = new onh::DriverBufferUpdater(buff[0].buffUpdater);
 		}
 
 		static void TearDownTestSuite() {
 
-			if (procUpdater)
-				delete procUpdater;
+			if (buffUpdaterModbus)
+				delete buffUpdaterModbus;
+
+			if (procUpdaterSHM)
+				delete procUpdaterSHM;
+			if (procUpdaterModbus)
+				delete procUpdaterModbus;
+
 
 			if (procWriter)
 				delete procWriter;
@@ -69,58 +110,42 @@ class driverTests: public ::testing::Test {
 
 		void SetUp() override {
 
-			// Test Tag
-			testTag = new onh::Tag(
-					14,
-					dc.getId(),
-					"TestTag1",
-					onh::TT_BIT,
-					{onh::PDA_INPUT, 0, 0}
-			);
+			// Test SHM Tag
+			testShmTag.setId(14);
+			testShmTag.setConnId(dcSHM.getId());
+			testShmTag.setName("TestShmTag1");
+			testShmTag.setType(onh::TT_BIT);
+			testShmTag.setAddress({onh::PDA_INPUT, 5, 0});
 
-			// Clear Tag
-			clearTag = new onh::Tag(
-					15,
-					dc.getId(),
-					"ClearTag1",
-					onh::TT_BIT,
-					BIT_CLEAR_PROCESS
-			);
-			// Sync Tag
-			syncTag = new onh::Tag(
-					16,
-					dc.getId(),
-					"SyncTag1",
-					onh::TT_BIT,
-					BIT_SYNC
-			);
+			// Test Modbus Tag
+			testModbusTag.setId(12);
+			testModbusTag.setConnId(dcModbus.getId());
+			testModbusTag.setName("TestModbusTag1");
+			testModbusTag.setType(onh::TT_BIT);
+			testModbusTag.setAddress({onh::PDA_OUTPUT, 3, 2});
 
 			// Clear server process data
 			clearServerProcessData();
 		}
 
 		void TearDown() override {
-			if (testTag)
-				delete testTag;
-			if (clearTag)
-				delete clearTag;
-			if (syncTag)
-				delete syncTag;
+
 		}
 
 		/**
 		 * Create test Byte tag
 		 *
 		 * @param addr Process data address
+		 * @param shmT SHM tag creation flag
 		 *
 		 * @return Test Byte Tag
 		 */
-		onh::Tag createByteTag(const onh::processDataAddress& addr) {
+		onh::Tag createByteTag(const onh::processDataAddress& addr, onh::DriverType driverType = onh::DriverType::DT_SHM) {
 
 			return onh::Tag(
 					1,
-					dc.getId(),
-					"TestTag1",
+					((driverType==onh::DriverType::DT_SHM)?(dcSHM.getId()):(dcModbus.getId())),
+					"TestByteTag1",
 					onh::TT_BYTE,
 					addr
 			);
@@ -133,12 +158,12 @@ class driverTests: public ::testing::Test {
 		 *
 		 * @return Test Word Tag
 		 */
-		onh::Tag createWordTag(const onh::processDataAddress& addr) {
+		onh::Tag createWordTag(const onh::processDataAddress& addr, onh::DriverType driverType = onh::DriverType::DT_SHM) {
 
 			return onh::Tag(
 					1,
-					dc.getId(),
-					"TestTag1",
+					((driverType==onh::DriverType::DT_SHM)?(dcSHM.getId()):(dcModbus.getId())),
+					"TestWordTag1",
 					onh::TT_WORD,
 					addr
 			);
@@ -151,12 +176,12 @@ class driverTests: public ::testing::Test {
 		 *
 		 * @return Test DWord Tag
 		 */
-		onh::Tag createDWordTag(const onh::processDataAddress& addr) {
+		onh::Tag createDWordTag(const onh::processDataAddress& addr, onh::DriverType driverType = onh::DriverType::DT_SHM) {
 
 			return onh::Tag(
 					1,
-					dc.getId(),
-					"TestTag1",
+					((driverType==onh::DriverType::DT_SHM)?(dcSHM.getId()):(dcModbus.getId())),
+					"TestDWordTag1",
 					onh::TT_DWORD,
 					addr
 			);
@@ -169,12 +194,12 @@ class driverTests: public ::testing::Test {
 		 *
 		 * @return Test Int Tag
 		 */
-		onh::Tag createIntTag(const onh::processDataAddress& addr) {
+		onh::Tag createIntTag(const onh::processDataAddress& addr, onh::DriverType driverType = onh::DriverType::DT_SHM) {
 
 			return onh::Tag(
 					1,
-					dc.getId(),
-					"TestTag1",
+					((driverType==onh::DriverType::DT_SHM)?(dcSHM.getId()):(dcModbus.getId())),
+					"TestIntTag1",
 					onh::TT_INT,
 					addr
 			);
@@ -187,12 +212,12 @@ class driverTests: public ::testing::Test {
 		 *
 		 * @return Test Real Tag
 		 */
-		onh::Tag createRealTag(const onh::processDataAddress& addr) {
+		onh::Tag createRealTag(const onh::processDataAddress& addr, onh::DriverType driverType = onh::DriverType::DT_SHM) {
 
 			return onh::Tag(
 					1,
-					dc.getId(),
-					"TestTag1",
+					((driverType==onh::DriverType::DT_SHM)?(dcSHM.getId()):(dcModbus.getId())),
+					"TestRealTag1",
 					onh::TT_REAL,
 					addr
 			);
@@ -204,10 +229,91 @@ class driverTests: public ::testing::Test {
 		void clearServerProcessData() {
 
 			// Set clear bit in server
-			procWriter->setBit(*clearTag);
+			procWriter->setBit(clearShmTag);
+			procWriter->setBit(clearModbusTag);
 
 			// Wait on synchronization
 			waitOnSyncBit();
+		}
+
+		/**
+		 * Wait on sync bit in SHM
+		 */
+		void waitOnSyncBitShm() {
+
+			// Set sync bit server process data
+			procWriter->setBit(syncShmTag);
+			// Wait until server copy modified process data to SHM
+			usleep(1500);
+			// Update local process data (copy from server)
+			procUpdaterSHM->update();
+			procReader->updateProcessData();
+			// Check sync bit to be 1
+			while (!procReader->getBitValue(syncShmTag)) {
+				// Sleep 1.5ms
+				usleep(1500);
+				// Update local process data (copy from server)
+				procUpdaterSHM->update();
+				procReader->updateProcessData();
+			}
+
+			// Reset sync bit server process data
+			procWriter->resetBit(syncShmTag);
+			// Wait until server copy modified process data to SHM
+			usleep(1500);
+			// Update local process data (copy from server)
+			procUpdaterSHM->update();
+			procReader->updateProcessData();
+			// Check sync bit to be 0
+			while (procReader->getBitValue(syncShmTag)) {
+				// Sleep 1.5ms
+				usleep(1500);
+				// Update local process data (copy from server)
+				procUpdaterSHM->update();
+				procReader->updateProcessData();
+			}
+		}
+
+		/**
+		 * Wait on sync bit in Modbus
+		 */
+		void waitOnSyncBitModbus() {
+
+			// Set sync bit server process data
+			procWriter->setBit(syncModbusTag);
+			// Wait until server copy modified process data to SHM
+			usleep(1500);
+			// Update local process data (copy from server)
+			buffUpdaterModbus->update();
+			procUpdaterModbus->update();
+			procReader->updateProcessData();
+			// Check sync bit to be 1
+			while (!procReader->getBitValue(syncModbusTag)) {
+				// Sleep 1.5ms
+				usleep(1500);
+				// Update local process data (copy from server)
+				buffUpdaterModbus->update();
+				procUpdaterModbus->update();
+				procReader->updateProcessData();
+			}
+
+			// Reset sync bit server process data
+			procWriter->resetBit(syncModbusTag);
+			// Wait until server copy modified process data to SHM
+			usleep(1500);
+			// Update local process data (copy from server)
+			buffUpdaterModbus->update();
+			procUpdaterModbus->update();
+			procReader->updateProcessData();
+			// Check sync bit to be 0
+			while (procReader->getBitValue(syncModbusTag)) {
+				// Sleep 1.5ms
+				usleep(1500);
+				// Update local process data (copy from server)
+				buffUpdaterModbus->update();
+				procUpdaterModbus->update();
+				procReader->updateProcessData();
+			}
 		}
 
 		/**
@@ -215,42 +321,28 @@ class driverTests: public ::testing::Test {
 		 */
 		void waitOnSyncBit() {
 
-			// Set sync bit server process data
-			procWriter->setBit(*syncTag);
-			// Wait until server copy modified process data to SHM
-			usleep(1500);
-			// Update local process data (copy from server)
-			procUpdater->update();
-			procReader->updateProcessData();
-			// Check sync bit to be 1
-			while (!procReader->getBitValue(*syncTag)) {
-				// Sleep 1.5ms
-				usleep(1500);
-				// Update local process data (copy from server)
-				procUpdater->update();
-				procReader->updateProcessData();
-			}
+			waitOnSyncBitShm();
+			waitOnSyncBitModbus();
+		}
 
-			// Reset sync bit server process data
-			procWriter->resetBit(*syncTag);
-			// Wait until server copy modified process data to SHM
-			usleep(1500);
-			// Update local process data (copy from server)
-			procUpdater->update();
-			procReader->updateProcessData();
-			// Check sync bit to be 0
-			while (procReader->getBitValue(*syncTag)) {
-				// Sleep 1.5ms
-				usleep(1500);
-				// Update local process data (copy from server)
-				procUpdater->update();
-				procReader->updateProcessData();
+		/**
+		 * Check all process data cleared
+		 */
+		void checkAllDataCleared() {
+			// Check all process data
+			for (unsigned int i=0; i<maxShmBytes; ++i) {
+				ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0}))) << " i: " << i;
+				ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0}))) << " i: " << i;
+				ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_MEMORY, i, 0}))) << " i: " << i;
+			}
+			for (unsigned int i=0; i<maxModbusBytes; ++i) {
+				ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_INPUT, i, 0}, onh::DT_Modbus))) << " i: " << i;
+				ASSERT_EQ(0, procReader->getByte(createByteTag({onh::PDA_OUTPUT, i, 0}, onh::DT_Modbus))) << " i: " << i;
 			}
 		}
 
 		// Driver connection
-		static std::vector<onh::DriverConnection> dcv;
-		static onh::DriverConnection dc;
+		static onh::DriverConnection dcSHM, dcModbus;
 
 		// Driver manager instance
 		static onh::DriverManager *drvM;
@@ -262,19 +354,30 @@ class driverTests: public ::testing::Test {
 		static onh::ProcessWriter *procWriter;
 
 		// Process updater instance
-		static onh::ProcessUpdater *procUpdater;
+		static onh::ProcessUpdater *procUpdaterSHM;
+		static onh::ProcessUpdater *procUpdaterModbus;
+
+		// Driver buffers
+		static onh::DriverBufferUpdater *buffUpdaterModbus;
 
 		// Test tag
-		onh::Tag *testTag;
-		onh::Tag *clearTag;
-		onh::Tag *syncTag;
+		onh::Tag testShmTag, testModbusTag;
+		const onh::Tag clearShmTag;
+		const onh::Tag syncShmTag;
+		const onh::Tag clearModbusTag;
+		const onh::Tag syncModbusTag;
+
+		static const unsigned int maxModbusBytes = MODBUS_REGS*2;
+		static const unsigned int maxShmBytes = PROCESS_DT_SIZE;
 };
 
-std::vector<onh::DriverConnection> driverTests::dcv = {};
-onh::DriverConnection driverTests::dc = onh::DriverConnection();
+onh::DriverConnection driverTests::dcSHM = onh::DriverConnection();
+onh::DriverConnection driverTests::dcModbus = onh::DriverConnection();
 onh::DriverManager* driverTests::drvM = nullptr;
 onh::ProcessReader* driverTests::procReader = nullptr;
 onh::ProcessWriter* driverTests::procWriter = nullptr;
-onh::ProcessUpdater* driverTests::procUpdater = nullptr;
+onh::ProcessUpdater* driverTests::procUpdaterSHM = nullptr;
+onh::ProcessUpdater* driverTests::procUpdaterModbus = nullptr;
+onh::DriverBufferUpdater* driverTests::buffUpdaterModbus = nullptr;
 
 #endif /* TESTS_DRIVER_DRIVERTESTSFIXTURES_H_ */

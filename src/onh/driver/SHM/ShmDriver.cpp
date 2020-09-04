@@ -32,8 +32,8 @@
 
 using namespace onh;
 
-ShmDriver::ShmDriver(const std::string& segmentName):
-	Driver("shm_"), sfd(0), shm(0), shmName(segmentName)
+ShmDriver::ShmDriver(const std::string& segmentName, unsigned int connId):
+	Driver("shm_"+std::to_string(connId)+"_"), sfd(0), shm(0), shmName(segmentName)
 {
 
 	if (shmName == "") {
