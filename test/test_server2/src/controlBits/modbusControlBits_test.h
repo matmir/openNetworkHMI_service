@@ -32,17 +32,17 @@
 #define MB_TEST_LOG_SIM1 {onh::PDA_OUTPUT, 0, 3}
 #define MB_TEST_LOG_DATA1 {onh::PDA_OUTPUT, 0, 4}
 
-#define MB_TEST_LOG_BIT1 {onh::PDA_OUTPUT, 2, 0}
+#define MB_TEST_LOG_BIT1 {onh::PDA_INPUT, 2, 0}
 
-#define MB_TEST_LOG_BYTE1 {onh::PDA_OUTPUT, 4, 0}
-#define MB_TEST_LOG_BYTE2 {onh::PDA_OUTPUT, 5, 0}
-#define MB_TEST_LOG_WORD1 {onh::PDA_OUTPUT, 6, 0}
-#define MB_TEST_LOG_WORD2 {onh::PDA_OUTPUT, 8, 0}
-#define MB_TEST_LOG_DWORD1 {onh::PDA_OUTPUT, 10, 0}
-#define MB_TEST_LOG_DWORD2 {onh::PDA_OUTPUT, 14, 0}
-#define MB_TEST_LOG_INT1 {onh::PDA_OUTPUT, 18, 0}
-#define MB_TEST_LOG_INT2 {onh::PDA_OUTPUT, 22, 0}
-#define MB_TEST_LOG_REAL1 {onh::PDA_OUTPUT, 26, 0}
-#define MB_TEST_LOG_REAL2 {onh::PDA_OUTPUT, 30, 0}
+#define MB_TEST_LOG_BYTE1 {onh::PDA_INPUT, 4, 0}
+#define MB_TEST_LOG_BYTE2 {onh::PDA_INPUT, 5, 0}
+#define MB_TEST_LOG_WORD1 {onh::PDA_INPUT, 6, 0}
+#define MB_TEST_LOG_WORD2 {onh::PDA_INPUT, 8, 0}
+#define MB_TEST_LOG_DWORD1 {onh::PDA_INPUT, 10, 0}
+#define MB_TEST_LOG_DWORD2 {onh::PDA_INPUT, 14, 0}
+#define MB_TEST_LOG_INT1 {onh::PDA_INPUT, 18, 0}
+#define MB_TEST_LOG_INT2 {onh::PDA_INPUT, 22, 0}
+#define MB_TEST_LOG_REAL1 {onh::PDA_INPUT, 26, 0}
+#define MB_TEST_LOG_REAL2 {onh::PDA_INPUT, 30, 0}
 
 #endif /* MODBUSCONTROLBITS_TEST_H_ */

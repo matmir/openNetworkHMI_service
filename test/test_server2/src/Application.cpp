@@ -198,74 +198,75 @@ void Application::tagLoggerSim() {
 		if (simData1) {
 
 			// BIT
-			mb_mapping->tab_registers[1] = 0;
+			mb_mapping->tab_input_registers[1] = 0;
 
-			// BYTE 150 and 250 in one register
-			b = 150;
+			// BYTE 78 and 37 in one register
+			b = 78;
 			reg = b << 8;
-			regTmp = 250;
+			regTmp = 37;
 			reg = (reg | regTmp);
-			mb_mapping->tab_registers[2] = reg;
+			mb_mapping->tab_input_registers[2] = reg;
 
 			// WORD
-			mb_mapping->tab_registers[3] = 35120;
-			mb_mapping->tab_registers[4] = 15120;
+			mb_mapping->tab_input_registers[3] = 42001;
+			mb_mapping->tab_input_registers[4] = 15120;
 
 			// DWORD
-			// 158654
-			mb_mapping->tab_registers[5] = 27582;
-			mb_mapping->tab_registers[6] = 2;
+			// 158653
+			mb_mapping->tab_input_registers[5] = 27581;
+			mb_mapping->tab_input_registers[6] = 2;
 			// 258654
-			mb_mapping->tab_registers[7] = 62046;
-			mb_mapping->tab_registers[8] = 3;
+			mb_mapping->tab_input_registers[7] = 62046;
+			mb_mapping->tab_input_registers[8] = 3;
 
 			// INT
-			pInt = (int*)&mb_mapping->tab_registers[9];
-			*pInt = -1200;
-			pInt = (int*)&mb_mapping->tab_registers[11];
+			pInt = (int*)&mb_mapping->tab_input_registers[9];
+			*pInt = -1300;
+			pInt = (int*)&mb_mapping->tab_input_registers[11];
 			*pInt = -10;
 
 			// REAL
-			pReal = (float*)&mb_mapping->tab_registers[13];
-			rVal = 3.78;
+			pReal = (float*)&mb_mapping->tab_input_registers[13];
+			rVal = 9.78;
 			memcpy(pReal, &rVal, sizeof rVal);
-			pReal = (float*)&mb_mapping->tab_registers[15];
+			pReal = (float*)&mb_mapping->tab_input_registers[15];
 			rVal = 2.15;
 			memcpy(pReal, &rVal, sizeof rVal);
 		} else {
 
 			// BIT
-			mb_mapping->tab_registers[1] = 1;
+			mb_mapping->tab_input_registers[1] = 1;
 
 			// BYTE 55 and 210 in one register
 			b = 55;
 			reg = b << 8;
 			regTmp = 210;
 			reg = (reg | regTmp);
-			mb_mapping->tab_registers[2] = reg;
+			mb_mapping->tab_input_registers[2] = reg;
 
 			// WORD
-			mb_mapping->tab_registers[3] = 12120;
-			mb_mapping->tab_registers[4] = 35120;
+			mb_mapping->tab_input_registers[3] = 20478;
+			mb_mapping->tab_input_registers[4] = 35120;
 
-			// 558654
-			mb_mapping->tab_registers[5] = 34366;
-			mb_mapping->tab_registers[6] = 8;
+			// DWORD
+			// 784566
+			mb_mapping->tab_input_registers[5] = 63670;
+			mb_mapping->tab_input_registers[6] = 11;
 			// 658654
-			mb_mapping->tab_registers[7] = 3294;
-			mb_mapping->tab_registers[8] = 10;
+			mb_mapping->tab_input_registers[7] = 3294;
+			mb_mapping->tab_input_registers[8] = 10;
 
 			// INT
-			pInt = (int*)&mb_mapping->tab_registers[9];
-			*pInt = -1201;
-			pInt = (int*)&mb_mapping->tab_registers[11];
+			pInt = (int*)&mb_mapping->tab_input_registers[9];
+			*pInt = -410;
+			pInt = (int*)&mb_mapping->tab_input_registers[11];
 			*pInt = -12;
 
 			// REAL
-			pReal = (float*)&mb_mapping->tab_registers[13];
-			rVal = 3.79;
+			pReal = (float*)&mb_mapping->tab_input_registers[13];
+			rVal = 3.07;
 			memcpy(pReal, &rVal, sizeof rVal);
-			pReal = (float*)&mb_mapping->tab_registers[15];
+			pReal = (float*)&mb_mapping->tab_input_registers[15];
 			rVal = 2.16;
 			memcpy(pReal, &rVal, sizeof rVal);
 		}

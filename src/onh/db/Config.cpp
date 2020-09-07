@@ -232,7 +232,7 @@ std::string Config::getShmCfg(unsigned int id) {
 modbusM::ModbusCfg Config::getModbusCfg(unsigned int id) {
 
 	// No data
-	bool noData = true;
+	bool noData = false;
 
 	// Query
 	std::stringstream q;
@@ -289,7 +289,7 @@ modbusM::ModbusCfg Config::getModbusCfg(unsigned int id) {
 	}
 
 	if (noData)
-		throw Exception("SHM configuration does not exist in DB", "Config::getShmCfg");
+		throw Exception("Modbus configuration does not exist in DB", "Config::getModbusCfg");
 
 	return mb;
 }
