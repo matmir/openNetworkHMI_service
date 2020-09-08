@@ -302,6 +302,7 @@ std::string CommandParser::replyOK(CycleTimeData tpcLogger,
     std::stringstream s;
 
     s << GET_THREAD_CYCLE_TIME << '|';
+    s << tpcUpdater.size() << "?" << tpcPolling.size() << '!';
     for (const auto& updater : tpcUpdater) {
     	s << updater.first << ":"  << updater.second.min << '?' << updater.second.max << '?' << updater.second.current << '!';
     }

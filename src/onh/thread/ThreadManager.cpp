@@ -63,7 +63,7 @@ void ThreadManager::initProcessUpdater(const std::vector<ProcessUpdaterData>& pu
 	// Prepare all updaters thread program data
 	for (unsigned int i=0; i<pu.size(); ++i) {
 		// Prepare updater name
-		nm = "Updater_"+pu[i].connId;
+		nm = "Updater_"+std::to_string(pu[i].connId);
 
 		thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
 
@@ -87,7 +87,7 @@ void ThreadManager::initDriverPolling(const std::vector<DriverBufferUpdaterData>
 	// Prepare all buffers thread program data
 	for (unsigned int i=0; i<dbu.size(); ++i) {
 		// Prepare buffer name
-		nm = "DriverBuffer_"+dbu[i].connId;
+		nm = "DriverBuffer_"+std::to_string(dbu[i].connId);
 
 		thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
 
