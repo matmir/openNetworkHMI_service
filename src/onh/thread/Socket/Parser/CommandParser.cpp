@@ -43,7 +43,7 @@ CommandParser::CommandParser(const ProcessReader& pr,
 
     // Create logger
     std::stringstream s;
-    s << "parser_th_" << connDescriptor << " ";
+    s << "parser_th_" << connDescriptor << "_";
     log = new Logger("parser", s.str());
 }
 
