@@ -38,8 +38,10 @@ ModbusMaster::ModbusMaster(const ModbusCfg& cfg):
 	}
 
 	// SlaveID
-	if (modbus_set_slave(mb, config.slaveID)) {
-		throw ModbusException("Invalid slave ID", "ModbusMaster::ModbusMaster");
+	if (config.mode == MM_RTU || (config.mode == MM_TCP && config.TCP_use_slaveID)) {
+		if (modbus_set_slave(mb, config.slaveID)) {
+			throw ModbusException("Invalid slave ID", "ModbusMaster::ModbusMaster");
+		}
 	}
 
 	// Response timeout (1s)

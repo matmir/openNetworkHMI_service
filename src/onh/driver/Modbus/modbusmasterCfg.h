@@ -50,6 +50,7 @@ namespace modbusM {
 		 */
 		std::string TCP_addr;
 		int TCP_port;
+		bool TCP_use_slaveID;
 
 		/**
 		 * Modbus RTU configuration
@@ -61,7 +62,7 @@ namespace modbusM {
 		int RTU_stopBit;
 
 		ModbusCfg(): mode(MM_TCP), slaveID(0), registerCount(0), polling(0), TCP_addr(""),
-					TCP_port(0), RTU_port(""), RTU_baud(0), RTU_parity(0), RTU_dataBit(0), RTU_stopBit(0) {}
+					TCP_port(0), TCP_use_slaveID(false), RTU_port(""), RTU_baud(0), RTU_parity(0), RTU_dataBit(0), RTU_stopBit(0) {}
 	} ModbusCfg;
 
 }

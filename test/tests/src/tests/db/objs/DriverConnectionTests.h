@@ -125,6 +125,7 @@ TEST(DriverConnectionTests, Create2) {
 	mb.polling = 200;
 	mb.TCP_addr = "192.168.5.5";
 	mb.TCP_port = 504;
+	mb.TCP_use_slaveID = true;
 
 	onh::DriverConnection conn1;
 	conn1.setId(1);
@@ -141,6 +142,7 @@ TEST(DriverConnectionTests, Create2) {
 	ASSERT_EQ(200, conn1.getModbusCfg().polling);
 	ASSERT_STREQ("192.168.5.5", conn1.getModbusCfg().TCP_addr.c_str());
 	ASSERT_EQ(504, conn1.getModbusCfg().TCP_port);
+	ASSERT_TRUE(conn1.getModbusCfg().TCP_use_slaveID);
 	ASSERT_FALSE(conn1.isEnabled());
 }
 

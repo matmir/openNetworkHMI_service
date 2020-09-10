@@ -270,6 +270,7 @@ modbusM::ModbusCfg Config::getModbusCfg(unsigned int id) {
 			} else {
 				mb.TCP_addr = result->getString("dmTCP_addr");
 				mb.TCP_port = result->getInt("dmTCP_port");
+				mb.TCP_use_slaveID = result->getInt("dmTCP_use_slaveID");
 			}
 
 			// Release memory
