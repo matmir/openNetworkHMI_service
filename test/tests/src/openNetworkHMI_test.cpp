@@ -45,6 +45,7 @@
 #include "tests/db/objs/ScriptItemTests.h"
 #include "tests/db/objs/DriverConnectionTests.h"
 
+#include "tests/driver/DriverTypesTests.h"
 #include "tests/driver/SHM/ShmDriverBitTests.h"
 #include "tests/driver/SHM/ShmDriverByteTests.h"
 #include "tests/driver/SHM/ShmDriverWordTests.h"
