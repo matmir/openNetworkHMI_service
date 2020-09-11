@@ -297,6 +297,9 @@ modbusM::ModbusCfg Config::getModbusCfg(unsigned int id) {
 
 std::vector<DriverConnection> Config::getDriverConnections(bool enabled) {
 
+	// Check driver connection limit
+	checkDriverConnectionLimit();
+
 	// Query
 	std::stringstream q;
 
@@ -350,4 +353,41 @@ std::vector<DriverConnection> Config::getDriverConnections(bool enabled) {
 	}
 
 	return vConn;
+}
+
+void Config::checkDriverConnectionLimit() {
+
+	DBResult *result = 0;
+	std::string q;
+	unsigned int cnt = 0;
+
+	try {
+
+		// Prepare query
+		q = "SELECT count(*) as 'cnt' FROM driver_connections;";
+
+		// Query
+		result = executeQuery(q);
+
+		// Read data
+		result->nextRow();
+		cnt = result->getUInt("cnt");
+
+		// Release memory
+		delete result;
+		result = 0;
+
+	} catch (DBException &e) {
+
+		if (result)
+			delete result;
+
+		throw Exception(e.what(), "Config::getDriverConnections");
+	}
+
+	// Check limit
+	if (cnt > DriverConnection::MAX_CONN) {
+		throw Exception("Driver connection limit exceeded. Max allowed connections number is "+std::to_string(DriverConnection::MAX_CONN),
+							"Config::checkDriverConnectionLimit");
+	}
 }

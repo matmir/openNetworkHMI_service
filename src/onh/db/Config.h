@@ -120,6 +120,11 @@ namespace onh {
              * @return Modbus driver identifier
              */
             modbusM::ModbusCfg getModbusCfg(unsigned int id);
+
+            /**
+             * Check driver connection limit
+             */
+            void checkDriverConnectionLimit();
     };
 
 }
