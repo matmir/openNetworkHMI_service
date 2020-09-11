@@ -43,7 +43,7 @@ namespace onh {
         public:
 
     		ShmException();
-            virtual ~ShmException() noexcept;
+            virtual ~ShmException() noexcept override;
 
             /**
              * Exception constructor with message
@@ -65,7 +65,7 @@ namespace onh {
              *
              * @return Exception message
              */
-            virtual const char* what() const noexcept;
+            virtual const char* what() const noexcept override;
 
         private:
             /// String with the error message
