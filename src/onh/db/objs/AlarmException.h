@@ -43,7 +43,7 @@ namespace onh {
 
             AlarmException();
 
-            virtual ~AlarmException() noexcept;
+            virtual ~AlarmException() noexcept override;
 
             /**
              * Exception constructor

@@ -41,7 +41,7 @@ namespace onh {
 
             CommandParserException();
 
-            virtual ~CommandParserException();
+            virtual ~CommandParserException() noexcept override;
 
             /**
              * Exception constructor

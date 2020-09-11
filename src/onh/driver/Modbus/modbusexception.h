@@ -32,7 +32,7 @@ namespace modbusM {
 
     		ModbusException();
 
-            virtual ~ModbusException() noexcept;
+            virtual ~ModbusException() noexcept override;
 
             /**
              * Exception constructor with message
@@ -54,7 +54,7 @@ namespace modbusM {
              *
              * @return Exception message
              */
-            virtual const char* what() const noexcept;
+            virtual const char* what() const noexcept override;
 
         private:
             /// String with the error message

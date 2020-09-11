@@ -42,7 +42,7 @@ namespace onh {
 
             ScriptException();
 
-            virtual ~ScriptException() noexcept;
+            virtual ~ScriptException() noexcept override;
 
             /**
              * Exception constructor

@@ -47,7 +47,7 @@ namespace onh {
              */
             DBException(const std::string& desc, const std::string& fName);
 
-            virtual ~DBException() noexcept;
+            virtual ~DBException() noexcept override;
     };
 
 }

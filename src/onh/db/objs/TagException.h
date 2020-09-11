@@ -44,7 +44,7 @@ namespace onh {
 
             TagException();
 
-            virtual ~TagException() noexcept;
+            virtual ~TagException() noexcept override;
 
             /**
              * Exception constructor

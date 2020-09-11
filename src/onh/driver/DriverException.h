@@ -47,7 +47,7 @@ namespace onh {
              */
             DriverException(const std::string& desc, const std::string& fName);
 
-            virtual ~DriverException() noexcept;
+            virtual ~DriverException() noexcept override;
     };
 
 }

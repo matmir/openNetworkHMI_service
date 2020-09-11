@@ -56,7 +56,7 @@ namespace onh {
 			 */
 			SocketException(const std::string& desc, int errorNumber, const std::string& fName);
 
-			virtual ~SocketException() noexcept;
+			virtual ~SocketException() noexcept override;
 	};
 
 }
