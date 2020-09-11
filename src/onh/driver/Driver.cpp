@@ -21,7 +21,7 @@
 using namespace onh;
 
 Driver::Driver(const std::string& logPrefix):
-	log(0)
+	log(nullptr)
 {
 	if (logPrefix == "")
 		throw DriverException("Driver::Driver: Logger prefix is empty");

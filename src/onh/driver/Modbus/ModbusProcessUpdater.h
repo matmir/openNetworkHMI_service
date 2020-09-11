@@ -42,7 +42,7 @@ namespace onh {
 			 */
 			ModbusProcessUpdater(const ModbusProcessUpdater&) = delete;
 
-			virtual ~ModbusProcessUpdater();
+			virtual ~ModbusProcessUpdater() override;
 
 			/**
 			 * Assign operator - inactive
@@ -52,14 +52,14 @@ namespace onh {
 			/**
 			 * Update process data (copy from load buffer)
 			 */
-			virtual void updateProcessData();
+			virtual void updateProcessData() override;
 
 			/**
 			 * Create new driver process updater
 			 *
 			 * @return Pointer to the new driver process updater
 			 */
-			virtual DriverProcessUpdater* createNew();
+			virtual DriverProcessUpdater* createNew() override;
 
 		private:
 

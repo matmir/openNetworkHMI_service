@@ -44,7 +44,7 @@ namespace onh {
 			 */
 			ModbusUpdater(const ModbusUpdater&) = delete;
 
-            virtual ~ModbusUpdater();
+            virtual ~ModbusUpdater() override;
 
             /**
 			 * Assign operator - inactive
@@ -54,7 +54,7 @@ namespace onh {
             /**
              * Update driver buffer (Get data from controller)
              */
-            virtual void updateBuffer();
+            virtual void updateBuffer() override;
 
         private:
 

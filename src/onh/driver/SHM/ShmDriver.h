@@ -46,7 +46,7 @@ namespace onh {
 			 */
             ShmDriver(const ShmDriver&) = delete;
 
-            virtual ~ShmDriver();
+            virtual ~ShmDriver() override;
 
             /**
 			 * Assign operator - inactive
@@ -58,28 +58,28 @@ namespace onh {
              *
              * @return Driver buffer handle
              */
-            virtual DriverBuffer* getBuffer();
+            virtual DriverBuffer* getBuffer() override;
 
             /**
 			 * Get driver process data reader
 			 *
 			 * @return Driver process data reader handle
 			 */
-			virtual DriverProcessReader* getReader();
+			virtual DriverProcessReader* getReader() override;
 
 			/**
 			 * Get driver process data writer
 			 *
 			 * @return Driver process data writer handle
 			 */
-			virtual DriverProcessWriter* getWriter();
+			virtual DriverProcessWriter* getWriter() override;
 
 			/**
 			 * Get driver process data updater
 			 *
 			 * @return Driver process data updater handle
 			 */
-			virtual DriverProcessUpdater* getUpdater();
+			virtual DriverProcessUpdater* getUpdater() override;
 
         private:
 

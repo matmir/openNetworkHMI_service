@@ -42,7 +42,7 @@ namespace onh {
 			 */
 			ModbusProcessReader(const ModbusProcessReader&) = delete;
 
-			virtual ~ModbusProcessReader();
+			virtual ~ModbusProcessReader() override;
 
 			/**
 			 * Assign operator - inactive
@@ -56,7 +56,7 @@ namespace onh {
 			 *
 			 * @return Bit value
 			 */
-			virtual bool getBitValue(processDataAddress addr);
+			virtual bool getBitValue(processDataAddress addr) override;
 
 			/**
 			 * Get bits value from process data
@@ -65,7 +65,7 @@ namespace onh {
 			 *
 			 * @return Bits values
 			 */
-			virtual std::vector<bool> getBitsValue(std::vector<processDataAddress> addr);
+			virtual std::vector<bool> getBitsValue(std::vector<processDataAddress> addr) override;
 
 			/**
 			 * Get byte value from process data
@@ -74,7 +74,7 @@ namespace onh {
 			 *
 			 * @return Byte value
 			 */
-			virtual BYTE getByte(processDataAddress addr);
+			virtual BYTE getByte(processDataAddress addr) override;
 
 			/**
 			 * Get word value from process data
@@ -83,7 +83,7 @@ namespace onh {
 			 *
 			 * @return Word value
 			 */
-			virtual WORD getWord(processDataAddress addr);
+			virtual WORD getWord(processDataAddress addr) override;
 
 			/**
 			 * Get double word value from process data
@@ -92,7 +92,7 @@ namespace onh {
 			 *
 			 * @return Double word value
 			 */
-			virtual DWORD getDWord(processDataAddress addr);
+			virtual DWORD getDWord(processDataAddress addr) override;
 
 			/**
 			 * Get int value from process data
@@ -101,7 +101,7 @@ namespace onh {
 			 *
 			 * @return Int value
 			 */
-			virtual int getInt(processDataAddress addr);
+			virtual int getInt(processDataAddress addr) override;
 
 			/**
 			 * Get real value from process data
@@ -110,19 +110,19 @@ namespace onh {
 			 *
 			 * @return Real value
 			 */
-			virtual float getReal(processDataAddress addr);
+			virtual float getReal(processDataAddress addr) override;
 
 			/**
 			 * Update reader process data (copy from driver)
 			 */
-			virtual void updateProcessData();
+			virtual void updateProcessData() override;
 
 			/**
 			 * Create new driver process reader
 			 *
 			 * @return Pointer to the new driver process reader
 			 */
-			virtual DriverProcessReader* createNew();
+			virtual DriverProcessReader* createNew() override;
 
 		private:
 

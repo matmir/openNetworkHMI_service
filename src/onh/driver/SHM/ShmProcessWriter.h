@@ -44,7 +44,7 @@ namespace onh {
 			 */
 			ShmProcessWriter(const ShmProcessWriter&) = delete;
 
-			virtual ~ShmProcessWriter();
+			virtual ~ShmProcessWriter() override;
 
 			/**
 			 * Assign operator - inactive
@@ -56,28 +56,28 @@ namespace onh {
 			 *
 			 * @param addr Process data address
 			 */
-			virtual void setBit(processDataAddress addr);
+			virtual void setBit(processDataAddress addr) override;
 
 			/**
 			 * Reset bit in device process data
 			 *
 			 * @param addr Process data address
 			 */
-			virtual void resetBit(processDataAddress addr);
+			virtual void resetBit(processDataAddress addr) override;
 
 			/**
 			 * Invert bit in device process data
 			 *
 			 * @param addr Process data address
 			 */
-			virtual void invertBit(processDataAddress addr);
+			virtual void invertBit(processDataAddress addr) override;
 
 			/**
 			 * Set bits in device process data
 			 *
 			 * @param addr Process data address
 			 */
-			virtual void setBits(std::vector<processDataAddress> addr);
+			virtual void setBits(std::vector<processDataAddress> addr) override;
 
 			/**
 			 * Write byte in device process data
@@ -85,7 +85,7 @@ namespace onh {
 			 * @param addr Process data address
 			 * @param val Value to write
 			 */
-			virtual void writeByte(processDataAddress addr, BYTE val);
+			virtual void writeByte(processDataAddress addr, BYTE val) override;
 
 			/**
 			 * Write word in device process data
@@ -93,7 +93,7 @@ namespace onh {
 			 * @param addr Process data address
 			 * @param val Value to write
 			 */
-			virtual void writeWord(processDataAddress addr, WORD val);
+			virtual void writeWord(processDataAddress addr, WORD val) override;
 
 			/**
 			 * Write double word in device process data
@@ -101,7 +101,7 @@ namespace onh {
 			 * @param addr Process data address
 			 * @param val Value to write
 			 */
-			virtual void writeDWord(processDataAddress addr, DWORD val);
+			virtual void writeDWord(processDataAddress addr, DWORD val) override;
 
 			/**
 			 * Write int in device process data
@@ -109,7 +109,7 @@ namespace onh {
 			 * @param addr Process data address
 			 * @param val Value to write
 			 */
-			virtual void writeInt(processDataAddress addr, int val);
+			virtual void writeInt(processDataAddress addr, int val) override;
 
 			/**
 			 * Write real in device process data
@@ -117,14 +117,14 @@ namespace onh {
 			 * @param addr Process data address
 			 * @param val Value to write
 			 */
-			virtual void writeReal(processDataAddress addr, float val);
+			virtual void writeReal(processDataAddress addr, float val) override;
 
 			/**
 			 * Create new driver process writer
 			 *
 			 * @return Pointer to the new driver process writer
 			 */
-			virtual DriverProcessWriter* createNew();
+			virtual DriverProcessWriter* createNew() override;
 
 			/**
 			 * Send exit command to the server
