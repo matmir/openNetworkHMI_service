@@ -52,12 +52,12 @@ namespace onh {
 			 */
 			DriverPollingProg(const DriverPollingProg&) = delete;
 
-            virtual ~DriverPollingProg();
+            virtual ~DriverPollingProg() override;
 
             /**
 			 * Thread program function
 			 */
-			virtual void operator()();
+			virtual void operator()() override;
 
 			/**
 			 * Assignment operator - inactive

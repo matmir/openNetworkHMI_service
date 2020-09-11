@@ -53,12 +53,12 @@ namespace onh {
 			 */
             AlarmingProg(const AlarmingProg&) = delete;
 
-            virtual ~AlarmingProg();
+            virtual ~AlarmingProg() override;
 
             /**
 			 * Thread program function
 			 */
-			virtual void operator()();
+			virtual void operator()() override;
 
 			/**
 			 * Assignment operator - inactive

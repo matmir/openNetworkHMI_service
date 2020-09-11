@@ -58,12 +58,12 @@ namespace onh {
 			 */
             TagLoggerProg(const TagLoggerProg&) = delete;
 
-			virtual ~TagLoggerProg();
+			virtual ~TagLoggerProg() override;
 
 			/**
 			 * Thread program function
 			 */
-			virtual void operator()();
+			virtual void operator()() override;
 
 			/**
 			 * Assignment operator - inactive

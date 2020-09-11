@@ -62,12 +62,12 @@ namespace onh {
 			 */
     		SocketProgram(const SocketProgram&) = delete;
 
-			virtual ~SocketProgram();
+			virtual ~SocketProgram() override;
 
 			/**
 			 * Thread program function
 			 */
-			virtual void operator()();
+			virtual void operator()() override;
 
 			/**
 			 * Assignment operator - inactive

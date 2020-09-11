@@ -60,12 +60,12 @@ namespace onh {
 			 */
             ScriptProg(const ScriptProg&) = delete;
 
-			virtual ~ScriptProg();
+			virtual ~ScriptProg() override;
 
 			/**
 			 * Thread program function
 			 */
-			virtual void operator()();
+			virtual void operator()() override;
 
 			/**
 			 * Assignment operator - inactive
