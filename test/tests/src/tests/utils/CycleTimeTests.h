@@ -68,4 +68,43 @@ TEST(CycleTimeTests, Cycle1) {
 	ASSERT_EQ(cdt3.max, cdt2.max);
 }
 
+TEST(CycleTimeTests, Cycle2) {
+
+	try {
+
+		onh::CycleTime ct;
+
+		ct.start();
+		ct.start();
+
+		FAIL() << "Expected onh::Exception";
+
+	} catch (onh::Exception &e) {
+
+		ASSERT_STREQ(e.what(), "CycleTime::start: Cycle calculation already started");
+
+	} catch(...) {
+		FAIL() << "Expected onh::TagException";
+	}
+}
+
+TEST(CycleTimeTests, Cycle3) {
+
+	try {
+
+		onh::CycleTime ct;
+
+		ct.stop();
+
+		FAIL() << "Expected onh::Exception";
+
+	} catch (onh::Exception &e) {
+
+		ASSERT_STREQ(e.what(), "CycleTime::stop: Cycle calculation not started");
+
+	} catch(...) {
+		FAIL() << "Expected onh::TagException";
+	}
+}
+
 #endif /* CYCLETIMETESTS_H_ */

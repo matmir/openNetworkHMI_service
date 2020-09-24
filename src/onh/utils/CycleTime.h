@@ -19,8 +19,9 @@
 #ifndef ONH_UTILS_CYCLETIME_H
 #define ONH_UTILS_CYCLETIME_H
 
-#include <time.h>
+#include <chrono>
 #include <string>
+#include "Exception.h"
 
 namespace onh {
 
@@ -87,10 +88,13 @@ namespace onh {
             /// First cycle flag
             bool firstCycle;
 
+            /// Start flag
+            bool started;
+
             /// Start time of the cycle
-            struct timespec cycleStart;
+            std::chrono::time_point<std::chrono::steady_clock> cycleStart;
             /// Stop time of the cycle
-            struct timespec cycleStop;
+            std::chrono::time_point<std::chrono::steady_clock> cycleStop;
     };
 
 }

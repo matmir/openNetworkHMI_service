@@ -20,18 +20,9 @@
 
 using namespace onh;
 
-CycleTime::CycleTime() {
-
-    // Init cycle times
-    cycle.min = 0;
-    cycle.max = 0;
-    cycle.current = 0;
-
-    firstCycle = true;
-
-    // Init time structures
-    clock_gettime(CLOCK_MONOTONIC, &cycleStart);
-    clock_gettime(CLOCK_MONOTONIC, &cycleStop);
+CycleTime::CycleTime():
+	cycle(), firstCycle(true), started(false)
+{
 }
 
 CycleTime::~CycleTime()
@@ -40,25 +31,30 @@ CycleTime::~CycleTime()
 
 void CycleTime::start() {
 
-    // Get time
-    clock_gettime(CLOCK_MONOTONIC, &cycleStart);
+	if (started) {
+		throw Exception("Cycle calculation already started", "CycleTime::start");
+	}
+
+    // Get start time
+	cycleStart = std::chrono::steady_clock::now();
+	started = true;
 }
 
 void CycleTime::stop() {
 
-    long seconds, nseconds;
-    double msec;
+	if (!started) {
+		throw Exception("Cycle calculation not started", "CycleTime::stop");
+	}
 
-    // Get time
-    clock_gettime(CLOCK_MONOTONIC, &cycleStop);
+	// Get stop time
+	cycleStop = std::chrono::steady_clock::now();
+	started = false;
 
-    // Calculate difference
-    seconds  = cycleStop.tv_sec  - cycleStart.tv_sec;
-    nseconds = cycleStop.tv_nsec - cycleStart.tv_nsec;
-    msec = nseconds/1000000.0;
+	// Calculate difference
+	std::chrono::duration<double, std::milli> elapsed = cycleStop-cycleStart;
 
     // Current cycle time (milliseconds)
-    cycle.current = ((seconds) * 1000 + msec);
+    cycle.current = elapsed.count();
 
     // Update max
     if (cycle.current > cycle.max) {
