@@ -50,10 +50,13 @@ TEST(DelayTests, Wait2) {
 	onh::Delay d(50);
 	onh::CycleTime ct;
 	onh::CycleTimeData cdt;
+	bool passed = false;
 
 	d.startDelay();
 	// Sleep 10ms
 	usleep(10000);
+
+	passed = d.delayPassed();
 
 	ct.start();
 	d.waitAfterStart();
@@ -61,6 +64,8 @@ TEST(DelayTests, Wait2) {
 
 	cdt = ct.getCycle();
 
+	ASSERT_FALSE(passed);
+	ASSERT_TRUE(d.delayPassed());
 	ASSERT_TRUE((cdt.current<50)?(true):(false)) << "Current cycle is: " << cdt.current;
 }
 
