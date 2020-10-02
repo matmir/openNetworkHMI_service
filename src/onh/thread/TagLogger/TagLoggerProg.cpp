@@ -75,11 +75,11 @@ void TagLoggerProg::operator()() {
 
         while(!isExitFlag()) {
 
+        	// Start thread cycle time measure
+			startCycleMeasure();
+
         	// Start delay
         	threadWaitStart();
-
-            // Start thread cycle time measure
-            startCycleMeasure();
 
             // Update process reader
 			prReader->updateProcessData();
