@@ -30,6 +30,10 @@
 #ifndef PROCESSDATAACCESS
 #define PROCESSDATAACCESS
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "processData.h"
 
 /**
@@ -239,5 +243,9 @@ int PROCESS_WRITE_INT(processData *process, processDataAddress addr, int val);
  * @return Error number
  */
 int PROCESS_WRITE_REAL(processData *process, processDataAddress addr, float val);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PROCESSDATAACCESS */

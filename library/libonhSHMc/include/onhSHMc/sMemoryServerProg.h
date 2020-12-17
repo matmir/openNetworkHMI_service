@@ -30,6 +30,10 @@
 #ifndef SMEMORY_SERVER_PROG
 #define SMEMORY_SERVER_PROG
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "sMemoryServer.h"
 
 #define SERVER_ERROR_NONE 0						// No error
@@ -192,5 +196,9 @@ int CMD_WRITE_REAL(extCMD *requestCMD, extCMD *replyCMD, processData *process, i
  * @return Error number
  */
 int copyProcessData(shm_serverData *ssdt, processData *process, int *additionalError);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

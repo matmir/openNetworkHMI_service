@@ -30,6 +30,10 @@
 #ifndef S_MEMORY_SERVER
 #define S_MEMORY_SERVER
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -152,5 +156,9 @@ int shm_put_replyIn(sMemory *shm, extCMD *sdt);
  * @return Error number
  */
 int shm_copy_process_data(sMemory *shm, processData *process);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
