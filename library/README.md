@@ -3,11 +3,17 @@ Shared Memory driver libraries for C and C++ based control program.
 COMPILATION
 ===========
 
-Run: 
+Go to selected library directory and run: 
 
-make release
+	mkdir build			# Directory with build output
+	cd build
+	cmake ..				# Generate build script
+	make 
+	sudo make install		# Install library in /usr/local
 
-sudo make install
+To build library with tests add option:
+
+	cmake -DWithTest=true ..
 
 License
 =======
