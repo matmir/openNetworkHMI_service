@@ -7,8 +7,6 @@ project(onhSHM_c_example)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 
-find_package(GTest REQUIRED)
-
 find_library(RT_LIB_EX NAMES rt)
 if (NOT RT_LIB_EX)
 	message(FATAL_ERROR "RT library not found")
@@ -29,4 +27,4 @@ endif()
 add_compile_options(-Wall)
 
 add_executable(${PROJECT_NAME} "src/server.c")
-target_link_libraries(${PROJECT_NAME} gtest Threads::Threads rt onhSHMc)
+target_link_libraries(${PROJECT_NAME} Threads::Threads rt onhSHMc)
