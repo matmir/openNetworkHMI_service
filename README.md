@@ -8,7 +8,14 @@ COMPILATION
 
 Run: 
 
-make release
+	mkdir build			# Directory with build output
+	cd build
+	cmake ..				# Generate build script
+	make					# Build application
+
+To build application with tests add option:
+
+	cmake -DWithTest=true ..
 
 TESTING
 ===========
