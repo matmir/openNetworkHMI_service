@@ -8,10 +8,10 @@ COMPILATION
 
 Run: 
 
-	mkdir build			# Directory with build output
+	mkdir build          # Directory with build output
 	cd build
-	cmake ..				# Generate build script
-	make					# Build application
+	cmake ..             # Generate build script
+	make                 # Build application
 
 To build application with tests add option:
 
