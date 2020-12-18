@@ -5,6 +5,10 @@ root = true
 indent_style = tab
 indent_size = 4
 
-[Makefile]
+[CMakeLists.txt]
+indent_style = tab
+indent_size = 4
+
+[sourcelist.cmake]
 indent_style = tab
 indent_size = 4
