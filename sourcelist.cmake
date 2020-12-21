@@ -4,6 +4,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     "src/Application.cpp"
 	"src/main.cpp"
 	"src/Application.h"
+	"src/appConfig.h"
 	"src/onh/driver/DriverBuffer.h"
 	"src/onh/driver/ProcessWriter.cpp"
 	"src/onh/driver/ProcessUtils.h"

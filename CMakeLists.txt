@@ -2,7 +2,9 @@
 
 cmake_minimum_required(VERSION 3.13.0)
 
-project(openNetworkHMI)
+project(openNetworkHMI VERSION 0.9.4)
+configure_file(${PROJECT_SOURCE_DIR}/appConfig.h.in ${PROJECT_SOURCE_DIR}/src/appConfig.h)
+message(STATUS "Generating ${PROJECT_NAME} version: ${PROJECT_VERSION}")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)

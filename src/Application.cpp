@@ -21,6 +21,7 @@
 #include <sstream>
 
 #include "Application.h"
+#include "appConfig.h"
 
 using namespace onh;
 
@@ -56,10 +57,12 @@ Application::~Application() {
 int Application::start() {
 
     int ret = 0;
+    std::stringstream appVersion;
+    appVersion << PROJECT_NAME << " (v" << PROJECT_VERSION << ")";
 
     try {
 
-    	log->write("Application starting...");
+    	log->write("Application "+appVersion.str()+" is starting...");
 
         // Initialize database connection
         initDB();
