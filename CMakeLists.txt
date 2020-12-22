@@ -21,7 +21,7 @@ endif()
 find_library(MODBUS_LIB_EX NAMES modbus)
 find_path(MODBUS_INCLUDE_DIR NAMES modbus.h
           PATH_SUFFIXES include modbus include/modbus
-          PATHS /usr/local/include/modbus)
+          PATHS /usr/include/modbus)
 if (NOT MODBUS_LIB_EX OR NOT MODBUS_INCLUDE_DIR)
 	message(FATAL_ERROR "modbus library not found")
 endif()

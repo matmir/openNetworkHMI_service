@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_compile_options(-Wall -Wno-int-in-bool-context)
 
 if(NOT CMAKE_BUILD_TYPE)
-	message(STATUS "Setting build type to 'Release'.")
+	message(STATUS "Setting build type to 'Release'")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING
             "Default build type: Release" FORCE)
 endif()
@@ -28,10 +28,10 @@ include(${PROJECT_SOURCE_DIR}/sourcelist.cmake)
 
 # test compilation
 if (WithTest)
-	message(STATUS "Building tests Enabled.")
+	message(STATUS "Building tests Enabled")
 	add_subdirectory(test)
 else()
-	message(STATUS "Building tests Disabled.")
+	message(STATUS "Building tests Disabled")
 endif()
 
 install(TARGETS ${PROJECT_NAME}

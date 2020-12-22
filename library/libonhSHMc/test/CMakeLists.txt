@@ -18,7 +18,7 @@ if (NOT RT_LIB_EX)
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
-	message(STATUS "Setting build type to 'Release'.")
+	message(STATUS "Setting build type to 'Release'")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING
             "Default build type: Release" FORCE)
 endif()
