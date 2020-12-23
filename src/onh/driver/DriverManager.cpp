@@ -24,6 +24,11 @@ using namespace onh;
 
 DriverManager::DriverManager(const std::vector<DriverConnection>& dcv)
 {
+	// Check drivers count
+	if (dcv.size() == 0) {
+		throw Exception("Missing driver configuration", "DriverManager::DriverManager");
+	}
+
 	driver.clear();
 	driverBuffer.clear();
 
