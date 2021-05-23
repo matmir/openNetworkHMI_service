@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <fcntl.h>
 #include <sys/shm.h>
 #include <sys/stat.h>
@@ -24,24 +23,21 @@
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
+#include <iostream>
 
 #include "Application.h"
-
-using namespace std;
 
 bool exitSignal;
 
 // Exit signal function
 void term(int signum) {
-
 	exitSignal = true;
 }
 
 int main() {
-
 	exitSignal = false;
 
-	cout << "C++ SHM test server 1 program!\n" << endl;
+	std::cout << "C++ SHM test server 1 program!\n" << std::endl;
 	// Remove init file
 	system("rm -f shmInited");
 
@@ -55,5 +51,5 @@ int main() {
 	Application app("onh_SHM_segment_test1", &exitSignal);
 	app.run();
 
-	cout << "Test server 1 program closed!" << endl;
+	std::cout << "Test server 1 program closed!" << std::endl;
 }

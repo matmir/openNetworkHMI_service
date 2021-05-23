@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+#include <unistd.h>
+#include <sstream>
 #include "ConnectionProg.h"
 #include "Socket.h"
-#include <string.h>
-#include <sstream>
-#include <unistd.h>
 
-using namespace onh;
+namespace onh {
 
 ConnectionProgram::ConnectionProgram(int connDescriptor,
 										const ProcessReader& pr,
@@ -30,8 +30,7 @@ ConnectionProgram::ConnectionProgram(int connDescriptor,
 										const ThreadCycleControllers& cc,
 										const DBCredentials& db,
 										const GuardDataController<ThreadExitData> &gdcTED):
-	connDesc(connDescriptor), dbCredentials(db), thExit(gdcTED), cycleController(cc)
-{
+	connDesc(connDescriptor), dbCredentials(db), thExit(gdcTED), cycleController(cc) {
 	// Process reader
 	pReader = new ProcessReader(pr);
 
@@ -53,8 +52,7 @@ ConnectionProgram::ConnectionProgram(int connDescriptor,
 }
 
 ConnectionProgram::ConnectionProgram(const ConnectionProgram& rhs):
-	connDesc(rhs.connDesc), dbCredentials(rhs.dbCredentials), thExit(rhs.thExit), cycleController(rhs.cycleController)
-{
+	connDesc(rhs.connDesc), dbCredentials(rhs.dbCredentials), thExit(rhs.thExit), cycleController(rhs.cycleController) {
 	// Process reader
 	pReader = new ProcessReader(*rhs.pReader);
 
@@ -76,7 +74,6 @@ ConnectionProgram::ConnectionProgram(const ConnectionProgram& rhs):
 }
 
 ConnectionProgram::~ConnectionProgram() {
-
 	if (pReader)
 		delete pReader;
 
@@ -91,15 +88,12 @@ ConnectionProgram::~ConnectionProgram() {
 }
 
 void ConnectionProgram::operator()() {
-
 	// Buffer
 	char buffer[MAX_BUFF_SIZE] = {0};
 
 	try {
-
 		// Read client data
 		if (read(connDesc, buffer, MAX_BUFF_SIZE) == -1) {
-
 			throw SocketException("Error while socket read data", errno, "ConnectionProgram::operator()");
 		}
 
@@ -107,16 +101,15 @@ void ConnectionProgram::operator()() {
 		std::string reply = parser->getReply(buffer);
 
 		// Send reply
-		if (send(connDesc, reply.c_str(), strlen(reply.c_str()), 0 ) == -1) {
-
+		if (send(connDesc, reply.c_str(), strlen(reply.c_str()), 0) == -1) {
 			throw SocketException("Error while socket send data", errno, "ConnectionProgram::operator()");
 		}
-
 	} catch (Exception &e) {
-
 		log->write(e.what());
 	}
 
 	// Close connection descriptor
 	close(connDesc);
 }
+
+}  // namespace onh

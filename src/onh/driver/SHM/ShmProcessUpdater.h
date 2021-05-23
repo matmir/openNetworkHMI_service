@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_SHM_SHMPROCESSUPDATER_H_
-#define SRC_ONH_DRIVER_SHM_SHMPROCESSUPDATER_H_
+#ifndef ONH_DRIVER_SHM_SHMPROCESSUPDATER_H_
+#define ONH_DRIVER_SHM_SHMPROCESSUPDATER_H_
 
 #include "../DriverProcessUpdater.h"
 #include "ShmProcessData.h"
@@ -26,67 +26,67 @@
 
 namespace onh {
 
-	/// Forward declaration
-	class ShmDriver;
+/// Forward declaration
+class ShmDriver;
 
-	/**
-	 * SHM driver process data updater class
-	 */
-	class ShmProcessUpdater: public DriverProcessUpdater {
+/**
+ * SHM driver process data updater class
+ */
+class ShmProcessUpdater: public DriverProcessUpdater {
+	public:
+		friend class ShmDriver;
 
-		public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ShmProcessUpdater(const ShmProcessUpdater&) = delete;
 
-			friend class ShmDriver;
+		virtual ~ShmProcessUpdater();
 
-			/**
-			 * Copy constructor - inactive
-			 */
-			ShmProcessUpdater(const ShmProcessUpdater&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		ShmProcessUpdater& operator=(const ShmProcessUpdater&) = delete;
 
-			virtual ~ShmProcessUpdater() override;
+		/**
+		 * Update process data (copy from device)
+		 */
+		void updateProcessData() override;
 
-			/**
-			 * Assign operator - inactive
-			 */
-			ShmProcessUpdater& operator=(const ShmProcessUpdater&) = delete;
+		/**
+		 * Create new driver process updater
+		 *
+		 * @return Pointer to the new driver process updater
+		 */
+		DriverProcessUpdater* createNew() override;
 
-			/**
-			 * Update process data (copy from device)
-			 */
-			virtual void updateProcessData() override;
+	private:
+		/**
+		 * Constructor with parameters (allowed only from ShmDriver)
+		 *
+		 * @param segmentName Shared memory segment name
+		 * @param smem SHM structure handle
+		 * @param gdc SHM process data controller (write mode)
+		 * @param lock Mutex for protecting driver
+		 */
+		ShmProcessUpdater(const std::string& segmentName,
+							sMemory *smem,
+							const GuardDataController<ShmProcessData> &gdc,
+							const MutexAccess& lock);
 
-			/**
-			 * Create new driver process updater
-			 *
-			 * @return Pointer to the new driver process updater
-			 */
-			virtual DriverProcessUpdater* createNew() override;
+		/// Shared memory segment name
+		std::string shmName;
 
-		private:
+		/// Shared memory structure handle
+		sMemory *shm;
 
-			/**
-			 * Constructor with parameters (allowed only from ShmDriver)
-			 *
-			 * @param segmentName Shared memory segment name
-			 * @param smem SHM structure handle
-			 * @param gdc SHM process data controller (write mode)
-			 * @param lock Mutex for protecting driver
-			 */
-			ShmProcessUpdater(const std::string& segmentName, sMemory *smem, const GuardDataController<ShmProcessData> &gdc, const MutexAccess& lock);
+		/// Driver process data controller (write mode)
+		GuardDataController<ShmProcessData> process;
 
-			/// Shared memory segment name
-			std::string shmName;
+		/// Mutex for protecting driver
+		MutexAccess driverLock;
+};
 
-			/// Shared memory structure handle
-			sMemory *shm;
+}  // namespace onh
 
-			/// Driver process data controller (write mode)
-			GuardDataController<ShmProcessData> process;
-
-			/// Mutex for protecting driver
-			MutexAccess driverLock;
-	};
-
-}
-
-#endif /* SRC_ONH_DRIVER_SHM_SHMPROCESSUPDATER_H_ */
+#endif  // ONH_DRIVER_SHM_SHMPROCESSUPDATER_H_

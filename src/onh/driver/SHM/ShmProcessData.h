@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_SHM_SHMPROCESSDATA_H_
-#define SRC_ONH_DRIVER_SHM_SHMPROCESSDATA_H_
+#ifndef ONH_DRIVER_SHM_SHMPROCESSDATA_H_
+#define ONH_DRIVER_SHM_SHMPROCESSDATA_H_
 
 #include "processData.h"
 #include <vector>
@@ -26,111 +26,108 @@
 
 namespace onh {
 
-	/**
-	 * SHM process data class
-	 */
-	class ShmProcessData {
+/**
+ * SHM process data class
+ */
+class ShmProcessData {
+	public:
+		/**
+		 * Default constructor
+		 */
+		ShmProcessData();
 
-		public:
+		/**
+		 * Constructor
+		 *
+		 * @param pd SHM process data structure
+		 */
+		explicit ShmProcessData(const processData &pd);
 
-			/**
-			 * Default constructor
-			 */
-			ShmProcessData();
+		/**
+		 * Copy constructor
+		 */
+		ShmProcessData(const ShmProcessData &spd);
 
-			/**
-			 * Constructor
-			 *
-			 * @param pd SHM process data structure
-			 */
-			ShmProcessData(const processData &pd);
+		virtual ~ShmProcessData();
 
-			/**
-			 * Copy constructor
-			 */
-			ShmProcessData(const ShmProcessData &spd);
+		/**
+		 * Assign operator
+		 */
+		ShmProcessData& operator=(const ShmProcessData &spd);
 
-			virtual ~ShmProcessData();
+		/**
+		 * Get bit from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Bit value from process data
+		 */
+		bool getBit(processDataAddress addr) const;
 
-			/**
-			 * Assign operator
-			 */
-			ShmProcessData& operator=(const ShmProcessData &spd);
+		/**
+		 * Get bits from process data
+		 *
+		 * @param addr Vector with bits addresses
+		 *
+		 * @return Vector with bits value
+		 */
+		std::vector<bool> getBits(const std::vector<processDataAddress>& addr) const;
 
-			/**
-			 * Get bit from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Bit value from process data
-			 */
-			bool getBit(processDataAddress addr) const;
+		/**
+		 * Get byte from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Byte value from process data
+		 */
+		BYTE getByte(processDataAddress addr) const;
 
-			/**
-			 * Get bits from process data
-			 *
-			 * @param addr Vector with bits addresses
-			 *
-			 * @return Vector with bits value
-			 */
-			std::vector<bool> getBits(const std::vector<processDataAddress>& addr) const;
+		/**
+		 * Get WORD from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Word value from process data
+		 */
+		WORD getWord(processDataAddress addr) const;
 
-			/**
-			 * Get byte from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Byte value from process data
-			 */
-			BYTE getByte(processDataAddress addr) const;
+		/**
+		 * Get DWORD from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Double word value from process data
+		 */
+		DWORD getDWord(processDataAddress addr) const;
 
-			/**
-			 * Get WORD from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Word value from process data
-			 */
-			WORD getWord(processDataAddress addr) const;
+		/**
+		 * Get INT from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Int value from process data
+		 */
+		int getInt(processDataAddress addr) const;
 
-			/**
-			 * Get DWORD from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Double word value from process data
-			 */
-			DWORD getDWord(processDataAddress addr) const;
+		/**
+		 * Get REAL from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Real value from process data
+		 */
+		float getReal(processDataAddress addr) const;
 
-			/**
-			 * Get INT from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Int value from process data
-			 */
-			int getInt(processDataAddress addr) const;
+		/**
+		 * Clear process data
+		 */
+		void clear();
 
-			/**
-			 * Get REAL from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Real value from process data
-			 */
-			float getReal(processDataAddress addr) const;
+	private:
+		/// SHM process data
+		processData *process;
+};
 
-			/**
-			 * Clear process data
-			 */
-			void clear();
+}  // namespace onh
 
-		private:
-
-			/// SHM process data
-			processData *process;
-	};
-
-}
-
-#endif /* SRC_ONH_DRIVER_SHM_SHMPROCESSDATA_H_ */
+#endif  // ONH_DRIVER_SHM_SHMPROCESSDATA_H_

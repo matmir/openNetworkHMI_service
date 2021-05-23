@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "../../../db/objs/Tag.h"
 #include "../../../utils/StringUtils.h"
 
-using namespace onh;
+namespace onh {
 
 CommandParser::CommandParser(const ProcessReader& pr,
 								const ProcessWriter& pw,
@@ -30,266 +30,244 @@ CommandParser::CommandParser(const ProcessReader& pr,
 								const ThreadCycleControllers& cc,
 								const GuardDataController<ThreadExitData> &gdcTED,
 								int connDescriptor):
-	thExitController(gdcTED), cycleController(cc)
-{
-    // Process reader
-    prReader = new ProcessReader(pr);
+	thExitController(gdcTED), cycleController(cc) {
+	// Process reader
+	prReader = new ProcessReader(pr);
 
-    // Process writer
-    prWriter = new ProcessWriter(pw);
+	// Process writer
+	prWriter = new ProcessWriter(pw);
 
-    // DB access
-    db = new ParserDB(dbc);
+	// DB access
+	db = new ParserDB(dbc);
 
-    // Create logger
-    std::stringstream s;
-    s << "parser_th_" << connDescriptor << "_";
-    log = new Logger("parser", s.str());
+	// Create logger
+	std::stringstream s;
+	s << "parser_th_" << connDescriptor << "_";
+	log = new Logger("parser", s.str());
 }
 
-CommandParser::~CommandParser()
-{
-    if (prReader)
-        delete prReader;
-    if (prWriter)
-        delete prWriter;
-    if (db)
-        delete db;
+CommandParser::~CommandParser() {
+	if (prReader)
+		delete prReader;
+	if (prWriter)
+		delete prWriter;
+	if (db)
+		delete db;
 
-    if (log) {
-        delete log;
-    }
+	if (log) {
+		delete log;
+	}
 }
 
 std::string CommandParser::getReply(const std::string& query) {
+	std::string s;
+	std::vector<std::string> v;
 
-    std::string s;
-    std::vector<std::string> v;
+	parserCMD cmd;
 
-    parserCMD cmd;
+	try {
+		// Check readers
+		if (!prReader)
+			throw Exception("No process reader object", "CommandParser::getReply");
+		if (!prWriter)
+			throw Exception("No process writer object", "CommandParser::getReply");
 
-    try {
-        // Check readers
-        if (!prReader)
-            throw Exception("No process reader object", "CommandParser::getReply");
-        if (!prWriter)
-            throw Exception("No process writer object", "CommandParser::getReply");
-
-        // Update process reader
+		// Update process reader
 		prReader->updateProcessData();
 
-        // Check if there is query string
-        if (query.length() == 0)
+		// Check if there is query string
+		if (query.length() == 0)
 			throw CommandParserException(CommandParserException::WRONG_DATA, "Query string is empty", "CommandParser::getReply");
 
-        // Explode command and data
-        v = StringUtils::explode(query,'|');
+		// Explode command and data
+		v = StringUtils::explode(query, '|');
 
-        // Check exploded data count
-        if (v.size() != 2)
-            throw CommandParserException(CommandParserException::WRONG_DATA_COUNT, "Wrong exploded data count", "CommandParser::getReply");
+		// Check exploded data count
+		if (v.size() != 2)
+			throw CommandParserException(CommandParserException::WRONG_DATA_COUNT,
+											"Wrong exploded data count",
+											"CommandParser::getReply");
 
-        // Parse command number
-        cmd = parseCMD(v[0]);
+		// Parse command number
+		cmd = parseCMD(v[0]);
 
-        // Parse whole command
-        s = parseCommand(cmd, v[1]);
+		// Parse whole command
+		s = parseCommand(cmd, v[1]);
+	} catch(CommandParserException &e) {
+		log->write(e.what());
 
+		switch (e.getType()) {
+			case CommandParserException::NONE: s = replyError(INTERNAL_ERR); break;
+			case CommandParserException::WRONG_DATA: s = replyError(UNKNOWN_CMD); break;
+			case CommandParserException::WRONG_DATA_COUNT: s = replyError(UNKNOWN_CMD); break;
+			case CommandParserException::CONVERSION_COMMAND: s = replyError(UNKNOWN_CMD); break;
+			case CommandParserException::UNKNOWN_COMMAND: s = replyError(UNKNOWN_CMD); break;
+		}
+	} catch (TagException &e) {
+		log->write(e.what());
 
-    } catch(CommandParserException &e) {
-        log->write(e.what());
+		switch (e.getType()) {
+			case TagException::NONE: s = replyError(INTERNAL_ERR); break;
+			case TagException::WRONG_ID: s = replyError(UNKNOWN_CMD); break;
+			case TagException::WRONG_NAME: s = replyError(UNKNOWN_CMD); break;
+			case TagException::WRONG_TYPE: s = replyError(WRONG_TAG_TYPE); break;
+			case TagException::WRONG_AREA: s = replyError(WRONG_TAG_AREA); break;
+			case TagException::BYTE_ADDRESS_OUT_OF_RANGE: s = replyError(WRONG_ADDR); break;
+			case TagException::BIT_ADDRESS_OUT_OF_RANGE: s = replyError(WRONG_ADDR); break;
+			case TagException::NOT_EXIST: s = replyError(NOT_EXIST); break;
+		}
+	} catch (Exception &e) {
+		log->write(e.what());
 
-        switch (e.getType()){
+		s = replyError(INTERNAL_ERR);
+	}
 
-            case CommandParserException::NONE: s = replyError(INTERNAL_ERR); break;
-            case CommandParserException::WRONG_DATA: s = replyError(UNKNOWN_CMD); break;
-            case CommandParserException::WRONG_DATA_COUNT: s = replyError(UNKNOWN_CMD); break;
-            case CommandParserException::CONVERSION_COMMAND: s = replyError(UNKNOWN_CMD); break;
-            case CommandParserException::UNKNOWN_COMMAND: s = replyError(UNKNOWN_CMD); break;
-
-        }
-    } catch (TagException &e) {
-        log->write(e.what());
-
-        switch (e.getType()) {
-
-            case TagException::NONE: s = replyError(INTERNAL_ERR); break;
-            case TagException::WRONG_ID: s = replyError(UNKNOWN_CMD); break;
-            case TagException::WRONG_NAME: s = replyError(UNKNOWN_CMD); break;
-            case TagException::WRONG_TYPE: s = replyError(WRONG_TAG_TYPE); break;
-            case TagException::WRONG_AREA: s = replyError(WRONG_TAG_AREA); break;
-            case TagException::BYTE_ADDRESS_OUT_OF_RANGE: s = replyError(WRONG_ADDR); break;
-            case TagException::BIT_ADDRESS_OUT_OF_RANGE: s = replyError(WRONG_ADDR); break;
-            case TagException::NOT_EXIST: s = replyError(NOT_EXIST); break;
-
-        }
-    } catch (Exception &e) {
-    	log->write(e.what());
-
-        s = replyError(INTERNAL_ERR);
-    }
-
-    return s;
-
+	return s;
 }
 
 bool CommandParser::checkCMD(int cmdNr) {
+	bool ret = false;
 
-    bool ret = false;
+	switch (cmdNr) {
+		case GET_BIT: ret = true; break;
+		case SET_BIT: ret = true; break;
+		case RESET_BIT: ret = true; break;
+		case INVERT_BIT: ret = true; break;
+		case GET_BITS: ret = true; break;
+		case SET_BITS: ret = true; break;
+		case GET_BYTE: ret = true; break;
+		case WRITE_BYTE: ret = true; break;
+		case GET_WORD: ret = true; break;
+		case WRITE_WORD: ret = true; break;
+		case GET_DWORD: ret = true; break;
+		case WRITE_DWORD: ret = true; break;
+		case GET_INT: ret = true; break;
+		case WRITE_INT: ret = true; break;
+		case GET_REAL: ret = true; break;
+		case WRITE_REAL: ret = true; break;
+		case MULTI_CMD: ret = true; break;
+		case ACK_ALARM: ret = true; break;
+		case GET_THREAD_CYCLE_TIME: ret = true; break;
+		case EXIT_APP: ret = true; break;
+	}
 
-    switch (cmdNr) {
-
-        case GET_BIT: ret = true; break;
-        case SET_BIT: ret = true; break;
-        case RESET_BIT: ret = true; break;
-        case INVERT_BIT: ret = true; break;
-        case GET_BITS: ret = true; break;
-        case SET_BITS: ret = true; break;
-        case GET_BYTE: ret = true; break;
-        case WRITE_BYTE: ret = true; break;
-        case GET_WORD: ret = true; break;
-        case WRITE_WORD: ret = true; break;
-        case GET_DWORD: ret = true; break;
-        case WRITE_DWORD: ret = true; break;
-        case GET_INT: ret = true; break;
-        case WRITE_INT: ret = true; break;
-        case GET_REAL: ret = true; break;
-        case WRITE_REAL: ret = true; break;
-        case MULTI_CMD: ret = true; break;
-        case ACK_ALARM: ret = true; break;
-        case GET_THREAD_CYCLE_TIME: ret = true; break;
-        case EXIT_APP: ret = true; break;
-
-    }
-
-    return ret;
+	return ret;
 }
 
 parserCMD CommandParser::parseCMD(const std::string& str) {
+	if (str.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::parseCMD");
 
-    if (str.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::parseCMD");
+	int val = 0;
 
-    int val = 0;
+	std::istringstream iss(str);
+	iss >> val;
 
-    std::istringstream iss(str);
-    iss >> val;
+	// Check value
+	if (!checkCMD(val))
+		throw CommandParserException(CommandParserException::UNKNOWN_COMMAND,
+										"Unknown command: "+str,
+										"CommandParser::parseCMD");
 
-    // Check value
-    if (!checkCMD(val))
-        throw CommandParserException(CommandParserException::UNKNOWN_COMMAND, "Unknown command: "+str, "CommandParser::parseCMD");
-
-    return (parserCMD)val;
+	return (parserCMD)val;
 }
 
 std::string CommandParser::replyOK(parserCMD cmd, const std::string& data) {
+	std::stringstream s;
 
-    std::stringstream s;
+	s << cmd << "|";
 
-    s << cmd << "|";
+	// Check data string
+	if (data.length() == 0) {
+		s << OK;
+	} else {
+		s << data;
+	}
 
-    // Check data string
-    if (data.length() == 0) {
-        s << OK;
-    } else {
-        s << data;
-    }
-
-    return s.str();
+	return s.str();
 }
 
 std::string CommandParser::replyOK(parserCMD cmd, const std::vector<bool>& data) {
+	std::stringstream s;
 
-    std::stringstream s;
+	s << cmd << '|';
 
-    s << cmd << '|';
+	// Check data
+	if (data.size() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::replyOK (vector BOOL)");
 
-    // Check data
-    if (data.size() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::replyOK (vector BOOL)");
+	for (unsigned int i=0; i < data.size(); ++i) {
+		s << ((data[i])?("1"):("0"));
 
-    for (unsigned int i=0; i<data.size(); ++i) {
+		if (i < data.size()-1) {
+			s << ',';
+		}
+	}
 
-        s << ((data[i])?("1"):("0"));
-
-        if (i < data.size()-1) {
-            s << ',';
-        }
-
-    }
-
-    return s.str();
+	return s.str();
 }
 
 std::string CommandParser::replyOK(BYTE data) {
+	std::stringstream s;
 
-    std::stringstream s;
+	s << GET_BYTE << '|' << (int)data;
 
-    s << GET_BYTE << '|' << (int)data;
-
-    return s.str();
+	return s.str();
 }
 
 std::string CommandParser::replyOK(WORD data) {
+	std::stringstream s;
 
-    std::stringstream s;
+	s << GET_WORD << '|' << (WORD)data;
 
-    s << GET_WORD << '|' << (WORD)data;
-
-    return s.str();
+	return s.str();
 }
 
 std::string CommandParser::replyOK(DWORD data) {
+	std::stringstream s;
 
-    std::stringstream s;
+	s << GET_DWORD << '|' << (DWORD)data;
 
-    s << GET_DWORD << '|' << (DWORD)data;
-
-    return s.str();
+	return s.str();
 }
 
 std::string CommandParser::replyOK(int data) {
+	std::stringstream s;
 
-    std::stringstream s;
+	s << GET_INT << '|' << (int)data;
 
-    s << GET_INT << '|' << (int)data;
-
-    return s.str();
+	return s.str();
 }
 
 std::string CommandParser::replyOK(float data) {
+	std::stringstream s;
 
-    std::stringstream s;
+	s << GET_REAL << '|' << (float)data;
 
-    s << GET_REAL << '|' << (float)data;
-
-    return s.str();
+	return s.str();
 }
 
 std::string CommandParser::replyOK(std::vector<std::string> data) {
+	std::stringstream s;
 
-    std::stringstream s;
+	s << MULTI_CMD << '|';
 
-    s << MULTI_CMD << '|';
+	// Check data
+	if (data.size() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::replyOK (MULTI_CMD)");
 
-    // Check data
-    if (data.size() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::replyOK (MULTI_CMD)");
+	for (unsigned int i=0; i < data.size(); ++i) {
+		// Replace delimiter
+		data[i] = StringUtils::replaceChar(data[i], '|', '?');
 
-    for (unsigned int i=0; i<data.size(); ++i) {
+		s << data[i];
 
-        // Replace delimiter
-        data[i] = StringUtils::replaceChar(data[i], '|', '?');
+		if (i < data.size()-1) {
+			s << '!';
+		}
+	}
 
-        s << data[i];
-
-        if (i < data.size()-1) {
-            s << '!';
-        }
-
-    }
-
-    return s.str();
+	return s.str();
 }
 
 std::string CommandParser::replyOK(CycleTimeData tpcLogger,
@@ -297,548 +275,537 @@ std::string CommandParser::replyOK(CycleTimeData tpcLogger,
 									CycleTimeData tpcAlarming,
 									CycleTimeData tpcScript,
 									const std::map<std::string, CycleTimeData>& tpcUpdater,
-									const std::map<std::string, CycleTimeData>& tpcPolling)
-{
-    std::stringstream s;
+									const std::map<std::string, CycleTimeData>& tpcPolling) {
+	std::stringstream s;
 
-    s << GET_THREAD_CYCLE_TIME << '|';
-    s << tpcUpdater.size() << "?" << tpcPolling.size() << '!';
-    for (const auto& updater : tpcUpdater) {
-    	s << updater.first << ":"  << updater.second.min << '?' << updater.second.max << '?' << updater.second.current << '!';
-    }
-    for (const auto& polling : tpcPolling) {
+	s << GET_THREAD_CYCLE_TIME << '|';
+	s << tpcUpdater.size() << "?" << tpcPolling.size() << '!';
+	for (const auto& updater : tpcUpdater) {
+		s << updater.first << ":"  << updater.second.min << '?' << updater.second.max << '?' << updater.second.current << '!';
+	}
+	for (const auto& polling : tpcPolling) {
 		s << polling.first << ":"  << polling.second.min << '?' << polling.second.max << '?' << polling.second.current << '!';
 	}
-    s << "Logger:"  << tpcLogger.min << '?' << tpcLogger.max << '?' << tpcLogger.current << '!';
-    s << "LoggerWriter:"  << tpcLoggerWriter.min << '?' << tpcLoggerWriter.max << '?' << tpcLoggerWriter.current << '!';
-    s << "Alarming:"  << tpcAlarming.min << '?' << tpcAlarming.max << '?' << tpcAlarming.current << '!';
-    s << "Script:"  << tpcScript.min << '?' << tpcScript.max << '?' << tpcScript.current;
+	s << "Logger:"  << tpcLogger.min << '?' << tpcLogger.max << '?' << tpcLogger.current << '!';
+	s << "LoggerWriter:"  << tpcLoggerWriter.min << '?' << tpcLoggerWriter.max << '?' << tpcLoggerWriter.current << '!';
+	s << "Alarming:"  << tpcAlarming.min << '?' << tpcAlarming.max << '?' << tpcAlarming.current << '!';
+	s << "Script:"  << tpcScript.min << '?' << tpcScript.max << '?' << tpcScript.current;
 
-    return s.str();
+	return s.str();
 }
 
 std::string CommandParser::replyError(parserReply rp) {
+	std::stringstream s;
 
-    std::stringstream s;
+	s << NOK << "|" << rp;
 
-    s << NOK << "|" << rp;
-
-    return s.str();
+	return s.str();
 }
 
 std::string CommandParser::CMD_GET_BIT(const std::string& data) {
+	std::string s;
 
-    std::string s;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_BIT");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_BIT");
+	// Get Tag
+	Tag t(db->getTag(data));
 
-    // Get Tag
-    Tag t(db->getTag(data));
+	// Get bit value
+	bool v = prReader->getBitValue(t);
 
-    // Get bit value
-    bool v = prReader->getBitValue(t);
+	// Prepare answer
+	s = (v)?("1"):("0");
 
-    // Prepare answer
-    s = (v)?("1"):("0");
-
-    return replyOK(GET_BIT, s);
+	return replyOK(GET_BIT, s);
 }
 
 std::string CommandParser::CMD_SET_BIT(const std::string& data) {
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_SET_BIT");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_SET_BIT");
+	// Get Tag
+	Tag t(db->getTag(data));
 
-    // Get Tag
-    Tag t(db->getTag(data));
+	// Set bit
+	prWriter->setBit(t);
 
-    // Set bit
-    prWriter->setBit(t);
-
-    return replyOK(SET_BIT);
+	return replyOK(SET_BIT);
 }
 
 std::string CommandParser::CMD_RESET_BIT(const std::string& data) {
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_RESET_BIT");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_RESET_BIT");
+	// Get Tag
+	Tag t(db->getTag(data));
 
-    // Get Tag
-    Tag t(db->getTag(data));
+	// Reset bit
+	prWriter->resetBit(t);
 
-    // Reset bit
-    prWriter->resetBit(t);
-
-    return replyOK(RESET_BIT);
+	return replyOK(RESET_BIT);
 }
 
 std::string CommandParser::CMD_INVERT_BIT(const std::string& data) {
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_RESET_BIT");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_RESET_BIT");
+	// Get Tag
+	Tag t(db->getTag(data));
 
-    // Get Tag
-    Tag t(db->getTag(data));
+	// Invert bit
+	prWriter->invertBit(t);
 
-    // Invert bit
-    prWriter->invertBit(t);
-
-    return replyOK(INVERT_BIT);
+	return replyOK(INVERT_BIT);
 }
 
 std::string CommandParser::CMD_GET_BITS(const std::string& data) {
+	std::string s;
+	std::vector<std::string> v;
+	std::vector<Tag> vTag;
+	std::vector<bool> TagValues;
 
-    std::string s;
-    std::vector<std::string> v;
-    std::vector<Tag> vTag;
-    std::vector<bool> TagValues;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_BITS");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_BITS");
+	// Explode tag names
+	v = StringUtils::explode(data, ',');
+	if (v.size() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_GET_BITS");
 
-    // Explode tag names
-    v = StringUtils::explode(data, ',');
-    if (v.size() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_GET_BITS");
+	// Read tag data from DB
+	vTag = db->getTags(v);
 
-    // Read tag data from DB
-    vTag = db->getTags(v);
+	// Get bits values
+	TagValues = prReader->getBitsValue(vTag);
 
-    // Get bits values
-    TagValues = prReader->getBitsValue(vTag);
+	if (TagValues.size() != v.size())
+		throw CommandParserException(CommandParserException::WRONG_DATA_COUNT,
+										"Not all data read",
+										"CommandParser::CMD_GET_BITS");
 
-    if (TagValues.size() != v.size())
-        throw CommandParserException(CommandParserException::WRONG_DATA_COUNT, "Not all data read", "CommandParser::CMD_GET_BITS");
+	if (TagValues.size() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA,
+										"No data from controller",
+										"CommandParser::CMD_GET_BITS");
 
-    if (TagValues.size() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data from controller", "CommandParser::CMD_GET_BITS");
-
-    return replyOK(GET_BITS, TagValues);
+	return replyOK(GET_BITS, TagValues);
 }
 
 std::string CommandParser::CMD_SET_BITS(const std::string& data) {
+	std::vector<std::string> v;
+	std::vector<Tag> vTag;
 
-    std::vector<std::string> v;
-    std::vector<Tag> vTag;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_SET_BITS");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_SET_BITS");
+	// Explode tag names
+	v = StringUtils::explode(data, ',');
+	if (v.size() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_SET_BITS");
 
-    // Explode tag names
-    v = StringUtils::explode(data, ',');
-    if (v.size() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_SET_BITS");
+	// Read tag data from DB
+	vTag = db->getTags(v);
 
-    // Read tag data from DB
-    vTag = db->getTags(v);
+	// Set bits
+	prWriter->setBits(vTag);
 
-    // Set bits
-    prWriter->setBits(vTag);
-
-    return replyOK(SET_BITS);
+	return replyOK(SET_BITS);
 }
 
 std::string CommandParser::CMD_GET_BYTE(const std::string& data) {
+	std::stringstream s;
+	BYTE v;
 
-    std::stringstream s;
-    BYTE v;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_BYTE");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_BYTE");
+	// Read Tag data from DB
+	Tag t(db->getTag(data));
 
-    // Read Tag data from DB
-    Tag t(db->getTag(data));
+	// Get Byte from controller
+	v = prReader->getByte(t);
 
-    // Get Byte from controller
-    v = prReader->getByte(t);
-
-    return replyOK(v);
+	return replyOK(v);
 }
 
 std::string CommandParser::CMD_WRITE_BYTE(const std::string& data) {
+	std::vector<std::string> v;
 
-    std::vector<std::string> v;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_WRITE_BYTE");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_WRITE_BYTE");
+	// Explode command on tag and value
+	v = StringUtils::explode(data, ',');
+	if (v.size() != 2)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_WRITE_BYTE");
 
-    // Explode command on tag and value
-    v = StringUtils::explode(data, ',');
-    if (v.size() != 2)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_WRITE_BYTE");
+	// Read Tag data from DB
+	Tag t(db->getTag(v[0]));
 
-    // Read Tag data from DB
-    Tag t(db->getTag(v[0]));
+	// Prepare value
+	BYTE val;
+	WORD cv;
+	std::istringstream iss(v[1]);
+	iss >> cv;
+	val = cv;
 
-    // Prepare value
-    BYTE val;
-    WORD cv;
-    std::istringstream iss(v[1]);
-    iss >> cv;
-    val = cv;
+	// Write byte
+	prWriter->writeByte(t, val);
 
-    // Write byte
-    prWriter->writeByte(t, val);
-
-    return replyOK(WRITE_BYTE);
+	return replyOK(WRITE_BYTE);
 }
 
 std::string CommandParser::CMD_GET_WORD(const std::string& data) {
+	std::stringstream s;
+	WORD w;
 
-    std::stringstream s;
-    WORD w;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_WORD");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_WORD");
+	// Read Tag data from DB
+	Tag t(db->getTag(data));
 
-    // Read Tag data from DB
-    Tag t(db->getTag(data));
+	// Get Word from controller
+	w = prReader->getWord(t);
 
-    // Get Word from controller
-    w = prReader->getWord(t);
-
-    return replyOK(w);
+	return replyOK(w);
 }
 
 std::string CommandParser::CMD_WRITE_WORD(const std::string& data) {
+	std::vector<std::string> v;
 
-    std::vector<std::string> v;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_WRITE_WORD");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_WRITE_WORD");
+	// Explode command on tag and value
+	v = StringUtils::explode(data, ',');
+	if (v.size() != 2)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_WRITE_WORD");
 
-    // Explode command on tag and value
-    v = StringUtils::explode(data, ',');
-    if (v.size() != 2)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_WRITE_WORD");
+	// Read Tag data from DB
+	Tag t(db->getTag(v[0]));
 
-    // Read Tag data from DB
-    Tag t(db->getTag(v[0]));
+	// Prepare value
+	WORD val;
+	std::istringstream iss(v[1]);
+	iss >> val;
 
-    // Prepare value
-    WORD val;
-    std::istringstream iss(v[1]);
-    iss >> val;
+	// Write byte
+	prWriter->writeWord(t, val);
 
-    // Write byte
-    prWriter->writeWord(t, val);
-
-    return replyOK(WRITE_WORD);
+	return replyOK(WRITE_WORD);
 }
 
 std::string CommandParser::CMD_GET_DWORD(const std::string& data) {
+	std::stringstream s;
+	DWORD dw;
 
-    std::stringstream s;
-    DWORD dw;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_DWORD");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_DWORD");
+	// Read Tag data from DB
+	Tag t(db->getTag(data));
 
-    // Read Tag data from DB
-    Tag t(db->getTag(data));
+	// Get Word from controller
+	dw = prReader->getDWord(t);
 
-    // Get Word from controller
-    dw = prReader->getDWord(t);
-
-    return replyOK(dw);
+	return replyOK(dw);
 }
 
 std::string CommandParser::CMD_WRITE_DWORD(const std::string& data) {
+	std::vector<std::string> v;
 
-    std::vector<std::string> v;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_WRITE_DWORD");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_WRITE_DWORD");
+	// Explode command on tag and value
+	v = StringUtils::explode(data, ',');
+	if (v.size() != 2)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_WRITE_DWORD");
 
-    // Explode command on tag and value
-    v = StringUtils::explode(data, ',');
-    if (v.size() != 2)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_WRITE_DWORD");
+	// Read Tag data from DB
+	Tag t(db->getTag(v[0]));
 
-    // Read Tag data from DB
-    Tag t(db->getTag(v[0]));
+	// Prepare value
+	DWORD val;
+	std::istringstream iss(v[1]);
+	iss >> val;
 
-    // Prepare value
-    DWORD val;
-    std::istringstream iss(v[1]);
-    iss >> val;
+	// Write byte
+	prWriter->writeDWord(t, val);
 
-    // Write byte
-    prWriter->writeDWord(t, val);
-
-    return replyOK(WRITE_DWORD);
+	return replyOK(WRITE_DWORD);
 }
 
 std::string CommandParser::CMD_GET_INT(const std::string& data) {
+	std::stringstream s;
+	int v;
 
-    std::stringstream s;
-    int v;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_INT");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_INT");
+	// Read Tag data from DB
+	Tag t(db->getTag(data));
 
-    // Read Tag data from DB
-    Tag t(db->getTag(data));
+	// Get INT from controller
+	v = prReader->getInt(t);
 
-    // Get INT from controller
-    v = prReader->getInt(t);
-
-    return replyOK(v);
+	return replyOK(v);
 }
 
 std::string CommandParser::CMD_WRITE_INT(const std::string& data) {
+	std::vector<std::string> v;
 
-    std::vector<std::string> v;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_WRITE_INT");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_WRITE_INT");
+	// Explode command on tag and value
+	v = StringUtils::explode(data, ',');
+	if (v.size() != 2)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_WRITE_INT");
 
-    // Explode command on tag and value
-    v = StringUtils::explode(data, ',');
-    if (v.size() != 2)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_WRITE_INT");
+	// Read Tag data from DB
+	Tag t(db->getTag(v[0]));
 
-    // Read Tag data from DB
-    Tag t(db->getTag(v[0]));
+	// Prepare value
+	int val;
+	std::istringstream iss(v[1]);
+	iss >> val;
 
-    // Prepare value
-    int val;
-    std::istringstream iss(v[1]);
-    iss >> val;
+	// Write byte
+	prWriter->writeInt(t, val);
 
-    // Write byte
-    prWriter->writeInt(t, val);
-
-    return replyOK(WRITE_INT);
+	return replyOK(WRITE_INT);
 }
 
 std::string CommandParser::CMD_GET_REAL(const std::string& data) {
+	float f;
 
-    float f;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_REAL");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_REAL");
+	// Read Tag data from DB
+	Tag t(db->getTag(data));
 
-    // Read Tag data from DB
-    Tag t(db->getTag(data));
+	// Get INT from controller
+	f = prReader->getReal(t);
 
-    // Get INT from controller
-    f = prReader->getReal(t);
-
-    return replyOK(f);
+	return replyOK(f);
 }
 
 std::string CommandParser::CMD_WRITE_REAL(const std::string& data) {
+	std::vector<std::string> v;
 
-    std::vector<std::string> v;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_WRITE_REAL");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_WRITE_REAL");
+	// Explode command on tag and value
+	v = StringUtils::explode(data, ',');
+	if (v.size() != 2)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_WRITE_REAL");
 
-    // Explode command on tag and value
-    v = StringUtils::explode(data, ',');
-    if (v.size() != 2)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No valid data", "CommandParser::CMD_WRITE_REAL");
+	// Read Tag data from DB
+	Tag t(db->getTag(v[0]));
 
-    // Read Tag data from DB
-    Tag t(db->getTag(v[0]));
+	// Prepare value
+	float val;
+	std::istringstream iss(v[1]);
+	iss >> val;
 
-    // Prepare value
-    float val;
-    std::istringstream iss(v[1]);
-    iss >> val;
+	// Write byte
+	prWriter->writeReal(t, val);
 
-    // Write byte
-    prWriter->writeReal(t, val);
-
-    return replyOK(WRITE_REAL);
+	return replyOK(WRITE_REAL);
 }
 
 std::string CommandParser::CMD_MULTI_CMD(const std::string& data) {
+	std::vector<std::string> v;
+	std::vector<std::string> cmdReply;
+	std::string cmd;
+	std::stringstream s;
 
-    std::vector<std::string> v;
-    std::vector<std::string> cmdReply;
-    std::string cmd;
-    std::stringstream s;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_MULTI_CMD");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_MULTI_CMD");
+	// Explode string on commands
+	v = StringUtils::explode(data, '!');
 
-    // Explode string on commands
-    v = StringUtils::explode(data, '!');
+	// Check commands
+	if (v.size() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No commands", "CommandParser::CMD_MULTI_CMD");
 
-    // Check commands
-    if (v.size() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No commands", "CommandParser::CMD_MULTI_CMD");
+	// Iterate all commands
+	for (unsigned int i=0; i < v.size(); ++i) {
+		// Get one command - replace delimiter
+		cmd = StringUtils::replaceChar(v[i], '?', '|');
 
-    // Iterate all commands
-    for (unsigned int i=0; i<v.size(); ++i) {
+		// Get command reply
+		cmdReply.push_back(getReplyFromMultiCMD(cmd));
+	}
 
-        // Get one command - replace delimiter
-        cmd = StringUtils::replaceChar(v[i], '?', '|');
-
-        // Get command reply
-        cmdReply.push_back(getReplyFromMultiCMD(cmd));
-
-    }
-
-    return replyOK(cmdReply);
+	return replyOK(cmdReply);
 }
 
 std::string CommandParser::getReplyFromMultiCMD(const std::string& cmd) {
+	std::vector<std::string> v;
+	std::string s;
 
-    std::vector<std::string> v;
-    std::string s;
+	parserCMD pcmd;
 
-    parserCMD pcmd;
+	// Explode command and data
+	v = StringUtils::explode(cmd, '|');
 
-    // Explode command and data
-    v = StringUtils::explode(cmd,'|');
+	// Check exploded data count
+	if (v.size() != 2)
+		throw CommandParserException(CommandParserException::WRONG_DATA_COUNT,
+										"Wrong exploded data count",
+										"CommandParser::getReplyFromMultiCMD");
 
-    // Check exploded data count
-    if (v.size() != 2)
-        throw CommandParserException(CommandParserException::WRONG_DATA_COUNT, "Wrong exploded data count", "CommandParser::getReplyFromMultiCMD");
+	// Parse command number
+	pcmd = parseCMD(v[0]);
 
-    // Parse command number
-    pcmd = parseCMD(v[0]);
+	// Check if there is no multi cmd inside muti cmd - We are using recursion!!
+	if (pcmd == MULTI_CMD)
+		throw CommandParserException(CommandParserException::UNKNOWN_COMMAND,
+										"Multi command inside multi command",
+										"CommandParser::getReplyFromMultiCMD");
 
-    // Check if there is no multi cmd inside muti cmd - We are using recursion!!
-    if (pcmd == MULTI_CMD)
-        throw CommandParserException(CommandParserException::UNKNOWN_COMMAND, "Multi command inside multi command", "CommandParser::getReplyFromMultiCMD");
+	if (pcmd == GET_THREAD_CYCLE_TIME)
+		throw CommandParserException(CommandParserException::UNKNOWN_COMMAND,
+										"Can not call GET_THREAD_CYCLE_TIME inside multi command",
+										"CommandParser::getReplyFromMultiCMD");
 
-    if (pcmd == GET_THREAD_CYCLE_TIME)
-        throw CommandParserException(CommandParserException::UNKNOWN_COMMAND, "Can not call GET_THREAD_CYCLE_TIME inside multi command", "CommandParser::getReplyFromMultiCMD");
-
-    // Parse whole command (recursion)
-    return parseCommand(pcmd, v[1]);
+	// Parse whole command (recursion)
+	return parseCommand(pcmd, v[1]);
 }
 
 std::string CommandParser::CMD_ACK_ALARM(const std::string& data) {
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_ACK_ALARM");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_ACK_ALARM");
+	// Get pending alaram identifier
+	unsigned int paid = 0;
+	std::istringstream iss(data);
+	iss >> paid;
 
-    // Get pending alaram identifier
-    unsigned int paid = 0;
-    std::istringstream iss(data);
-    iss >> paid;
+	// Acknowledge alarm
+	db->getAlarmDB().ackAlarm(paid);
 
-    // Acknowledge alarm
-    db->getAlarmDB().ackAlarm(paid);
-
-    return replyOK(ACK_ALARM);
+	return replyOK(ACK_ALARM);
 }
 
 std::string CommandParser::CMD_GET_THREAD_CYCLE_TIME(const std::string& data) {
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA,
+										"No data",
+										"CommandParser::CMD_GET_THREAD_CYCLE_TIME");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_GET_THREAD_CYCLE_TIME");
+	if (data != "1")
+		throw CommandParserException(CommandParserException::WRONG_DATA,
+										"Wrong data",
+										"CommandParser::CMD_GET_THREAD_CYCLE_TIME");
 
-    if (data != "1")
-        throw CommandParserException(CommandParserException::WRONG_DATA, "Wrong data", "CommandParser::CMD_GET_THREAD_CYCLE_TIME");
+	// Cycle times structures
+	CycleTimeData LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, tmp;
+	std::map<std::string, CycleTimeData> UpdaterCT, PollingCT;
 
-    // Cycle times structures
-    CycleTimeData LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, tmp;
-    std::map<std::string, CycleTimeData> UpdaterCT, PollingCT;
-
-    // Get cycle time of the updaters and buffers
-    for (auto& cntr : cycleController) {
-
-    	// Updater?
-    	if (cntr.first.find("Updater_") != std::string::npos) {
-    		// Get cycle time
-    		cntr.second.getData(tmp);
+	// Get cycle time of the updaters and buffers
+	for (auto& cntr : cycleController) {
+		// Updater?
+		if (cntr.first.find("Updater_") != std::string::npos) {
+			// Get cycle time
+			cntr.second.getData(tmp);
 			UpdaterCT.insert(std::pair<std::string, CycleTimeData>(cntr.first, tmp));
-    	}
+		}
 
-    	// Driver buffer?
+		// Driver buffer?
 		if (cntr.first.find("DriverBuffer_") != std::string::npos) {
 			// Get cycle time
 			cntr.second.getData(tmp);
 			PollingCT.insert(std::pair<std::string, CycleTimeData>(cntr.first, tmp));
 		}
-    }
+	}
 
-    // Get cycle times of the threads
-    cycleController.at("TagLogger").getData(LoggerCT);
-    cycleController.at("TagLoggerWriter").getData(LoggerWriterCT);
-    cycleController.at("Alarming").getData(AlarmingCT);
-    cycleController.at("Script").getData(ScriptCT);
+	// Get cycle times of the threads
+	cycleController.at("TagLogger").getData(LoggerCT);
+	cycleController.at("TagLoggerWriter").getData(LoggerWriterCT);
+	cycleController.at("Alarming").getData(AlarmingCT);
+	cycleController.at("Script").getData(ScriptCT);
 
-    return replyOK(LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, UpdaterCT, PollingCT);
+	return replyOK(LoggerCT, LoggerWriterCT, AlarmingCT, ScriptCT, UpdaterCT, PollingCT);
 }
 
 std::string CommandParser::CMD_EXIT_APP(const std::string& data) {
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_EXIT_APP");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::CMD_EXIT_APP");
+	if (data != "1")
+		throw CommandParserException(CommandParserException::WRONG_DATA, "Wrong data", "CommandParser::CMD_EXIT_APP");
 
-    if (data != "1")
-        throw CommandParserException(CommandParserException::WRONG_DATA, "Wrong data", "CommandParser::CMD_EXIT_APP");
-
-    // Exit application
-    ThreadExitData ex;
+	// Exit application
+	ThreadExitData ex;
 	ex.exit = true;
 	ex.additionalInfo = "CMD_EXIT_APP from socket client";
 
 	// Trigger application exit
 	thExitController.setData(ex);
 
-    return replyOK(EXIT_APP);
+	return replyOK(EXIT_APP);
 }
 
 std::string CommandParser::parseCommand(parserCMD cmd, const std::string& data) {
+	std::string ret;
 
-    std::string ret;
+	// Check data string
+	if (data.length() == 0)
+		throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::parseCommand");
 
-    // Check data string
-    if (data.length() == 0)
-        throw CommandParserException(CommandParserException::WRONG_DATA, "No data", "CommandParser::parseCommand");
+	// Execute command
+	switch (cmd) {
+		case GET_BIT: ret = CMD_GET_BIT(data); break;
+		case SET_BIT: ret = CMD_SET_BIT(data); break;
+		case RESET_BIT: ret = CMD_RESET_BIT(data); break;
+		case INVERT_BIT: ret = CMD_INVERT_BIT(data); break;
+		case GET_BITS: ret = CMD_GET_BITS(data); break;
+		case SET_BITS: ret = CMD_SET_BITS(data); break;
+		case GET_BYTE: ret = CMD_GET_BYTE(data); break;
+		case WRITE_BYTE: ret = CMD_WRITE_BYTE(data); break;
+		case GET_WORD: ret = CMD_GET_WORD(data); break;
+		case WRITE_WORD: ret = CMD_WRITE_WORD(data); break;
+		case GET_DWORD: ret = CMD_GET_DWORD(data); break;
+		case WRITE_DWORD: ret = CMD_WRITE_DWORD(data); break;
+		case GET_INT: ret = CMD_GET_INT(data); break;
+		case WRITE_INT: ret = CMD_WRITE_INT(data); break;
+		case GET_REAL: ret = CMD_GET_REAL(data); break;
+		case WRITE_REAL: ret = CMD_WRITE_REAL(data); break;
+		case MULTI_CMD: ret = CMD_MULTI_CMD(data); break;
+		case ACK_ALARM: ret = CMD_ACK_ALARM(data); break;
+		case GET_THREAD_CYCLE_TIME: ret = CMD_GET_THREAD_CYCLE_TIME(data); break;
+		case EXIT_APP: ret = CMD_EXIT_APP(data); break;
+	}
 
-    // Execute command
-    switch (cmd) {
-        case GET_BIT: ret = CMD_GET_BIT(data); break;
-        case SET_BIT: ret = CMD_SET_BIT(data); break;
-        case RESET_BIT: ret = CMD_RESET_BIT(data); break;
-        case INVERT_BIT: ret = CMD_INVERT_BIT(data); break;
-        case GET_BITS: ret = CMD_GET_BITS(data); break;
-        case SET_BITS: ret = CMD_SET_BITS(data); break;
-        case GET_BYTE: ret = CMD_GET_BYTE(data); break;
-        case WRITE_BYTE: ret = CMD_WRITE_BYTE(data); break;
-        case GET_WORD: ret = CMD_GET_WORD(data); break;
-        case WRITE_WORD: ret = CMD_WRITE_WORD(data); break;
-        case GET_DWORD: ret = CMD_GET_DWORD(data); break;
-        case WRITE_DWORD: ret = CMD_WRITE_DWORD(data); break;
-        case GET_INT: ret = CMD_GET_INT(data); break;
-        case WRITE_INT: ret = CMD_WRITE_INT(data); break;
-        case GET_REAL: ret = CMD_GET_REAL(data); break;
-        case WRITE_REAL: ret = CMD_WRITE_REAL(data); break;
-        case MULTI_CMD: ret = CMD_MULTI_CMD(data); break;
-        case ACK_ALARM: ret = CMD_ACK_ALARM(data); break;
-        case GET_THREAD_CYCLE_TIME: ret = CMD_GET_THREAD_CYCLE_TIME(data); break;
-        case EXIT_APP: ret = CMD_EXIT_APP(data); break;
-    }
-
-    return ret;
+	return ret;
 }
+
+}  // namespace onh

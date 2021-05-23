@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sys/socket.h>
 #include "ThreadManager.h"
 #include "Alarming/AlarmingProg.h"
 #include "DriverPolling/DriverPollingProg.h"
@@ -25,19 +26,16 @@
 #include "TagLogger/TagLoggerProg.h"
 #include "TagLogger/TagLoggerWriterProg.h"
 #include "ThreadCycleControllers.h"
-#include <sys/socket.h>
 
-using namespace onh;
+namespace onh {
 
 ThreadManager::ThreadManager():
-	thSocket(nullptr), threadSocket(nullptr), updatersInited(false), driverBuffersInited(false)
-{
+	thSocket(nullptr), threadSocket(nullptr), updatersInited(false), driverBuffersInited(false) {
 	thProgramData.clear();
 	threadProgs.clear();
 }
 
-ThreadManager::~ThreadManager()
-{
+ThreadManager::~ThreadManager() {
 	for (auto& th : thProgramData) {
 		delete th.second.thProgram;
 	}
@@ -54,14 +52,13 @@ ThreadManager::~ThreadManager()
 }
 
 void ThreadManager::initProcessUpdater(const std::vector<ProcessUpdaterData>& pu, unsigned int updateInterval) {
-
 	if (updatersInited)
 		throw Exception("Process updater threads already initialized", "ThreadManager::initProcessUpdater");
 
 	std::string nm = "";
 
 	// Prepare all updaters thread program data
-	for (unsigned int i=0; i<pu.size(); ++i) {
+	for (unsigned int i=0; i < pu.size(); ++i) {
 		// Prepare updater name
 		nm = "Updater_"+std::to_string(pu[i].connId);
 
@@ -78,14 +75,13 @@ void ThreadManager::initProcessUpdater(const std::vector<ProcessUpdaterData>& pu
 }
 
 void ThreadManager::initDriverPolling(const std::vector<DriverBufferUpdaterData>& dbu) {
-
 	if (driverBuffersInited)
 		throw Exception("Driver polling thread already initialized", "ThreadManager::initDriverPolling");
 
 	std::string nm = "";
 
 	// Prepare all buffers thread program data
-	for (unsigned int i=0; i<dbu.size(); ++i) {
+	for (unsigned int i=0; i < dbu.size(); ++i) {
 		// Prepare buffer name
 		nm = "DriverBuffer_"+std::to_string(dbu[i].connId);
 
@@ -104,8 +100,7 @@ void ThreadManager::initDriverPolling(const std::vector<DriverBufferUpdaterData>
 void ThreadManager::initAlarmingThread(const ProcessReader& pr,
 										const ProcessWriter& pw,
 										const AlarmingDB& adb,
-										unsigned int updateInterval)
-{
+										unsigned int updateInterval) {
 	std::string nm = "Alarming";
 
 	if (thProgramData.count(nm) != 0)
@@ -123,8 +118,7 @@ void ThreadManager::initAlarmingThread(const ProcessReader& pr,
 
 void ThreadManager::initTagLoggerThread(const ProcessReader& pr,
 										const TagLoggerDB& tldb,
-										unsigned int updateInterval)
-{
+										unsigned int updateInterval) {
 	std::string nm = "TagLogger";
 
 	if (thProgramData.count(nm) != 0)
@@ -141,8 +135,7 @@ void ThreadManager::initTagLoggerThread(const ProcessReader& pr,
 }
 
 void ThreadManager::initTagLoggerWriterThread(const TagLoggerDB& tldb,
-												unsigned int updateInterval)
-{
+												unsigned int updateInterval) {
 	std::string nm = "TagLoggerWriter";
 
 	if (thProgramData.count(nm) != 0)
@@ -162,8 +155,7 @@ void ThreadManager::initScriptThread(const ProcessReader& pr,
 										const ScriptDB& sdb,
 										unsigned int updateInterval,
 										const std::string& executeScript,
-										bool testEnv)
-{
+										bool testEnv) {
 	std::string nm = "Script";
 
 	if (thProgramData.count(nm) != 0)
@@ -185,8 +177,7 @@ void ThreadManager::initSocketThread(const ProcessReader& pr,
 										const ProcessWriter& pw,
 										const DBCredentials& dbc,
 										int port,
-										int maxConn)
-{
+										int maxConn) {
 	if (thSocket)
 		throw Exception("Socket thread already initialized", "ThreadManager::initSocketThread");
 
@@ -207,7 +198,6 @@ void ThreadManager::initSocketThread(const ProcessReader& pr,
 }
 
 void ThreadManager::run() {
-
 	// Check thread initialization
 	if (!updatersInited)
 		throw Exception("Process updater thread not initialized", "ThreadManager::run");
@@ -249,7 +239,6 @@ void ThreadManager::run() {
 }
 
 void ThreadManager::exitMain() {
-
 	ThreadExitData ex;
 	ex.exit = true;
 	ex.additionalInfo = "Exit from main";
@@ -259,7 +248,6 @@ void ThreadManager::exitMain() {
 }
 
 std::string ThreadManager::getExitInfo() {
-
 	ThreadExitData ex;
 	tmExit.getController().getData(ex);
 
@@ -267,15 +255,15 @@ std::string ThreadManager::getExitInfo() {
 }
 
 void ThreadManager::shutdownSocket() {
-
 	int sockFD = 0;
 	tmSockDesc.getController().getData(sockFD);
 
 	// Shutdown socket
 	if (sockFD != 0 && sockFD != -1) {
-
 		if (shutdown(sockFD, SHUT_RD)) {
 			throw Exception("Can not shutdown socket", "ThreadManager::shutdownSocket");
 		}
 	}
 }
+
+}  // namespace onh

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef THREADSOCKET_H
-#define THREADSOCKET_H
+#ifndef ONH_THREAD_THREADSOCKET_H_
+#define ONH_THREAD_THREADSOCKET_H_
 
 #include "ThreadExitData.h"
 #include "../utils/GuardDataController.h"
@@ -25,95 +25,91 @@
 
 namespace onh {
 
-	/**
-	 * Thread socket base class
-	 */
-    class ThreadSocket {
+/**
+ * Thread socket base class
+ */
+class ThreadSocket {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param gdcTED Thread exit data controller
+		 * @param gdcSockDesc Socket file descriptor controller
+		 * @param dirName Name of the directory where to write log files
+		 * @param fPrefix Log file name prefix
+		 */
+		ThreadSocket(const GuardDataController<ThreadExitData> &gdcTED,
+						const GuardDataController<int> &gdcSockDesc,
+						const std::string& dirName,
+						const std::string& fPrefix = "");
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ThreadSocket(const ThreadSocket&) = delete;
 
-            /**
-             * Constructor
-             *
-             * @param gdcTED Thread exit data controller
-             * @param gdcSockDesc Socket file descriptor controller
-             * @param dirName Name of the directory where to write log files
-             * @param fPrefix Log file name prefix
-             */
-    		ThreadSocket(const GuardDataController<ThreadExitData> &gdcTED,
-							const GuardDataController<int> &gdcSockDesc,
-							const std::string& dirName,
-							const std::string& fPrefix = "");
+		/**
+		 * Destructor
+		 */
+		virtual ~ThreadSocket();
 
-            /**
-             * Copy constructor - inactive
-             */
-    		ThreadSocket(const ThreadSocket&) = delete;
+		/**
+		 * Thread program function
+		 */
+		virtual void operator()() = 0;
 
-            /**
-             * Destructor
-             */
-            virtual ~ThreadSocket();
+		/**
+		 * Assignment operator - inactive
+		 */
+		ThreadSocket& operator=(const ThreadSocket&) = delete;
 
-            /**
-             * Thread program function
-             */
-            virtual void operator()() = 0;
+	private:
+		/// Thread exit data controller
+		GuardDataController<ThreadExitData> thExitController;
 
-            /**
-             * Assignment operator - inactive
-             */
-            ThreadSocket& operator=(const ThreadSocket&) = delete;
+		/// Socket file descriptor controller
+		GuardDataController<int> thSockDecsController;
 
-        private:
+		/// Logger object
+		Logger* log;
 
-            /// Thread exit data controller
-			GuardDataController<ThreadExitData> thExitController;
+	protected:
+		/**
+		 * Get Exit controller
+		 *
+		 * @return Exit data controller
+		 */
+		const GuardDataController<ThreadExitData>& getExitController();
 
-			/// Socket file descriptor controller
-			GuardDataController<int> thSockDecsController;
+		/**
+		 * Check if thread need to be closed
+		 *
+		 * @return True if thread need to be closed
+		 */
+		bool isExitFlag();
 
-			/// Logger object
-			Logger* log;
+		/**
+		 * Trigger exit from thread
+		 *
+		 * @param info Additional info about exit
+		 */
+		void exit(const std::string& info);
 
-        protected:
+		/**
+		 * Set Socket file descriptor
+		 *
+		 * @param sockFD Socket file descriptor
+		 */
+		void setSocketFD(int sockFD);
 
-			/**
-			 * Get Exit controller
-			 *
-			 * @return Exit data controller
-			 */
-			const GuardDataController<ThreadExitData>& getExitController();
+		/**
+		 * Get logger instance
+		 *
+		 * @return Logger instance
+		 */
+		Logger& getLogger();
+};
 
-            /**
-             * Check if thread need to be closed
-             *
-             * @return True if thread need to be closed
-             */
-            bool isExitFlag();
+}  // namespace onh
 
-            /**
-             * Trigger exit from thread
-             *
-             * @param info Additional info about exit
-             */
-            void exit(const std::string& info);
-
-            /**
-			 * Set Socket file descriptor
-			 *
-			 * @param sockFD Socket file descriptor
-			 */
-            void setSocketFD(int sockFD);
-
-            /**
-			 * Get logger instance
-			 *
-			 * @return Logger instance
-			 */
-            Logger& getLogger();
-    };
-
-}
-
-#endif // THREADSOCKET_H
+#endif  // ONH_THREAD_THREADSOCKET_H_

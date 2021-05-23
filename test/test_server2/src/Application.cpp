@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,28 +16,25 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Application.h"
-#include <iostream>
 #include <unistd.h>
+#include <string.h>
+#include <iostream>
 #include <chrono>
 #include <thread>
 #include <sstream>
-#include <string.h>
+#include "Application.h"
 #include "controlBits/modbusControlBits_test.h"
 #include "utils/Exception.h"
 
-//#define debugMSG
-
-Application::Application(const std::string &addr, const unsigned int& port, const unsigned int& regCount, bool *exSignal):
-	ctx(nullptr), mb_mapping(nullptr), exitProg(false), exitSignal(exSignal), clearProcess(false), exit(false), simData(false), simData1(false)
-{
+Application::Application(const std::string &addr, unsigned int port, unsigned int regCount, bool *exSignal):
+	ctx(nullptr), mb_mapping(nullptr), exitProg(false), exitSignal(exSignal), clearProcess(false),
+	exit(false), simData(false), simData1(false) {
 	// Create modbus
 	ctx = modbus_new_tcp(addr.c_str(), port);
 
 	// Init registers
 	mb_mapping = modbus_mapping_new(0, 0, regCount, regCount);
 	if (mb_mapping == NULL) {
-
 		modbus_free(ctx);
 
 		std::stringstream s;
@@ -58,7 +55,6 @@ Application::~Application() {
 }
 
 void Application::run() {
-
 	int s = -1;
 	int rc;
 
@@ -79,11 +75,8 @@ void Application::run() {
 	}
 
 	while (!exitProg && !(*exitSignal)) {
-
 		try {
-
 			if (down) {
-
 				#ifdef debugMSG
 					std::cout << "before accept\n";
 				#endif
@@ -109,8 +102,7 @@ void Application::run() {
 			#endif
 
 				clearQuery();
-			} else { // client disconnected or error
-
+			} else {  // client disconnected or error
 				down = true;
 			#ifdef debugMSG
 				std::cout << "client down\n";
@@ -132,9 +124,7 @@ void Application::run() {
 			#ifdef debugMSG
 				std::cout << "-----------------\n";
 			#endif
-
 		} catch(std::exception &e) {
-
 			exitProg = true;
 			std::cout << e.what() << std::endl;
 		}
@@ -154,7 +144,6 @@ void Application::run() {
 }
 
 void Application::updateControlFlags() {
-
 	// Control register
 	uint16_t reg = mb_mapping->tab_registers[0];
 
@@ -166,10 +155,9 @@ void Application::updateControlFlags() {
 }
 
 void Application::checkControlBits() {
-
 	// Clear process data
 	if (clearProcess) {
-		for (int i=0; i<mb_mapping->nb_input_registers; ++i) {
+		for (int i=0; i < mb_mapping->nb_input_registers; ++i) {
 			mb_mapping->tab_input_registers[i] = 0;
 			mb_mapping->tab_registers[i] = 0;
 		}
@@ -182,7 +170,6 @@ void Application::checkControlBits() {
 }
 
 void Application::tagLoggerSim() {
-
 	uint16_t reg = 0;
 	uint16_t regTmp = 0;
 	uint8_t b = 0;
@@ -193,10 +180,8 @@ void Application::tagLoggerSim() {
 
 	// Read simulation flag
 	if (simData) {
-
 		// Read logger data flag
 		if (simData1) {
-
 			// BIT
 			mb_mapping->tab_input_registers[1] = 0;
 
@@ -233,7 +218,6 @@ void Application::tagLoggerSim() {
 			rVal = 2.15;
 			memcpy(pReal, &rVal, sizeof rVal);
 		} else {
-
 			// BIT
 			mb_mapping->tab_input_registers[1] = 1;
 
@@ -274,8 +258,7 @@ void Application::tagLoggerSim() {
 }
 
 void Application::clearQuery() {
-
-	for (unsigned int i=0; i<MODBUS_TCP_MAX_ADU_LENGTH; ++i) {
+	for (unsigned int i=0; i < MODBUS_TCP_MAX_ADU_LENGTH; ++i) {
 		query[i] = 0;
 	}
 }

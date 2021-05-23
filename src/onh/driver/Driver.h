@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_DRIVER_DRIVER_H_
-#define SRC_DRIVER_DRIVER_H_
+#ifndef ONH_DRIVER_DRIVER_H_
+#define ONH_DRIVER_DRIVER_H_
 
 #include <vector>
 #include "../utils/Logger.h"
@@ -32,75 +32,71 @@
 
 namespace onh {
 
-	/**
-	 * Base driver abstract class
-	 */
-	class Driver {
+/**
+ * Base driver abstract class
+ */
+class Driver {
+	public:
+		/**
+		 * Default constructor
+		 *
+		 * @param logName Logger name
+		 */
+		explicit Driver(const std::string& logName);
 
-		public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		Driver(const Driver&) = delete;
 
-			/**
-			 * Default constructor
-			 *
-			 * @param logName Logger name
-			 */
-			Driver(const std::string& logName);
+		virtual ~Driver();
 
-			/**
-			 * Copy constructor - inactive
-			 */
-			Driver(const Driver&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		Driver& operator=(const Driver&) = delete;
 
-			virtual ~Driver();
+		/**
+		 * Get driver buffer handle
+		 *
+		 * @return Driver buffer handle
+		 */
+		virtual DriverBuffer* getBuffer() = 0;
 
-			/**
-			 * Assign operator - inactive
-			 */
-			Driver& operator=(const Driver&) = delete;
+		/**
+		 * Get driver process data reader
+		 *
+		 * @return Driver process data reader handle
+		 */
+		virtual DriverProcessReader* getReader() = 0;
 
-			/**
-			 * Get driver buffer handle
-			 *
-			 * @return Driver buffer handle
-			 */
-			virtual DriverBuffer* getBuffer() = 0;
+		/**
+		 * Get driver process data writer
+		 *
+		 * @return Driver process data writer handle
+		 */
+		virtual DriverProcessWriter* getWriter() = 0;
 
-			/**
-			 * Get driver process data reader
-			 *
-			 * @return Driver process data reader handle
-			 */
-			virtual DriverProcessReader* getReader() = 0;
+		/**
+		 * Get driver process data updater
+		 *
+		 * @return Driver process data updater handle
+		 */
+		virtual DriverProcessUpdater* getUpdater() = 0;
 
-			/**
-			 * Get driver process data writer
-			 *
-			 * @return Driver process data writer handle
-			 */
-			virtual DriverProcessWriter* getWriter() = 0;
+	protected:
+		/**
+		 * Get driver logger
+		 *
+		 * @return Driver logger
+		 */
+		Logger& getLog();
 
-			/**
-			 * Get driver process data updater
-			 *
-			 * @return Driver process data updater handle
-			 */
-			virtual DriverProcessUpdater* getUpdater() = 0;
+	private:
+		/// Logger object
+		Logger *log;
+};
 
-		protected:
+}  // namespace onh
 
-			/**
-			 * Get driver logger
-			 *
-			 * @return Driver logger
-			 */
-			Logger& getLog();
-
-		private:
-
-			/// Logger object
-			Logger *log;
-	};
-
-}
-
-#endif /* SRC_DRIVER_DRIVER_H_ */
+#endif  // ONH_DRIVER_DRIVER_H_

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,101 +16,98 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TAGDB_H
-#define TAGDB_H
+#ifndef ONH_DB_PARSERDB_H_
+#define ONH_DB_PARSERDB_H_
 
-#include "objs/Tag.h"
 #include <vector>
+#include "objs/Tag.h"
 #include "DB.h"
 #include "DBCredentials.h"
 #include "AlarmingDB.h"
 
 namespace onh {
 
-    /**
-	 * Class for read/write DB from Parser
-	 */
-    class ParserDB: public DB {
+/**
+ * Class for read/write DB from Parser
+ */
+class ParserDB: public DB {
+	public:
+		/**
+		 * Parser DB constructor
+		 *
+		 * @param dbData DB connection data
+		 */
+		explicit ParserDB(const DBCredentials & dbData);
 
-        public:
+		/**
+		 * Copy constructor
+		 *
+		 * @param tDB PArserDB to copy
+		 */
+		ParserDB(const ParserDB &tDB);
 
-    		/**
-			 * Parser DB constructor
-			 *
-			 * @param dbData DB connection data
-			 */
-    		ParserDB(const DBCredentials & dbData);
+		virtual ~ParserDB();
 
-            /**
-             * Copy constructor
-             *
-             * @param tDB PArserDB to copy
-             */
-            ParserDB(const ParserDB &tDB);
+		/**
+		 * Assign operator - inactive
+		 */
+		ParserDB& operator=(const ParserDB&) = delete;
 
-            virtual ~ParserDB();
+		/**
+		 * Get Tag data from DB
+		 *
+		 * @param tagName String with tag name
+		 *
+		 * @return Tag object
+		 */
+		const Tag getTag(const std::string& tagName);
 
-            /**
-			 * Assign operator - inactive
-			 */
-            ParserDB& operator=(const ParserDB&) = delete;
+		/**
+		 * Get Tags data from DB
+		 *
+		 * @param tagNames Vector with tag names
+		 * @return Vector with Tag objects
+		 */
+		std::vector<Tag> getTags(std::vector<std::string> tagNames);
 
-            /**
-             * Get Tag data from DB
-             *
-             * @param tagName String with tag name
-             *
-             * @return Tag object
-             */
-            const Tag getTag(const std::string& tagName);
+		/**
+		 * Get access to the alarming DB
+		 *
+		 * @return Reference to the AlarmingDB object
+		 */
+		AlarmingDB& getAlarmDB();
 
-            /**
-             * Get Tags data from DB
-             *
-             * @param tagNames Vector with tag names
-             * @return Vector with Tag objects
-             */
-            std::vector<Tag> getTags(std::vector<std::string> tagNames);
+	private:
+		/**
+		 * Get Tag object from SQL resultset
+		 *
+		 * @param res Pointer to the resultset
+		 *
+		 * @return  Tag objects
+		 */
+		Tag getTagFromResultset(DBResult *res);
 
-            /**
-             * Get access to the alarming DB
-             *
-             * @return Reference to the AlarmingDB object
-             */
-            AlarmingDB& getAlarmDB();
+		/**
+		 * Prepare SQL IN array statement
+		 *
+		 * @param tagNames Vector with tag names
+		 *
+		 * @return SQL IN array statement
+		 */
+		std::stringstream prepareIN(const std::vector<std::string> &tagNames);
 
-        private:
+		/**
+		 * Check if Tag names exists in Tag vector
+		 *
+		 * @param tagNames Vector with tag names
+		 * @param vTags Vector with Tag objects
+		 */
+		void checkTagNamesExist(const std::vector<std::string> &tagNames, const std::vector<Tag> &vTags);
 
-            /**
-             * Get Tag object from SQL resultset
-             *
-             * @param res Pointer to the resultset
-             *
-             * @return  Tag objects
-             */
-            Tag getTagFromResultset(DBResult *res);
+		/// AlarmingDB object
+		AlarmingDB *pAlarmDB;
+};
 
-            /**
-             * Prepare SQL IN array statement
-             *
-             * @param tagNames Vector with tag names
-             *
-             * @return SQL IN array statement
-             */
-            std::stringstream prepareIN(const std::vector<std::string> &tagNames);
+}  // namespace onh
 
-            /**
-             * Check if Tag names exists in Tag vector
-             *
-             * @param tagNames Vector with tag names
-             * @param vTags Vector with Tag objects
-             */
-            void checkTagNamesExist(const std::vector<std::string> &tagNames, const std::vector<Tag> &vTags);
-
-            /// AlarmingDB object
-            AlarmingDB *pAlarmDB;
-    };
-
-}
-
-#endif // TAGDB_H
+#endif  // ONH_DB_PARSERDB_H_

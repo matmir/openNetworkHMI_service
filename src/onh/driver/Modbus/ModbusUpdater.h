@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBUSUPDATER_H
-#define MODBUSUPDATER_H
+#ifndef ONH_DRIVER_MODBUS_MODBUSUPDATER_H_
+#define ONH_DRIVER_MODBUS_MODBUSUPDATER_H_
 
 #include "../DriverBuffer.h"
 #include "../DriverException.h"
@@ -27,60 +27,58 @@
 
 namespace onh {
 
-    /// Forward declaration
-	class ModbusDriver;
+/// Forward declaration
+class ModbusDriver;
 
-    /**
-	 * Modbus updater class
-	 */
-    class ModbusUpdater: public DriverBuffer {
+/**
+ * Modbus updater class
+ */
+class ModbusUpdater: public DriverBuffer {
+	public:
+		friend class ModbusDriver;
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ModbusUpdater(const ModbusUpdater&) = delete;
 
-            friend class ModbusDriver;
+		virtual ~ModbusUpdater();
 
-            /**
-			 * Copy constructor - inactive
-			 */
-			ModbusUpdater(const ModbusUpdater&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		ModbusUpdater& operator=(const ModbusUpdater&) = delete;
 
-            virtual ~ModbusUpdater() override;
+		/**
+		 * Update driver buffer (Get data from controller)
+		 */
+		void updateBuffer() override;
 
-            /**
-			 * Assign operator - inactive
-			 */
-			ModbusUpdater& operator=(const ModbusUpdater&) = delete;
+	private:
+		/**
+		 * Constructor with parameters (allowed only from ModbusDriver)
+		 *
+		 * @param drv Driver instance
+		 * @param drvLock Driver Mutex locking structure
+		 * @param mbuff Driver buffer data controller (write mode)
+		 */
+		ModbusUpdater(modbusM::ModbusMaster* drv,
+							const MutexAccess &drvLock,
+							const GuardDataController<ModbusProcessData> &mbuff);
 
-            /**
-             * Update driver buffer (Get data from controller)
-             */
-            virtual void updateBuffer() override;
+		void clearTempReg();
 
-        private:
+		/// Driver instance
+		modbusM::ModbusMaster* driver;
+		MutexAccess driverLock;
 
-            /**
-             * Constructor with parameters (allowed only from ModbusDriver)
-             *
-             * @param drv Driver instance
-             * @param drvLock Driver Mutex locking structure
-             * @param mbuff Driver buffer data controller (write mode)
-             */
-            ModbusUpdater(modbusM::ModbusMaster* drv,
-                             const MutexAccess &drvLock,
-                             const GuardDataController<ModbusProcessData> &mbuff);
+		/// Driver buffer data controller (write mode)
+		GuardDataController<ModbusProcessData> buff;
 
-            void clearTempReg();
+		/// Modbus temporary registers
+		ModbusRegisters tempBuff;
+};
 
-            /// Driver instance
-            modbusM::ModbusMaster* driver;
-            MutexAccess driverLock;
+}  // namespace onh
 
-            /// Driver buffer data controller (write mode)
-			GuardDataController<ModbusProcessData> buff;
-
-            /// Modbus temporary registers
-            ModbusRegisters tempBuff;
-    };
-
-}
-#endif // MODBUSUPDATER_H
+#endif  // ONH_DRIVER_MODBUS_MODBUSUPDATER_H_

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,26 +16,25 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DRIVERBUFFER_H
-#define DRIVERBUFFER_H
+#ifndef ONH_DRIVER_DRIVERBUFFER_H_
+#define ONH_DRIVER_DRIVERBUFFER_H_
 
 namespace onh {
 
-    /**
-	 * Base driver buffer abstract class
-	 */
-    class DriverBuffer {
+/**
+ * Base driver buffer abstract class
+ */
+class DriverBuffer {
+	public:
+		DriverBuffer();
+		virtual ~DriverBuffer();
 
-        public:
-            DriverBuffer();
-            virtual ~DriverBuffer();
+		/**
+		 * Update driver buffer
+		 */
+		virtual void updateBuffer() = 0;
+};
 
-            /**
-             * Update driver buffer
-             */
-            virtual void updateBuffer() = 0;
-    };
+}  // namespace onh
 
-}
-
-#endif // DRIVERBUFFER_H
+#endif  // ONH_DRIVER_DRIVERBUFFER_H_

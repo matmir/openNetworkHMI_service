@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBUSCONTROLBITS_TEST_H_
-#define MODBUSCONTROLBITS_TEST_H_
+#ifndef CONTROLBITS_MODBUSCONTROLBITS_TEST_H_
+#define CONTROLBITS_MODBUSCONTROLBITS_TEST_H_
 
 // Client/server synchronization bit
 #define MB_BIT_SYNC {onh::PDA_OUTPUT, 0, 0}
@@ -45,4 +45,4 @@
 #define MB_TEST_LOG_REAL1 {onh::PDA_INPUT, 26, 0}
 #define MB_TEST_LOG_REAL2 {onh::PDA_INPUT, 30, 0}
 
-#endif /* MODBUSCONTROLBITS_TEST_H_ */
+#endif  // CONTROLBITS_MODBUSCONTROLBITS_TEST_H_

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SOCKETPROGRAM_H
-#define SOCKETPROGRAM_H
+#ifndef ONH_THREAD_SOCKET_SOCKETPROG_H_
+#define ONH_THREAD_SOCKET_SOCKETPROG_H_
 
 #define THREADS_POOL 20
 
@@ -29,80 +29,77 @@
 
 namespace onh {
 
-    /**
-	 * Socket program class
-	 */
-    class SocketProgram: public ThreadSocket {
+/**
+ * Socket program class
+ */
+class SocketProgram: public ThreadSocket {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param pr Process reader
+		 * @param pw Process writer
+		 * @param dbc DB data
+		 * @param port Socket port
+		 * @param maxConn Socket max connection number
+		 * @param cc Thread cycle controllers
+		 * @param gdcTED Thread exit data controller
+		 * @param gdcSockDesc Socket file descriptor controller
+		 */
+		SocketProgram(const ProcessReader& pr,
+						const ProcessWriter& pw,
+						const DBCredentials& dbc,
+						int port,
+						int maxConn,
+						const ThreadCycleControllers& cc,
+						const GuardDataController<ThreadExitData> &gdcTED,
+						const GuardDataController<int> &gdcSockDesc);
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		SocketProgram(const SocketProgram&) = delete;
 
-            /**
-             * Constructor
-             *
-             * @param pr Process reader
-             * @param pw Process writer
-             * @param dbc DB data
-             * @param port Socket port
-             * @param maxConn Socket max connection number
-             * @param cc Thread cycle controllers
-             * @param gdcTED Thread exit data controller
-             * @param gdcSockDesc Socket file descriptor controller
-             */
-    		SocketProgram(const ProcessReader& pr,
-							const ProcessWriter& pw,
-							const DBCredentials& dbc,
-							int port,
-							int maxConn,
-							const ThreadCycleControllers& cc,
-							const GuardDataController<ThreadExitData> &gdcTED,
-							const GuardDataController<int> &gdcSockDesc);
+		virtual ~SocketProgram();
 
-    		/**
-			 * Copy constructor - inactive
-			 */
-    		SocketProgram(const SocketProgram&) = delete;
+		/**
+		 * Thread program function
+		 */
+		void operator()() override;
 
-			virtual ~SocketProgram() override;
+		/**
+		 * Assignment operator - inactive
+		 */
+		SocketProgram& operator=(const SocketProgram&) = delete;
 
-			/**
-			 * Thread program function
-			 */
-			virtual void operator()() override;
+	private:
+		/// Socket thread data
+		ProcessReader *pReader;
+		ProcessWriter *pWriter;
+		DBCredentials dbCredentials;
+		ThreadCycleControllers cycleController;
+		int sPort;
+		int sMaxConn;
 
-			/**
-			 * Assignment operator - inactive
-			 */
-			SocketProgram& operator=(const SocketProgram&) = delete;
+		/// Socket object
+		Socket *sock;
 
-        private:
+		/// Connection threads pool
+		std::vector<std::thread*> tConn;
 
-            /// Socket thread data
-			ProcessReader *pReader;
-			ProcessWriter *pWriter;
-			DBCredentials dbCredentials;
-			ThreadCycleControllers cycleController;
-			int sPort;
-			int sMaxConn;
+		/**
+		 * Create connection thread
+		 *
+		 * @param connFD Connection file descriptor
+		 */
+		void createConnectionThread(int connFD);
 
-            /// Socket object
-            Socket *sock;
+		/**
+		 * Wait on threads
+		 */
+		void waitOnThreads();
+};
 
-            /// Connection threads pool
-            std::vector<std::thread*> tConn;
+}  // namespace onh
 
-            /**
-             * Create connection thread
-             *
-             * @param connFD Connection file descriptor
-             */
-            void createConnectionThread(int connFD);
-
-            /**
-             * Wait on threads
-             */
-            void waitOnThreads();
-    };
-
-}
-
-#endif // SOCKETPROGRAM_H
+#endif  // ONH_THREAD_SOCKET_SOCKETPROG_H_

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,46 +16,48 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROCESSUTILS_H
-#define PROCESSUTILS_H
+#ifndef ONH_DRIVER_PROCESSUTILS_H_
+#define ONH_DRIVER_PROCESSUTILS_H_
 
 #include "../db/objs/Tag.h"
 
 namespace onh {
 
-    /**
-     * Process utils class
-     */
-    class ProcessUtils {
+/**
+ * Process utils class
+ */
+class ProcessUtils {
+	public:
+		/**
+		 * Triggers tag type error
+		 *
+		 * @param tagName Tag name
+		 * @param fName Function from which exception was thrown
+		 */
+		static void triggerTagTypeError(const std::string& tagName,
+										const std::string& fName);
 
-        public:
+		/**
+		 * Triggers tag area error
+		 *
+		 * @param tagName Tag name
+		 * @param fName Function from which exception was thrown
+		 */
+		static void triggerTagAreaError(const std::string& tagName,
+										const std::string& fName);
 
-            /**
-             * Triggers tag type error
-             *
-             * @param tagName Tag name
-             * @param fName Function from which exception was thrown
-             */
-            static void triggerTagTypeError(const std::string& tagName, const std::string& fName);
+		/**
+		 * Triggers error
+		 *
+		 * @param msg Exception message
+		 * @param tagName Tag name
+		 * @param fName Function from which exception was thrown
+		 */
+		static void triggerError(const std::string& msg,
+									const std::string& tagName,
+									const std::string& fName);
+};
 
-            /**
-             * Triggers tag area error
-             *
-             * @param tagName Tag name
-             * @param fName Function from which exception was thrown
-             */
-            static void triggerTagAreaError(const std::string& tagName, const std::string& fName);
+}  // namespace onh
 
-            /**
-             * Triggers error
-             *
-             * @param msg Exception message
-             * @param tagName Tag name
-             * @param fName Function from which exception was thrown
-             */
-            static void triggerError(const std::string& msg, const std::string& tagName, const std::string& fName);
-    };
-
-}
-
-#endif // PROCESSUTILS_H
+#endif  // ONH_DRIVER_PROCESSUTILS_H_

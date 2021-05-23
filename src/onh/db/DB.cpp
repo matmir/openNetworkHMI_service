@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,70 +19,64 @@
 #include "DB.h"
 #include <sstream>
 
-using namespace onh;
+namespace onh {
 
 DB::DB(MYSQL *connDB):
-    conn(connDB)
-{
+	conn(connDB) {
 }
 
 DB::DB(const DB &rhs):
-    conn(rhs.conn)
-{
+	conn(rhs.conn) {
 }
 
-DB::~DB()
-{
+DB::~DB() {
 }
 
-bool DB::checkStringValue(std::string val)
-{
-    bool ret = true;
-    char c = 0;
+bool DB::checkStringValue(std::string val) {
+	bool ret = true;
+	char c = 0;
 
-    for (unsigned int i=0; i<val.size(); ++i) {
+	for (unsigned int i=0; i < val.size(); ++i) {
+		// Get one char
+		c = val[i];
 
-        // Get one char
-        c = val[i];
+		// Allow only 0-9, A-Z, a-z, _
+		if (!((c >= 48 && c <= 57) || (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c == 95))) {
+			// invalid character found
+			ret = false;
 
-        // Allow only 0-9, A-Z, a-z, _
-        if (!((c >= 48 && c <= 57)||(c >= 65 && c <= 90)||(c >= 97 && c <= 122)||(c == 95))) {
+			// stop the loop
+			break;
+		}
+	}
 
-            // invalid character found
-            ret = false;
-
-            // stop the loop
-            break;
-        }
-    }
-
-    return ret;
+	return ret;
 }
 
 DBResult* DB::executeQuery(const std::string &q) {
+	if (!conn)
+		throw DBException("Connection not initialized", "DB::executeQuery");
 
-    if (!conn)
-        throw DBException("Connection not initialized", "DB::executeQuery");
-
-    // Query
+	// Query
 	if (mysql_query(conn, q.c_str())) {
-        std::stringstream s;
-        s << "Error during query execute: " << mysql_error(conn);
-        throw DBException(s.str(), "DB::executeQuery");
+		std::stringstream s;
+		s << "Error during query execute: " << mysql_error(conn);
+		throw DBException(s.str(), "DB::executeQuery");
 	}
 
 	return new DBResult(conn);
 }
 
 void DB::executeSaveQuery(const std::string &q) {
+	if (!conn)
+		throw DBException("Connection not initialized", "DB::executeSaveQuery");
 
-    if (!conn)
-        throw DBException("Connection not initialized", "DB::executeSaveQuery");
-
-    // Query
+	// Query
 	if (mysql_query(conn, q.c_str())) {
-        std::stringstream s;
-        s << "Error during query execute: " << mysql_error(conn);
-        throw DBException(s.str(), "DB::executeSaveQuery");
+		std::stringstream s;
+		s << "Error during query execute: " << mysql_error(conn);
+		throw DBException(s.str(), "DB::executeSaveQuery");
 	}
 }
+
+}  // namespace onh

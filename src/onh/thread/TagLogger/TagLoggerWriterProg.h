@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_THREAD_TAGLOGGER_TAGLOGGERWRITERPROG_H_
-#define SRC_ONH_THREAD_TAGLOGGER_TAGLOGGERWRITERPROG_H_
+#ifndef ONH_THREAD_TAGLOGGER_TAGLOGGERWRITERPROG_H_
+#define ONH_THREAD_TAGLOGGER_TAGLOGGERWRITERPROG_H_
 
 #include "../../driver/ProcessReader.h"
 #include "../../utils/Delay.h"
@@ -28,66 +28,63 @@
 
 namespace onh {
 
-	/**
-	 * Tag logger writer program class
-	 */
-	class TagLoggerWriterProg: public ThreadProgram {
+/**
+ * Tag logger writer program class
+ */
+class TagLoggerWriterProg: public ThreadProgram {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param tldb Tag logger DB
+		 * @param tlbc Tag logger buffer controller
+		 * @param updateInterval Logger update interval (milliseconds)
+		 * @param gdcTED Thread exit data controller
+		 * @param gdcCTD Thread cycle time controller
+		 */
+		TagLoggerWriterProg(const TagLoggerDB& tldb,
+							const TagLoggerBufferController& tlbc,
+							unsigned int updateInterval,
+							const GuardDataController<ThreadExitData> &gdcTED,
+							const GuardDataController<CycleTimeData> &gdcCTD);
 
-		public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		TagLoggerWriterProg(const TagLoggerWriterProg&) = delete;
 
-			/**
-			 * Constructor
-			 *
-			 * @param tldb Tag logger DB
-			 * @param tlbc Tag logger buffer controller
-			 * @param updateInterval Logger update interval (milliseconds)
-			 * @param gdcTED Thread exit data controller
-             * @param gdcCTD Thread cycle time controller
-			 */
-			TagLoggerWriterProg(const TagLoggerDB& tldb,
-								const TagLoggerBufferController& tlbc,
-								unsigned int updateInterval,
-								const GuardDataController<ThreadExitData> &gdcTED,
-								const GuardDataController<CycleTimeData> &gdcCTD);
+		virtual ~TagLoggerWriterProg();
 
-			/**
-			 * Copy constructor - inactive
-			 */
-			TagLoggerWriterProg(const TagLoggerWriterProg&) = delete;
+		/**
+		 * Thread program function
+		 */
+		void operator()() override;
 
-			virtual ~TagLoggerWriterProg() override;
+		/**
+		 * Assignment operator - inactive
+		 */
+		TagLoggerWriterProg& operator=(const TagLoggerWriterProg&) = delete;
 
-			/**
-			 * Thread program function
-			 */
-			virtual void operator()() override;
+	private:
+		/// Tag Logger DB access
+		TagLoggerDB *db;
 
-			/**
-			 * Assignment operator - inactive
-			 */
-			TagLoggerWriterProg& operator=(const TagLoggerWriterProg&) = delete;
+		/// Tag logger buffer controller
+		TagLoggerBufferController *tagLoggerBuffer;
 
-		private:
+		/**
+		 * Get information that tag logger writer should stop working
+		 *
+		 * @return True if tag logger writer should stop working
+		 */
+		bool exitWriterProg();
 
-			/// Tag Logger DB access
-			TagLoggerDB *db;
+		/**
+		 * Write data from buffer to DB
+		 */
+		void writeDataToDB();
+};
 
-			/// Tag logger buffer controller
-			TagLoggerBufferController *tagLoggerBuffer;
+}  // namespace onh
 
-			/**
-			 * Get information that tag logger writer should stop working
-			 *
-			 * @return True if tag logger writer should stop working
-			 */
-			bool exitWriterProg();
-
-			/**
-			 * Write data from buffer to DB
-			 */
-			void writeDataToDB();
-	};
-
-}
-
-#endif /* SRC_ONH_THREAD_TAGLOGGER_TAGLOGGERWRITERPROG_H_ */
+#endif  // ONH_THREAD_TAGLOGGER_TAGLOGGERWRITERPROG_H_

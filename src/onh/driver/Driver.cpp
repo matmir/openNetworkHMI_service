@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,10 @@
 
 #include "Driver.h"
 
-using namespace onh;
+namespace onh {
 
 Driver::Driver(const std::string& logPrefix):
-	log(nullptr)
-{
+	log(nullptr) {
 	if (logPrefix == "")
 		throw DriverException("Driver::Driver: Logger prefix is empty");
 
@@ -32,15 +31,15 @@ Driver::Driver(const std::string& logPrefix):
 }
 
 Driver::~Driver() {
-
 	if (log)
 		delete log;
 }
 
 Logger& Driver::getLog() {
-
 	if (!log)
 		throw DriverException("Driver::getLog: Logger not initialized");
 
 	return *log;
 }
+
+}  // namespace onh

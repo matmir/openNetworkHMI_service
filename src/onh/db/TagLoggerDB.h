@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,68 +16,65 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TAGLOGGERDB_H
-#define TAGLOGGERDB_H
+#ifndef ONH_DB_TAGLOGGERDB_H_
+#define ONH_DB_TAGLOGGERDB_H_
 
+#include <vector>
 #include "objs/TagLoggerItem.h"
 #include "../driver/DriverRegisterTypes.h"
-#include <vector>
 #include "DB.h"
 
 namespace onh {
 
-    /// Forward declaration
-	class DBManager;
+/// Forward declaration
+class DBManager;
 
-    /**
-	 * Class for read/write Tag logger
-	 */
-    class TagLoggerDB: public DB {
+/**
+ * Class for read/write Tag logger
+ */
+class TagLoggerDB: public DB {
+	public:
+		friend class DBManager;
 
-        public:
+		/**
+		 * Copy constructor
+		 *
+		 * @param tlDB TagLoggerDB to copy
+		 */
+		TagLoggerDB(const TagLoggerDB &tlDB);
 
-            friend class DBManager;
+		virtual ~TagLoggerDB();
 
-            /**
-             * Copy constructor
-             *
-             * @param tlDB TagLoggerDB to copy
-             */
-            TagLoggerDB(const TagLoggerDB &tlDB);
+		/**
+		 * Assign operator - inactive
+		 */
+		TagLoggerDB& operator=(const TagLoggerDB&) = delete;
 
-            virtual ~TagLoggerDB();
+		/**
+		 * Get Tag logger items from DB
+		 *
+		 * @param enabled Get only enabled loggers
+		 *
+		 * @return Vector with Tag logger items
+		 */
+		std::vector<TagLoggerItem> getLoggers(bool enabled = true);
 
-            /**
-			 * Assign operator - inactive
-			 */
-            TagLoggerDB& operator=(const TagLoggerDB&) = delete;
+		/**
+		 * Write current tag value to the DB
+		 *
+		 * @param loggerItem Tag logger item object
+		 */
+		void logTag(const TagLoggerItem& loggerItem);
 
-            /**
-             * Get Tag logger items from DB
-             *
-             * @param enabled Get only enabled loggers
-             *
-             * @return Vector with Tag logger items
-             */
-            std::vector<TagLoggerItem> getLoggers(bool enabled=true);
+	private:
+		/**
+		 * Constructor with connection param (allowed only from DBManager)
+		 *
+		 * @param connection Connection handle
+		 */
+		explicit TagLoggerDB(MYSQL *connDB);
+};
 
-            /**
-			 * Write current tag value to the DB
-			 *
-			 * @param loggerItem Tag logger item object
-			 */
-			void logTag(const TagLoggerItem& loggerItem);
+}  // namespace onh
 
-        private:
-
-            /**
-             * Constructor with connection param (allowed only from DBManager)
-             *
-             * @param connection Connection handle
-             */
-            TagLoggerDB(MYSQL *connDB);
-    };
-
-}
-
-#endif // TAGLOGGERDB_H
+#endif  // ONH_DB_TAGLOGGERDB_H_

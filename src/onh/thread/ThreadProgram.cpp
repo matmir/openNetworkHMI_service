@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,44 +19,39 @@
 #include "ThreadProgram.h"
 #include "../utils/Exception.h"
 
-using namespace onh;
+namespace onh {
 
 ThreadProgram::ThreadProgram(const GuardDataController<ThreadExitData> &gdcTED,
 								const GuardDataController<CycleTimeData> &gdcCTD,
 								unsigned int updateInterval,
 								const std::string& dirName,
 								const std::string& fPrefix):
-	thDelay(updateInterval), thExitController(gdcTED), thCycleTimeController(gdcCTD)
-{
-    // Create logger
-    log = new Logger(dirName, fPrefix);
-    log->write("Initialize thread logger");
+	thDelay(updateInterval), thExitController(gdcTED), thCycleTimeController(gdcCTD) {
+	// Create logger
+	log = new Logger(dirName, fPrefix);
+	log->write("Initialize thread logger");
 }
 
-ThreadProgram::~ThreadProgram()
-{
-    if (log) {
-        log->write("Closing thread logger");
+ThreadProgram::~ThreadProgram() {
+	if (log) {
+		log->write("Closing thread logger");
 
-        delete log;
-    }
+		delete log;
+	}
 }
 
 void ThreadProgram::startCycleMeasure() {
-
-    thCycle.start();
+	thCycle.start();
 }
 
 void ThreadProgram::stopCycleMeasure() {
+	thCycle.stop();
 
-    thCycle.stop();
-
-    // Pass counted value to the cycle time controller
-    thCycleTimeController.setData(thCycle.getCycle());
+	// Pass counted value to the cycle time controller
+	thCycleTimeController.setData(thCycle.getCycle());
 }
 
 bool ThreadProgram::isExitFlag() {
-
 	ThreadExitData ex;
 	thExitController.getData(ex);
 
@@ -64,7 +59,6 @@ bool ThreadProgram::isExitFlag() {
 }
 
 void ThreadProgram::exit(const std::string& info) {
-
 	ThreadExitData ex;
 	ex.exit = true;
 	ex.additionalInfo = info;
@@ -74,7 +68,6 @@ void ThreadProgram::exit(const std::string& info) {
 }
 
 Logger& ThreadProgram::getLogger() {
-
 	if (!log)
 		throw Exception("Logger object does not exist", "ThreadProgram::getLogger");
 
@@ -82,16 +75,15 @@ Logger& ThreadProgram::getLogger() {
 }
 
 void ThreadProgram::threadWait() {
-
 	thDelay.wait();
 }
 
 void ThreadProgram::threadWaitStart() {
-
 	thDelay.startDelay();
 }
 
 void ThreadProgram::threadWaitAfterStart() {
-
 	thDelay.waitAfterStart();
 }
+
+}  // namespace onh

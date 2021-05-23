@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,159 +16,156 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_SHM_SHMPROCESSWRITER_H_
-#define SRC_ONH_DRIVER_SHM_SHMPROCESSWRITER_H_
+#ifndef ONH_DRIVER_SHM_SHMPROCESSWRITER_H_
+#define ONH_DRIVER_SHM_SHMPROCESSWRITER_H_
 
+#include <vector>
 #include "../DriverProcessWriter.h"
 #include "processData.h"
 #include "../../utils/MutexAccess.h"
 #include "sMemory.h"
-#include <vector>
 
 namespace onh {
 
-	/// Forward declaration
-	class ShmDriver;
+/// Forward declaration
+class ShmDriver;
 
-	/**
-	 * SHM driver process data writer class
-	 */
-	class ShmProcessWriter: public DriverProcessWriter {
+/**
+ * SHM driver process data writer class
+ */
+class ShmProcessWriter: public DriverProcessWriter {
+	public:
+		friend class ShmDriver;
 
-		public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ShmProcessWriter(const ShmProcessWriter&) = delete;
 
-			friend class ShmDriver;
+		virtual ~ShmProcessWriter();
 
-			/**
-			 * Copy constructor - inactive
-			 */
-			ShmProcessWriter(const ShmProcessWriter&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		ShmProcessWriter& operator=(const ShmProcessWriter&) = delete;
 
-			virtual ~ShmProcessWriter() override;
+		/**
+		 * Set bit in device process data
+		 *
+		 * @param addr Process data address
+		 */
+		void setBit(processDataAddress addr) override;
 
-			/**
-			 * Assign operator - inactive
-			 */
-			ShmProcessWriter& operator=(const ShmProcessWriter&) = delete;
+		/**
+		 * Reset bit in device process data
+		 *
+		 * @param addr Process data address
+		 */
+		void resetBit(processDataAddress addr) override;
 
-			/**
-			 * Set bit in device process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void setBit(processDataAddress addr) override;
+		/**
+		 * Invert bit in device process data
+		 *
+		 * @param addr Process data address
+		 */
+		void invertBit(processDataAddress addr) override;
 
-			/**
-			 * Reset bit in device process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void resetBit(processDataAddress addr) override;
+		/**
+		 * Set bits in device process data
+		 *
+		 * @param addr Process data address
+		 */
+		void setBits(std::vector<processDataAddress> addr) override;
 
-			/**
-			 * Invert bit in device process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void invertBit(processDataAddress addr) override;
+		/**
+		 * Write byte in device process data
+		 *
+		 * @param addr Process data address
+		 * @param val Value to write
+		 */
+		void writeByte(processDataAddress addr, BYTE val) override;
 
-			/**
-			 * Set bits in device process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void setBits(std::vector<processDataAddress> addr) override;
+		/**
+		 * Write word in device process data
+		 *
+		 * @param addr Process data address
+		 * @param val Value to write
+		 */
+		void writeWord(processDataAddress addr, WORD val) override;
 
-			/**
-			 * Write byte in device process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeByte(processDataAddress addr, BYTE val) override;
+		/**
+		 * Write double word in device process data
+		 *
+		 * @param addr Process data address
+		 * @param val Value to write
+		 */
+		void writeDWord(processDataAddress addr, DWORD val) override;
 
-			/**
-			 * Write word in device process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeWord(processDataAddress addr, WORD val) override;
+		/**
+		 * Write int in device process data
+		 *
+		 * @param addr Process data address
+		 * @param val Value to write
+		 */
+		void writeInt(processDataAddress addr, int val) override;
 
-			/**
-			 * Write double word in device process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeDWord(processDataAddress addr, DWORD val) override;
+		/**
+		 * Write real in device process data
+		 *
+		 * @param addr Process data address
+		 * @param val Value to write
+		 */
+		void writeReal(processDataAddress addr, float val) override;
 
-			/**
-			 * Write int in device process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeInt(processDataAddress addr, int val) override;
+		/**
+		 * Create new driver process writer
+		 *
+		 * @return Pointer to the new driver process writer
+		 */
+		DriverProcessWriter* createNew() override;
 
-			/**
-			 * Write real in device process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeReal(processDataAddress addr, float val) override;
+		/**
+		 * Send exit command to the server
+		 */
+		void sendServerExitCommand();
 
-			/**
-			 * Create new driver process writer
-			 *
-			 * @return Pointer to the new driver process writer
-			 */
-			virtual DriverProcessWriter* createNew() override;
+	private:
+		/**
+		 * Constructor with parameters (allowed only from ShmDriver)
+		 *
+		 * @param segmentName Shared memory segment name
+		 * @param smem SHM structure handle
+		 * @param lock Mutex for protecting driver
+		 */
+		ShmProcessWriter(const std::string& segmentName, sMemory *smem, const MutexAccess& lock);
 
-			/**
-			 * Send exit command to the server
-			 */
-			void sendServerExitCommand();
+		/// Shared memory segment name
+		std::string shmName;
 
-		private:
+		/// Shared memory structure handle
+		sMemory *shm;
 
-			/**
-			 * Constructor with parameters (allowed only from ShmDriver)
-			 *
-			 * @param segmentName Shared memory segment name
-			 * @param smem SHM structure handle
-			 * @param lock Mutex for protecting driver
-			 */
-			ShmProcessWriter(const std::string& segmentName, sMemory *smem, const MutexAccess& lock);
+		/// Mutex for protecting driver
+		MutexAccess driverLock;
 
-			/// Shared memory segment name
-			std::string shmName;
+		/**
+		 * Puts a request to server
+		 *
+		 * @param cmd The command
+		 *
+		 * @return Server reply command
+		 */
+		extCMD putRequest(extCMD cmd);
 
-			/// Shared memory structure handle
-			sMemory *shm;
+		/**
+		 * Modify bit in process memory
+		 *
+		 * @param addr The command
+		 * @param drvFunc Bit function
+		 */
+		void modifyBit(processDataAddress addr, int drvFunc);
+};
 
-			/// Mutex for protecting driver
-			MutexAccess driverLock;
+}  // namespace onh
 
-			/**
-			 * Puts a request to server
-			 *
-			 * @param cmd The command
-			 *
-			 * @return Server reply command
-			 */
-			extCMD putRequest(extCMD cmd);
-
-			/**
-			 * Modify bit in process memory
-			 *
-			 * @param addr The command
-			 * @param drvFunc Bit function
-			 */
-			void modifyBit(processDataAddress addr, int drvFunc);
-	};
-
-}
-
-#endif /* SRC_ONH_DRIVER_SHM_SHMPROCESSWRITER_H_ */
+#endif  // ONH_DRIVER_SHM_SHMPROCESSWRITER_H_

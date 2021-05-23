@@ -147,7 +147,7 @@ TEST(GuardDataControllerTests, GuardSHM1) {
 		ASSERT_EQ(pd2.getByte({onh::PDA_MEMORY, i, 0}), 0);
 	}
 
-	pd = shmPD;
+	pd = onh::ShmProcessData(shmPD);
 	c1.setData(pd);
 
 	c1.getData(pd1);

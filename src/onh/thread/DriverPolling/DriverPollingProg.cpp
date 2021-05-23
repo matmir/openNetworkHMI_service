@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,55 +23,50 @@
 #include "../../driver/DriverException.h"
 #include "../../utils/Exception.h"
 
-using namespace onh;
+namespace onh {
 
 DriverPollingProg::DriverPollingProg(const DriverBufferUpdater& dbu,
 										unsigned int connId,
 										unsigned int updateInterval,
 										const GuardDataController<ThreadExitData> &gdcTED,
 										const GuardDataController<CycleTimeData> &gdcCTD):
-    ThreadProgram(gdcTED, gdcCTD, updateInterval, "driver", "polling_"+std::to_string(connId)+"_")
-{
-    // Driver updater
-    drvUpdater = new DriverBufferUpdater(dbu);
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "driver", "polling_"+std::to_string(connId)+"_") {
+	// Driver updater
+	drvUpdater = new DriverBufferUpdater(dbu);
 }
 
-DriverPollingProg::~DriverPollingProg()
-{
-    if (drvUpdater)
-        delete drvUpdater;
+DriverPollingProg::~DriverPollingProg() {
+	if (drvUpdater)
+		delete drvUpdater;
 }
 
 
 void DriverPollingProg::operator()() {
+	try {
+		getLogger().write("Start main loop");
 
-    try {
+		if (!drvUpdater)
+			throw Exception("No driver updater object");
 
-    	getLogger().write("Start main loop");
+		while(!isExitFlag()) {
+			// Start thread cycle time measure
+			startCycleMeasure();
 
-        if (!drvUpdater)
-            throw Exception("No driver updater object");
+			// Read data from controller to buffer
+			drvUpdater->update();
 
-        while(!isExitFlag()) {
+			// Wait
+			threadWait();
 
-            // Start thread cycle time measure
-            startCycleMeasure();
+			// Stop thread cycle time measure
+			stopCycleMeasure();
+		}
+	} catch (Exception &e) {
+		getLogger().write(e.what());
 
-            // Read data from controller to buffer
-            drvUpdater->update();
-
-            // Wait
-            threadWait();
-
-            // Stop thread cycle time measure
-            stopCycleMeasure();
-        }
-
-    } catch (Exception &e) {
-
-    	getLogger().write(e.what());
-
-        // Exit application
-    	exit("Driver polling");
-    }
+		// Exit application
+		exit("Driver polling");
+	}
 }
+
+}  // namespace onh

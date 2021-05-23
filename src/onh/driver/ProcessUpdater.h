@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,57 +16,54 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROCESSUPDATER_H
-#define PROCESSUPDATER_H
+#ifndef ONH_DRIVER_PROCESSUPDATER_H_
+#define ONH_DRIVER_PROCESSUPDATER_H_
 
 #include "DriverProcessUpdater.h"
 
 namespace onh {
 
-    /// Forward declaration
-	class DriverManager;
+/// Forward declaration
+class DriverManager;
 
-	/**
-	 * Process updater class
-	 */
-    class ProcessUpdater {
+/**
+ * Process updater class
+ */
+class ProcessUpdater {
+	public:
+		friend class DriverManager;
 
-        public:
+		/**
+		 * Copy constructor
+		 *
+		 * @param pu ProcessUpdater to copy
+		 */
+		ProcessUpdater(const ProcessUpdater &pu);
 
-            friend class DriverManager;
+		virtual ~ProcessUpdater();
 
-            /**
-             * Copy constructor
-             *
-             * @param pu ProcessUpdater to copy
-             */
-            ProcessUpdater(const ProcessUpdater &pu);
+		/**
+		 * Assign operator - inactive
+		 */
+		ProcessUpdater& operator=(const ProcessUpdater&) = delete;
 
-            virtual ~ProcessUpdater();
+		/**
+		 * Update process data (read from controller)
+		 */
+		void update();
 
-            /**
-			 * Assign operator - inactive
-			 */
-            ProcessUpdater& operator=(const ProcessUpdater&) = delete;
+	private:
+		/**
+		 * Constructor with parameters (allowed only from ProcessManager)
+		 *
+		 * @param dpu Pointer to the driver process data updater
+		 */
+		explicit ProcessUpdater(DriverProcessUpdater *dpu);
 
-            /**
-             * Update process data (read from controller)
-             */
-            void update();
+		/// Driver process data updater
+		DriverProcessUpdater *driverUpdater;
+};
 
-        private:
+}  // namespace onh
 
-            /**
-             * Constructor with parameters (allowed only from ProcessManager)
-             *
-             * @param dpu Pointer to the driver process data updater
-             */
-            ProcessUpdater(DriverProcessUpdater *dpu);
-
-            /// Driver process data updater
-            DriverProcessUpdater *driverUpdater;
-    };
-
-}
-
-#endif // PROCESSUPDATER_H
+#endif  // ONH_DRIVER_PROCESSUPDATER_H_

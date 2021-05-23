@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,33 +16,31 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include "ModbusProcessWriter.h"
 #include "../DriverUtils.h"
 #include "ModbusUtils.h"
 #include "../DriverException.h"
-#include <iostream>
 
-using namespace onh;
+namespace onh {
 
 ModbusProcessWriter::ModbusProcessWriter(modbusM::ModbusMaster *mbus, const MutexAccess& lock, unsigned int maxBytes):
-	modbus(mbus), driverLock(lock), maxByteCount(maxBytes)
-{
+	modbus(mbus), driverLock(lock), maxByteCount(maxBytes) {
 }
 
 ModbusProcessWriter::~ModbusProcessWriter() {
 }
 
 void ModbusProcessWriter::setBit(processDataAddress addr) {
+	driverLock.lock();
 
-    driverLock.lock();
+	try {
+		// Check Modbus
+		if (!modbus) {
+			throw DriverException("Modbus protocol is not initialized", "ModbusProcessWriter::setBit");
+		}
 
-    try {
-    	// Check Modbus
-    	if (!modbus) {
-    		throw DriverException("Modbus protocol is not initialized", "ModbusProcessWriter::setBit");
-    	}
-
-    	// Check process address
+		// Check process address
 		ModbusUtils::checkProcessAddress(addr, maxByteCount, 0, true);
 
 		// Reg address
@@ -51,33 +49,31 @@ void ModbusProcessWriter::setBit(processDataAddress addr) {
 		// Modbus register
 		WORD reg = 0;
 
-        // Read current status of the register
-        modbus->READ_HOLDING_REGISTERS(regAddr, 1, &reg);
+		// Read current status of the register
+		modbus->READ_HOLDING_REGISTERS(regAddr, 1, &reg);
 
-        // Calculate bit position in WORD register
-        BYTE bitPos = (addr.byteAddr % 2)?(addr.bitAddr+8):(addr.bitAddr);
+		// Calculate bit position in WORD register
+		BYTE bitPos = (addr.byteAddr % 2)?(addr.bitAddr+8):(addr.bitAddr);
 
-        // Update register
-        reg |= (1 << bitPos);
+		// Update register
+		reg |= (1 << bitPos);
 
-        // Write register
-        modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
+		// Write register
+		modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
 
-        driverLock.unlock();
+		driverLock.unlock();
+	} catch (modbusM::ModbusException &e) {
+		driverLock.unlock();
 
-    } catch (modbusM::ModbusException &e) {
-    	driverLock.unlock();
+		throw DriverException(e.what(), "ModbusProcessWriter::setBit");
+	} catch (...) {
+		driverLock.unlock();
 
-        throw DriverException(e.what(), "ModbusProcessWriter::setBit");
-    } catch (...) {
-    	driverLock.unlock();
-
-    	throw;
-    }
+		throw;
+	}
 }
 
 void ModbusProcessWriter::resetBit(processDataAddress addr) {
-
 	driverLock.lock();
 
 	try {
@@ -95,33 +91,31 @@ void ModbusProcessWriter::resetBit(processDataAddress addr) {
 		// Modbus register
 		WORD reg = 0;
 
-        // Read current status of the register
-        modbus->READ_HOLDING_REGISTERS(regAddr, 1, &reg);
+		// Read current status of the register
+		modbus->READ_HOLDING_REGISTERS(regAddr, 1, &reg);
 
-        // Calculate bit position in WORD register
-        BYTE bitPos = (addr.byteAddr % 2)?(addr.bitAddr+8):(addr.bitAddr);
+		// Calculate bit position in WORD register
+		BYTE bitPos = (addr.byteAddr % 2)?(addr.bitAddr+8):(addr.bitAddr);
 
-        // Update register
-        reg &= ~(1 << bitPos);
+		// Update register
+		reg &= ~(1 << bitPos);
 
-        // Write register
-        modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
+		// Write register
+		modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
 
-        driverLock.unlock();
+		driverLock.unlock();
+	} catch (modbusM::ModbusException &e) {
+		driverLock.unlock();
 
-    } catch (modbusM::ModbusException &e) {
-    	driverLock.unlock();
+		throw DriverException(e.what(), "ModbusProcessWriter::resetBit");
+	} catch (...) {
+		driverLock.unlock();
 
-    	throw DriverException(e.what(), "ModbusProcessWriter::resetBit");
-    } catch (...) {
-    	driverLock.unlock();
-
-    	throw;
-    }
+		throw;
+	}
 }
 
 void ModbusProcessWriter::invertBit(processDataAddress addr) {
-
 	driverLock.lock();
 
 	try {
@@ -139,42 +133,38 @@ void ModbusProcessWriter::invertBit(processDataAddress addr) {
 		// Modbus register
 		WORD reg = 0;
 
-        // Read current status of the register
-        modbus->READ_HOLDING_REGISTERS(regAddr, 1, &reg);
+		// Read current status of the register
+		modbus->READ_HOLDING_REGISTERS(regAddr, 1, &reg);
 
-        // Calculate bit position in WORD register
-        BYTE bitPos = (addr.byteAddr % 2)?(addr.bitAddr+8):(addr.bitAddr);
+		// Calculate bit position in WORD register
+		BYTE bitPos = (addr.byteAddr % 2)?(addr.bitAddr+8):(addr.bitAddr);
 
-        // Update register
-        reg ^= (1 << bitPos);
+		// Update register
+		reg ^= (1 << bitPos);
 
-        // Write register
-        modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
+		// Write register
+		modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
 
-        driverLock.unlock();
+		driverLock.unlock();
+	} catch (modbusM::ModbusException &e) {
+		driverLock.unlock();
 
-    } catch (modbusM::ModbusException &e) {
-    	driverLock.unlock();
+		throw DriverException(e.what(), "ModbusProcessWriter::invertBit");
+	} catch (...) {
+		driverLock.unlock();
 
-    	throw DriverException(e.what(), "ModbusProcessWriter::invertBit");
-    } catch (...) {
-    	driverLock.unlock();
-
-    	throw;
-    }
+		throw;
+	}
 }
 
 void ModbusProcessWriter::setBits(std::vector<processDataAddress> addr) {
-
-    for (unsigned int i=0; i<addr.size(); ++i) {
-
-        // Set one bit
-        setBit(addr[i]);
-    }
+	for (unsigned int i=0; i < addr.size(); ++i) {
+		// Set one bit
+		setBit(addr[i]);
+	}
 }
 
 void ModbusProcessWriter::writeByte(processDataAddress addr, BYTE val) {
-
 	driverLock.lock();
 
 	try {
@@ -192,44 +182,42 @@ void ModbusProcessWriter::writeByte(processDataAddress addr, BYTE val) {
 		// Modbus register
 		WORD reg = 0;
 
-        // Read current status of the register
-        modbus->READ_HOLDING_REGISTERS(regAddr, 1, &reg);
+		// Read current status of the register
+		modbus->READ_HOLDING_REGISTERS(regAddr, 1, &reg);
 
-        // Low byte of the register
-        BYTE bLO = reg & 0x00FF;
-        // High byte of the register
-        BYTE bHI = (reg & 0xFF00) >> 8;
+		// Low byte of the register
+		BYTE bLO = reg & 0x00FF;
+		// High byte of the register
+		BYTE bHI = (reg & 0xFF00) >> 8;
 
-        // Update byte
-        if (addr.byteAddr % 2) {
-            bHI = val;
-        } else {
-            bLO = val;
-        }
+		// Update byte
+		if (addr.byteAddr % 2) {
+			bHI = val;
+		} else {
+			bLO = val;
+		}
 
-        // Update register
-        reg = bHI;
-        reg = reg << 8;
-        reg = (reg | bLO);
+		// Update register
+		reg = bHI;
+		reg = reg << 8;
+		reg = (reg | bLO);
 
-        // Write register
-        modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
+		// Write register
+		modbus->WRITE_SINGLE_REGISTER(regAddr, reg);
 
-        driverLock.unlock();
+		driverLock.unlock();
+	} catch (modbusM::ModbusException &e) {
+		driverLock.unlock();
 
-    } catch (modbusM::ModbusException &e) {
-    	driverLock.unlock();
+		throw DriverException(e.what(), "ModbusProcessWriter::writeByte");
+	} catch (...) {
+		driverLock.unlock();
 
-    	throw DriverException(e.what(), "ModbusProcessWriter::writeByte");
-    } catch (...) {
-    	driverLock.unlock();
-
-    	throw;
-    }
+		throw;
+	}
 }
 
 void ModbusProcessWriter::writeWord(processDataAddress addr, WORD val) {
-
 	driverLock.lock();
 
 	try {
@@ -256,7 +244,7 @@ void ModbusProcessWriter::writeWord(processDataAddress addr, WORD val) {
 		// Pointer to WORD value
 		WORD *pWord = nullptr;
 
-        // Read current status of the register
+		// Read current status of the register
 		if (regOverlap) {
 			modbus->READ_HOLDING_REGISTERS(regAddr, 2, reg);
 
@@ -276,26 +264,23 @@ void ModbusProcessWriter::writeWord(processDataAddress addr, WORD val) {
 			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
 
 		} else {
-
 			// Write register
 			modbus->WRITE_SINGLE_REGISTER(regAddr, val);
 		}
 
-        driverLock.unlock();
+		driverLock.unlock();
+	} catch (modbusM::ModbusException &e) {
+		driverLock.unlock();
 
-    } catch (modbusM::ModbusException &e) {
-    	driverLock.unlock();
+		throw DriverException(e.what(), "ModbusProcessWriter::writeWord");
+	} catch (...) {
+		driverLock.unlock();
 
-    	throw DriverException(e.what(), "ModbusProcessWriter::writeWord");
-    } catch (...) {
-    	driverLock.unlock();
-
-    	throw;
-    }
+		throw;
+	}
 }
 
 void ModbusProcessWriter::writeDWord(processDataAddress addr, DWORD val) {
-
 	driverLock.lock();
 
 	try {
@@ -342,7 +327,6 @@ void ModbusProcessWriter::writeDWord(processDataAddress addr, DWORD val) {
 			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 3, reg);
 
 		} else {
-
 			// Update registers
 			reg[0] = val & 0x0000FFFF;
 			reg[1] = ((val & 0xFFFF0000) >> 16);
@@ -351,21 +335,19 @@ void ModbusProcessWriter::writeDWord(processDataAddress addr, DWORD val) {
 			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
 		}
 
-        driverLock.unlock();
+		driverLock.unlock();
+	} catch (modbusM::ModbusException &e) {
+		driverLock.unlock();
 
-    } catch (modbusM::ModbusException &e) {
-    	driverLock.unlock();
+		throw DriverException(e.what(), "ModbusProcessWriter::writeDWord");
+	} catch (...) {
+		driverLock.unlock();
 
-    	throw DriverException(e.what(), "ModbusProcessWriter::writeDWord");
-    } catch (...) {
-    	driverLock.unlock();
-
-    	throw;
-    }
+		throw;
+	}
 }
 
 void ModbusProcessWriter::writeInt(processDataAddress addr, int val) {
-
 	driverLock.lock();
 
 	try {
@@ -412,7 +394,6 @@ void ModbusProcessWriter::writeInt(processDataAddress addr, int val) {
 			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 3, reg);
 
 		} else {
-
 			// Point to the register area
 			pInt = (int*)&reg[0];
 
@@ -423,21 +404,19 @@ void ModbusProcessWriter::writeInt(processDataAddress addr, int val) {
 			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
 		}
 
-        driverLock.unlock();
+		driverLock.unlock();
+	} catch (modbusM::ModbusException &e) {
+		driverLock.unlock();
 
-    } catch (modbusM::ModbusException &e) {
-    	driverLock.unlock();
+		throw DriverException(e.what(), "ModbusProcessWriter::writeInt");
+	} catch (...) {
+		driverLock.unlock();
 
-    	throw DriverException(e.what(), "ModbusProcessWriter::writeInt");
-    } catch (...) {
-    	driverLock.unlock();
-
-    	throw;
-    }
+		throw;
+	}
 }
 
 void ModbusProcessWriter::writeReal(processDataAddress addr, float val) {
-
 	driverLock.lock();
 
 	try {
@@ -484,7 +463,6 @@ void ModbusProcessWriter::writeReal(processDataAddress addr, float val) {
 			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 3, reg);
 
 		} else {
-
 			// Point to the register area
 			pFloat = (float*)&reg[0];
 
@@ -495,20 +473,20 @@ void ModbusProcessWriter::writeReal(processDataAddress addr, float val) {
 			modbus->WRITE_MULTIPLE_REGISTERS(regAddr, 2, reg);
 		}
 
-        driverLock.unlock();
+		driverLock.unlock();
+	} catch (modbusM::ModbusException &e) {
+		driverLock.unlock();
 
-    } catch (modbusM::ModbusException &e) {
-    	driverLock.unlock();
+		throw DriverException(e.what(), "ModbusProcessWriter::writeReal");
+	} catch (...) {
+		driverLock.unlock();
 
-    	throw DriverException(e.what(), "ModbusProcessWriter::writeReal");
-    } catch (...) {
-    	driverLock.unlock();
-
-    	throw;
-    }
+		throw;
+	}
 }
 
 DriverProcessWriter* ModbusProcessWriter::createNew() {
-
 	return new ModbusProcessWriter(modbus, driverLock, maxByteCount);
 }
+
+}   // namespace onh

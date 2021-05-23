@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCRIPTPROG_H
-#define SCRIPTPROG_H
+#ifndef ONH_THREAD_SCRIPT_SCRIPTPROG_H_
+#define ONH_THREAD_SCRIPT_SCRIPTPROG_H_
 
 #include "../../driver/ProcessReader.h"
 #include "../../driver/ProcessWriter.h"
@@ -27,75 +27,72 @@
 
 namespace onh {
 
-	/**
-	 * Script system program class
-	 */
-    class ScriptProg: public ThreadProgram {
+/**
+ * Script system program class
+ */
+class ScriptProg: public ThreadProgram {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param pr Process reader
+		 * @param pw Proces writer
+		 * @param sdb Script DB
+		 * @param updateInterval Script system update interval (milliseconds)
+		 * @param execScript Full path to the main execute script
+		 * @param tstEnv Test environment flag
+		 * @param gdcTED Thread exit data controller
+		 * @param gdcCTD Thread cycle time controller
+		 */
+		ScriptProg(const ProcessReader& pr,
+					const ProcessWriter& pw,
+					const ScriptDB& sdb,
+					unsigned int updateInterval,
+					const std::string& execScript,
+					bool tstEnv,
+					const GuardDataController<ThreadExitData> &gdcTED,
+					const GuardDataController<CycleTimeData> &gdcCTD);
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ScriptProg(const ScriptProg&) = delete;
 
-            /**
-             * Constructor
-             *
-             * @param pr Process reader
-             * @param pw Proces writer
-             * @param sdb Script DB
-             * @param updateInterval Script system update interval (milliseconds)
-             * @param execScript Full path to the main execute script
-             * @param tstEnv Test environment flag
-             * @param gdcTED Thread exit data controller
-             * @param gdcCTD Thread cycle time controller
-             */
-            ScriptProg(const ProcessReader& pr,
-						const ProcessWriter& pw,
-						const ScriptDB& sdb,
-						unsigned int updateInterval,
-						const std::string& execScript,
-						bool tstEnv,
-						const GuardDataController<ThreadExitData> &gdcTED,
-						const GuardDataController<CycleTimeData> &gdcCTD);
+		virtual ~ScriptProg();
 
-            /**
-			 * Copy constructor - inactive
-			 */
-            ScriptProg(const ScriptProg&) = delete;
+		/**
+		 * Thread program function
+		 */
+		void operator()() override;
 
-			virtual ~ScriptProg() override;
+		/**
+		 * Assignment operator - inactive
+		 */
+		ScriptProg& operator=(const ScriptProg&) = delete;
 
-			/**
-			 * Thread program function
-			 */
-			virtual void operator()() override;
+	private:
+		/// Handle for process reader object
+		ProcessReader* prReader;
 
-			/**
-			 * Assignment operator - inactive
-			 */
-			ScriptProg& operator=(const ScriptProg&) = delete;
+		/// Handle for process writer object
+		ProcessWriter* prWriter;
 
-        private:
+		/// Script DB access
+		ScriptDB *db;
 
-            /// Handle for process reader object
-            ProcessReader* prReader;
+		/// Full path to the main execute script
+		std::string executeScript;
 
-            /// Handle for process writer object
-            ProcessWriter* prWriter;
+		/// Flag informs that log (redirected script output) directory exist
+		bool dirReady;
 
-            /// Script DB access
-            ScriptDB *db;
+		/// Test environment flag
+		bool testEnv;
 
-            /// Full path to the main execute script
-            std::string executeScript;
+		/// Check scripts
+		void checkScripts();
+};
 
-            /// Flag informs that log (redirected script output) directory exist
-            bool dirReady;
+}  // namespace onh
 
-            /// Test environment flag
-            bool testEnv;
-
-            /// Check scripts
-            void checkScripts();
-    };
-
-}
-
-#endif // SCRIPTPROG_H
+#endif  // ONH_THREAD_SCRIPT_SCRIPTPROG_H_

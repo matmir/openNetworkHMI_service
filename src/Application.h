@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#ifndef APPLICATION_H_
+#define APPLICATION_H_
 
 #include "onh/driver/DriverManager.h"
 #include "onh/driver/SHM/ShmDriver.h"
@@ -30,80 +30,77 @@
 
 namespace onh {
 
-    /**
-	 * Application class
-	 */
-    class Application {
+/**
+ * Application class
+ */
+class Application {
+	public:
+		/**
+		 * Application constructor
+		 *
+		 * @param test Test environment flag
+		 */
+		explicit Application(bool test);
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		Application(const Application&) = delete;
 
-    		/**
-			 * Application constructor
-			 *
-			 * @param test Test environment flag
-			 */
-			Application(bool test);
+		virtual ~Application();
 
-    		/**
-			 * Copy constructor - inactive
-			 */
-    		Application(const Application&) = delete;
+		/**
+		 * Assignment operator - inactive
+		 */
+		Application& operator=(const Application&) = delete;
 
-            virtual ~Application();
+		/**
+		 * Start application
+		 *
+		 * @return Return value to the system
+		 */
+		int start();
 
-            /**
-			 * Assignment operator - inactive
-			 */
-            Application& operator=(const Application&) = delete;
+	private:
+		/**
+		 * Initialize database
+		 */
+		void initDB();
 
-            /**
-			 * Start application
-			 *
-			 * @return Return value to the system
-			 */
-			int start();
+		/**
+		 * Initialize driver
+		 */
+		void initDriver();
 
-        private:
+		/**
+		 * Initialize Thread manager
+		 */
+		void initThreadManager();
 
-            /**
-             * Initialize database
-             */
-            void initDB();
+		/**
+		 * Run all threads
+		 */
+		void runThreads();
 
-            /**
-             * Initialize driver
-             */
-            void initDriver();
+		/// Main program logger
+		Logger *log;
 
-            /**
-             * Initialize Thread manager
-             */
-            void initThreadManager();
+		/// Driver manager
+		DriverManager *drvManager;
 
-            /**
-             * Run all threads
-             */
-            void runThreads();
+		/// Thread manager
+		ThreadManager *thManager;
 
-            /// Main program logger
-            Logger *log;
+		/// Database manager
+		DBManager *dbManager;
 
-            /// Driver manager
-            DriverManager *drvManager;
+		/// Config DB access
+		Config *cfg;
 
-            /// Thread manager
-            ThreadManager *thManager;
+		/// Test environment flag
+		bool testEnv;
+};
 
-            /// Database manager
-            DBManager *dbManager;
+}  // namespace onh
 
-            /// Config DB access
-            Config *cfg;
-
-            /// Test environment flag
-            bool testEnv;
-    };
-
-}
-
-#endif // APPLICATION_H
+#endif  // APPLICATION_H_

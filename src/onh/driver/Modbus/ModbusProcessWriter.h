@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,137 +16,134 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_MODBUS_MODBUSPROCESSWRITER_H_
-#define SRC_ONH_DRIVER_MODBUS_MODBUSPROCESSWRITER_H_
+#ifndef ONH_DRIVER_MODBUS_MODBUSPROCESSWRITER_H_
+#define ONH_DRIVER_MODBUS_MODBUSPROCESSWRITER_H_
 
+#include <vector>
 #include "../DriverProcessWriter.h"
 #include "ModbusProcessData.h"
 #include "../../utils/MutexAccess.h"
 #include "modbusmaster.h"
-#include <vector>
 
 namespace onh {
 
-	/// Forward declaration
-	class ModbusDriver;
+/// Forward declaration
+class ModbusDriver;
 
-	/**
-	 * Modbus driver process data writer class
-	 */
-	class ModbusProcessWriter: public DriverProcessWriter {
+/**
+ * Modbus driver process data writer class
+ */
+class ModbusProcessWriter: public DriverProcessWriter {
+	public:
+		friend class ModbusDriver;
 
-		public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ModbusProcessWriter(const ModbusProcessWriter&) = delete;
 
-			friend class ModbusDriver;
+		virtual ~ModbusProcessWriter();
 
-			/**
-			 * Copy constructor - inactive
-			 */
-			ModbusProcessWriter(const ModbusProcessWriter&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		ModbusProcessWriter& operator=(const ModbusProcessWriter&) = delete;
 
-			virtual ~ModbusProcessWriter();
+		/**
+		 * Set bit in device process data
+		 *
+		 * @param addr Process data address
+		 */
+		void setBit(processDataAddress addr) override;
 
-			/**
-			 * Assign operator - inactive
-			 */
-			ModbusProcessWriter& operator=(const ModbusProcessWriter&) = delete;
+		/**
+		 * Reset bit in device process data
+		 *
+		 * @param addr Process data address
+		 */
+		void resetBit(processDataAddress addr) override;
 
-			/**
-			 * Set bit in device process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void setBit(processDataAddress addr) override;
+		/**
+		 * Invert bit in device process data
+		 *
+		 * @param addr Process data address
+		 */
+		void invertBit(processDataAddress addr) override;
 
-			/**
-			 * Reset bit in device process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void resetBit(processDataAddress addr) override;
+		/**
+		 * Set bits in device process data
+		 *
+		 * @param addr Process data address
+		 */
+		void setBits(std::vector<processDataAddress> addr) override;
 
-			/**
-			 * Invert bit in device process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void invertBit(processDataAddress addr) override;
+		/**
+		 * Write byte in device process data
+		 *
+		 * @param addr Process data address
+		 * @param val Value to write
+		 */
+		void writeByte(processDataAddress addr, BYTE val) override;
 
-			/**
-			 * Set bits in device process data
-			 *
-			 * @param addr Process data address
-			 */
-			virtual void setBits(std::vector<processDataAddress> addr) override;
+		/**
+		 * Write word in device process data
+		 *
+		 * @param addr Process data address
+		 * @param val Value to write
+		 */
+		void writeWord(processDataAddress addr, WORD val) override;
 
-			/**
-			 * Write byte in device process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeByte(processDataAddress addr, BYTE val) override;
+		/**
+		 * Write double word in device process data
+		 *
+		 * @param addr Process data address
+		 * @param val Value to write
+		 */
+		void writeDWord(processDataAddress addr, DWORD val) override;
 
-			/**
-			 * Write word in device process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeWord(processDataAddress addr, WORD val) override;
+		/**
+		 * Write int in device process data
+		 *
+		 * @param addr Process data address
+		 * @param val Value to write
+		 */
+		void writeInt(processDataAddress addr, int val) override;
 
-			/**
-			 * Write double word in device process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeDWord(processDataAddress addr, DWORD val) override;
+		/**
+		 * Write real in device process data
+		 *
+		 * @param addr Process data address
+		 * @param val Value to write
+		 */
+		void writeReal(processDataAddress addr, float val) override;
 
-			/**
-			 * Write int in device process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeInt(processDataAddress addr, int val) override;
+		/**
+		 * Create new driver process writer
+		 *
+		 * @return Pointer to the new driver process writer
+		 */
+		DriverProcessWriter* createNew() override;
 
-			/**
-			 * Write real in device process data
-			 *
-			 * @param addr Process data address
-			 * @param val Value to write
-			 */
-			virtual void writeReal(processDataAddress addr, float val) override;
+	private:
+		/**
+		 * Constructor with parameters (allowed only from ModbusDriver)
+		 *
+		 * @param mbus Modbus Master protocol handle
+		 * @param lock Mutex for protecting driver
+		 * @param maxBytes Maximum Byte address
+		 */
+		ModbusProcessWriter(modbusM::ModbusMaster *mbus, const MutexAccess& lock, unsigned int maxBytes);
 
-			/**
-			 * Create new driver process writer
-			 *
-			 * @return Pointer to the new driver process writer
-			 */
-			virtual DriverProcessWriter* createNew() override;
+		/// Modbus Master protocol handle
+		modbusM::ModbusMaster *modbus;
 
-		private:
+		/// Mutex for protecting driver
+		MutexAccess driverLock;
 
-			/**
-			 * Constructor with parameters (allowed only from ModbusDriver)
-			 *
-			 * @param mbus Modbus Master protocol handle
-			 * @param lock Mutex for protecting driver
-			 * @param maxBytes Maximum Byte address
-			 */
-			ModbusProcessWriter(modbusM::ModbusMaster *mbus, const MutexAccess& lock, unsigned int maxBytes);
+		/// Maximum Byte address
+		unsigned int maxByteCount;
+};
 
-			/// Modbus Master protocol handle
-			modbusM::ModbusMaster *modbus;
+}  // namespace onh
 
-			/// Mutex for protecting driver
-			MutexAccess driverLock;
-
-			/// Maximum Byte address
-			unsigned int maxByteCount;
-	};
-
-}
-
-#endif /* SRC_ONH_DRIVER_MODBUS_MODBUSPROCESSWRITER_H_ */
+#endif  // ONH_DRIVER_MODBUS_MODBUSPROCESSWRITER_H_

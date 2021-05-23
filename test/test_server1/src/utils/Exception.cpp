@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,30 +18,27 @@
 
 #include "Exception.h"
 
-using namespace onh;
+namespace onh {
 
 Exception::Exception():
-    errorMessage(""), functionName(""), allMessage("none")
-{
+	errorMessage(""), functionName(""), allMessage("none") {
 }
 
 Exception::Exception(const std::string& exceptionMSG):
-    errorMessage(exceptionMSG), functionName(""), allMessage(exceptionMSG)
-{
+	errorMessage(exceptionMSG), functionName(""), allMessage(exceptionMSG) {
 }
 
 Exception::Exception(const std::string& exceptionMSG, const std::string& funcName):
-    errorMessage(exceptionMSG), functionName(funcName)
-{
+	errorMessage(exceptionMSG), functionName(funcName) {
 	allMessage = functionName + ": ";
 	allMessage += errorMessage;
 }
 
-Exception::~Exception() noexcept
-{
+Exception::~Exception() noexcept {
 }
 
 const char* Exception::what() const noexcept {
-
-    return allMessage.c_str();
+	return allMessage.c_str();
 }
+
+}  // namespace onh

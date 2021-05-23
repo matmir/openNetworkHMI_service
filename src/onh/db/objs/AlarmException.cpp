@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,21 @@
 
 #include "AlarmException.h"
 
-using namespace onh;
+namespace onh {
 
 AlarmException::AlarmException():
-    Exception(), exType(ExceptionType::NONE)
-{
+	Exception(), exType(ExceptionType::NONE) {
 }
 
 AlarmException::AlarmException(ExceptionType type, const std::string& desc, const std::string& fName):
-    Exception(desc, fName), exType(type)
-{
+	Exception(desc, fName), exType(type) {
 }
 
-AlarmException::~AlarmException() noexcept
-{
+AlarmException::~AlarmException() noexcept {
 }
 
-AlarmException::ExceptionType AlarmException::getType() const
-{
-    return exType;
+AlarmException::ExceptionType AlarmException::getType() const {
+	return exType;
 }
+
+}  // namespace onh

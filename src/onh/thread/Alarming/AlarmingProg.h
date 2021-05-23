@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ALARMINGPROG_H
-#define ALARMINGPROG_H
+#ifndef ONH_THREAD_ALARMING_ALARMINGPROG_H_
+#define ONH_THREAD_ALARMING_ALARMINGPROG_H_
 
 #include "../../driver/ProcessReader.h"
 #include "../../driver/ProcessWriter.h"
@@ -27,59 +27,56 @@
 
 namespace onh {
 
-    class AlarmingProg: public ThreadProgram {
+class AlarmingProg: public ThreadProgram {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param pr Process reader
+		 * @param pw Process writer
+		 * @param adb Alarming DB
+		 * @param updateInterval Alarm update interval (milliseconds)
+		 * @param gdcTED Thread exit data controller
+		 * @param gdcCTD Thread cycle time controller
+		 */
+		AlarmingProg(const ProcessReader& pr,
+						const ProcessWriter& pw,
+						const AlarmingDB& adb,
+						unsigned int updateInterval,
+						const GuardDataController<ThreadExitData> &gdcTED,
+						const GuardDataController<CycleTimeData> &gdcCTD);
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		AlarmingProg(const AlarmingProg&) = delete;
 
-            /**
-             * Constructor
-             *
-             * @param pr Process reader
-             * @param pw Process writer
-             * @param adb Alarming DB
-             * @param updateInterval Alarm update interval (milliseconds)
-             * @param gdcTED Thread exit data controller
-             * @param gdcCTD Thread cycle time controller
-             */
-            AlarmingProg(const ProcessReader& pr,
-							const ProcessWriter& pw,
-							const AlarmingDB& adb,
-							unsigned int updateInterval,
-							const GuardDataController<ThreadExitData> &gdcTED,
-							const GuardDataController<CycleTimeData> &gdcCTD);
+		virtual ~AlarmingProg();
 
-            /**
-			 * Copy constructor - inactive
-			 */
-            AlarmingProg(const AlarmingProg&) = delete;
+		/**
+		 * Thread program function
+		 */
+		void operator()() override;
 
-            virtual ~AlarmingProg() override;
+		/**
+		 * Assignment operator - inactive
+		 */
+		AlarmingProg& operator=(const AlarmingProg&) = delete;
 
-            /**
-			 * Thread program function
-			 */
-			virtual void operator()() override;
+	private:
+		/// Handle for process reader object
+		ProcessReader* prReader;
 
-			/**
-			 * Assignment operator - inactive
-			 */
-			AlarmingProg& operator=(const AlarmingProg&) = delete;
+		/// Handle for process writer object
+		ProcessWriter* prWriter;
 
-        private:
+		/// Alarmin DB access
+		AlarmingDB *db;
 
-            /// Handle for process reader object
-            ProcessReader* prReader;
+		/// Check alarms
+		void checkAlarms();
+};
 
-            /// Handle for process writer object
-            ProcessWriter* prWriter;
+}  // namespace onh
 
-            /// Alarmin DB access
-            AlarmingDB *db;
-
-            /// Check alarms
-            void checkAlarms();
-    };
-
-}
-
-#endif // ALARMINGPROG_H
+#endif  // ONH_THREAD_ALARMING_ALARMINGPROG_H_

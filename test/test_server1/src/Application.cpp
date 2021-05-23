@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,14 +16,14 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Application.h"
-#include "utils/Delay.h"
 #include <iostream>
+
+#include "utils/Delay.h"
 #include "controlBits/serverControlBits_test.h"
+#include "Application.h"
 
 Application::Application(const std::string &smem, bool *exSignal):
-	shmServer(smem), exitProg(false), exitSignal(exSignal)
-{
+	shmServer(smem), exitProg(false), exitSignal(exSignal) {
 	// Create process data access
 	pda = new onh::processDataAccess(shmServer.getProcessAccess());
 }
@@ -34,16 +34,13 @@ Application::~Application() {
 }
 
 void Application::run() {
-
 	onh::Delay d(1);
 
 	// Create file informs that SHM is ready
 	system("touch shmInited");
 
 	while (!exitProg && !(*exitSignal)) {
-
 		try {
-
 			// Parse client commands
 			shmServer.parseClientCommand();
 
@@ -60,9 +57,7 @@ void Application::run() {
 			exitProg = shmServer.isExitFlag();
 
 			d.wait();
-
 		} catch(std::exception &e) {
-
 			exitProg = true;
 			std::cout << e.what() << std::endl;
 		}
@@ -79,7 +74,6 @@ void Application::run() {
 }
 
 void Application::checkControlBits() {
-
 	// Clear process data
 	if (pda->getBit(BIT_CLEAR_PROCESS)) {
 		shmServer.clearProcessData(true, false);
@@ -87,13 +81,10 @@ void Application::checkControlBits() {
 }
 
 void Application::tagLoggerSim() {
-
 	// Read simulation flag
 	if (pda->getBit(TEST_LOG_SIM1)) {
-
 		// Read logger data flag
 		if (pda->getBit(TEST_LOG_DATA1)) {
-
 			// BIT
 			pda->invertBit(TEST_LOG_BIT1);
 			pda->setBit(TEST_LOG_BIT2);
@@ -118,7 +109,6 @@ void Application::tagLoggerSim() {
 			pda->writeReal(TEST_LOG_REAL1, 3.78);
 			pda->writeReal(TEST_LOG_REAL2, 2.15);
 		} else {
-
 			// BIT
 			pda->invertBit(TEST_LOG_BIT1);
 			pda->resetBit(TEST_LOG_BIT2);

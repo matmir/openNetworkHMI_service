@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROCESSUPDATERPROG_H
-#define PROCESSUPDATERPROG_H
+#ifndef ONH_THREAD_PROCESSUPDATER_PROCESSUPDATERPROG_H_
+#define ONH_THREAD_PROCESSUPDATER_PROCESSUPDATERPROG_H_
 
 #include "../../driver/ProcessUpdater.h"
 #include "../../utils/Delay.h"
@@ -25,50 +25,48 @@
 
 namespace onh {
 
-    /**
-	 * Process data updater program class
-	 */
-    class ProcessUpdaterProg: public ThreadProgram {
+/**
+ * Process data updater program class
+ */
+class ProcessUpdaterProg: public ThreadProgram {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param pru Process updater
+		 * @param connId Driver connection identifier
+		 * @param updateInterval Process update interval (milliseconds)
+		 * @param gdcTED Thread exit data controller
+		 * @param gdcCTD Thread cycle time controller
+		 */
+		ProcessUpdaterProg(const ProcessUpdater& pru,
+							unsigned int connId,
+							unsigned int updateInterval,
+							const GuardDataController<ThreadExitData> &gdcTED,
+							const GuardDataController<CycleTimeData> &gdcCTD);
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ProcessUpdaterProg(const ProcessUpdaterProg&) = delete;
 
-            /**
-             * Constructor
-             *
-             * @param pru Process updater
-             * @param connId Driver connection identifier
-             * @param updateInterval Process update interval (milliseconds)
-             * @param gdcTED Thread exit data controller
-             * @param gdcCTD Thread cycle time controller
-             */
-            ProcessUpdaterProg(const ProcessUpdater& pru,
-            					unsigned int connId,
-            					unsigned int updateInterval,
-								const GuardDataController<ThreadExitData> &gdcTED,
-								const GuardDataController<CycleTimeData> &gdcCTD);
+		virtual ~ProcessUpdaterProg();
 
-            /**
-             * Copy constructor - inactive
-             */
-            ProcessUpdaterProg(const ProcessUpdaterProg&) = delete;
+		/**
+		 * Thread program function
+		 */
+		void operator()() override;
 
-            virtual ~ProcessUpdaterProg() override;
+		/**
+		 * Assignment operator - inactive
+		 */
+		ProcessUpdaterProg& operator=(const ProcessUpdaterProg&) = delete;
 
-            /**
-			 * Thread program function
-			 */
-			virtual void operator()() override;
+	private:
+		/// Handle for process updater object
+		ProcessUpdater* prUpdater;
+};
 
-			/**
-			 * Assignment operator - inactive
-			 */
-			ProcessUpdaterProg& operator=(const ProcessUpdaterProg&) = delete;
+}  // namespace onh
 
-        private:
-
-            /// Handle for process updater object
-            ProcessUpdater* prUpdater;
-    };
-}
-
-#endif // PROCESSUPDATERPROG_H
+#endif  // ONH_THREAD_PROCESSUPDATER_PROCESSUPDATERPROG_H_

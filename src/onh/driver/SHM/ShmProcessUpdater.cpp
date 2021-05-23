@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,22 +22,22 @@
 #include <unistd.h>
 #include "../DriverException.h"
 
-using namespace onh;
+namespace onh {
 
-ShmProcessUpdater::ShmProcessUpdater(const std::string& segmentName, sMemory *smem, const GuardDataController<ShmProcessData> &gdc, const MutexAccess& lock):
-	shmName(segmentName), shm(smem), process(gdc), driverLock(lock)
-{
+ShmProcessUpdater::ShmProcessUpdater(const std::string& segmentName,
+										sMemory *smem,
+										const GuardDataController<ShmProcessData> &gdc,
+										const MutexAccess& lock):
+	shmName(segmentName), shm(smem), process(gdc), driverLock(lock) {
 }
 
 ShmProcessUpdater::~ShmProcessUpdater() {
 }
 
 void ShmProcessUpdater::updateProcessData() {
-
 	driverLock.lock();
 
 	try {
-
 		// Check SHM
 		if (shm == MAP_FAILED || shm == 0) {
 			throw DriverException("SHM ("+shmName+") is not initialized", "ShmProcessUpdater::updateProcessData");
@@ -49,7 +49,7 @@ void ShmProcessUpdater::updateProcessData() {
 		}
 
 		// Copy process data
-		process.setData(shm->process.procDT);
+		process.setData(ShmProcessData(shm->process.procDT));
 
 		// Unlock process mutex
 		if (pthread_mutex_unlock(&shm->process.processMutex) != 0) {
@@ -57,7 +57,6 @@ void ShmProcessUpdater::updateProcessData() {
 		}
 
 		driverLock.unlock();
-
 	} catch(...) {
 		// Unlock access to the driver
 		driverLock.unlock();
@@ -68,6 +67,7 @@ void ShmProcessUpdater::updateProcessData() {
 }
 
 DriverProcessUpdater* ShmProcessUpdater::createNew() {
-
 	return new ShmProcessUpdater(shmName, shm, process, driverLock);
 }
+
+}  // namespace onh

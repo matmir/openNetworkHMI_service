@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,12 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AlarmingProg.h"
-
 #include <sstream>
+#include "AlarmingProg.h"
 #include "../../utils/Exception.h"
 #include "../../db/AlarmingDB.h"
 
-using namespace onh;
+namespace onh {
 
 AlarmingProg::AlarmingProg(const ProcessReader& pr,
 							const ProcessWriter& pw,
@@ -30,185 +29,165 @@ AlarmingProg::AlarmingProg(const ProcessReader& pr,
 							unsigned int updateInterval,
 							const GuardDataController<ThreadExitData> &gdcTED,
 							const GuardDataController<CycleTimeData> &gdcCTD):
-    ThreadProgram(gdcTED, gdcCTD, updateInterval, "alarming", "alarmLog_")
-{
-    // Process Reader
-    prReader = new ProcessReader(pr);
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "alarming", "alarmLog_") {
+	// Process Reader
+	prReader = new ProcessReader(pr);
 
-    // Process Writer
-    prWriter = new ProcessWriter(pw);
+	// Process Writer
+	prWriter = new ProcessWriter(pw);
 
-    // Create Alarming DB
-    db = new AlarmingDB(adb);
+	// Create Alarming DB
+	db = new AlarmingDB(adb);
 }
 
-AlarmingProg::~AlarmingProg()
-{
-    if (prReader)
-        delete prReader;
-    if (prWriter)
-        delete prWriter;
-    if (db)
-        delete db;
+AlarmingProg::~AlarmingProg() {
+	if (prReader)
+		delete prReader;
+	if (prWriter)
+		delete prWriter;
+	if (db)
+		delete db;
 
-    getLogger().write("Alarming close");
+	getLogger().write("Alarming close");
 }
 
 void AlarmingProg::operator()() {
+	try {
+		getLogger().write("Start main loop");
 
-    try {
+		if (!prReader)
+			throw Exception("No reader object");
 
-    	getLogger().write("Start main loop");
+		if (!prWriter)
+			throw Exception("No writer object");
 
-        if (!prReader)
-            throw Exception("No reader object");
+		while(!isExitFlag()) {
+			// Start thread cycle time measure
+			startCycleMeasure();
 
-        if (!prWriter)
-            throw Exception("No writer object");
+			// Update process reader
+			prReader->updateProcessData();
 
-        while(!isExitFlag()) {
+			// Check alarms
+			checkAlarms();
 
-            // Start thread cycle time measure
-            startCycleMeasure();
+			// Wait
+			threadWait();
 
-            // Update process reader
-            prReader->updateProcessData();
+			// Stop thread cycle time measure
+			stopCycleMeasure();
+		}
+	} catch (Exception &e) {
+		std::stringstream s;
+		s << "AlarmingProg::run: " << e.what();
+		getLogger().write(s.str());
 
-            // Check alarms
-            checkAlarms();
-
-            // Wait
-            threadWait();
-
-            // Stop thread cycle time measure
-            stopCycleMeasure();
-        }
-
-    } catch (Exception &e) {
-
-        std::stringstream s;
-        s << "AlarmingProg::run: " << e.what();
-        getLogger().write(s.str());
-
-        // Exit application
-        exit("Alarming system");
-    }
+		// Exit application
+		exit("Alarming system");
+	}
 }
 
 void AlarmingProg::checkAlarms() {
+	// Get alarms
+	std::vector<AlarmDefinitionItem> ad = db->getAlarms();
 
-    // Get alarms
-    std::vector<AlarmDefinitionItem> ad = db->getAlarms();
+	// Alarm state - trigger return
+	AlarmDefinitionItem::triggerRet tr;
 
-    // Alarm state - trigger return
-    AlarmDefinitionItem::triggerRet tr;
+	for (unsigned int i=0; i < ad.size(); ++i) {
+		// Check tag type
+		if (ad[i].getTag().getType() == TT_BIT) {
+			// Get tag value
+			bool tv = prReader->getBitValue(ad[i].getTag());
 
-    for (unsigned int i=0; i<ad.size(); ++i) {
+			// Check alarm state
+			tr = ad[i].checkTrigger(tv);
 
-        // Check tag type
-        if (ad[i].getTag().getType() == TT_BIT) {
+		} else if (ad[i].getTag().getType() == TT_BYTE) {
+			// Get tag value
+			BYTE tv = prReader->getByte(ad[i].getTag());
 
-            // Get tag value
-            bool tv = prReader->getBitValue(ad[i].getTag());
+			// Check alarm state
+			tr = ad[i].checkTrigger(tv);
 
-            // Check alarm state
-            tr = ad[i].checkTrigger(tv);
+		} else if (ad[i].getTag().getType() == TT_WORD) {
+			// Get tag value
+			WORD tv = prReader->getWord(ad[i].getTag());
 
-        } else if (ad[i].getTag().getType() == TT_BYTE) {
+			// Check alarm state
+			tr = ad[i].checkTrigger(tv);
 
-            // Get tag value
-            BYTE tv = prReader->getByte(ad[i].getTag());
+		} else if (ad[i].getTag().getType() == TT_DWORD) {
+			// Get tag value
+			DWORD tv = prReader->getDWord(ad[i].getTag());
 
-            // Check alarm state
-            tr = ad[i].checkTrigger(tv);
+			// Check alarm state
+			tr = ad[i].checkTrigger(tv);
 
-        } else if (ad[i].getTag().getType() == TT_WORD) {
+		} else if (ad[i].getTag().getType() == TT_INT) {
+			// Get tag value
+			int tv = prReader->getInt(ad[i].getTag());
 
-            // Get tag value
-            WORD tv = prReader->getWord(ad[i].getTag());
+			// Check alarm state
+			tr = ad[i].checkTrigger(tv);
 
-            // Check alarm state
-            tr = ad[i].checkTrigger(tv);
+		} else if (ad[i].getTag().getType() == TT_REAL) {
+			// Get tag value
+			float tv = prReader->getReal(ad[i].getTag());
 
-        } else if (ad[i].getTag().getType() == TT_DWORD) {
+			// Check alarm state
+			tr = ad[i].checkTrigger(tv);
+		}
 
-            // Get tag value
-            DWORD tv = prReader->getDWord(ad[i].getTag());
+		if (tr.trigger) {
+			// Set alarm
+			db->setAlarm(ad[i]);
 
-            // Check alarm state
-            tr = ad[i].checkTrigger(tv);
+		} else if (tr.activeUpdate) {
+			// Update alarm state
+			db->updateAlarmState(ad[i], tr.active);
+		}
 
-        } else if (ad[i].getTag().getType() == TT_INT) {
+		// Feedback Tags
+		if (ad[i].isPending()) {
+			try {
+				// Set bit informs controller that alarm is not acknowledgment
+				if (!prReader->getBitValue(ad[i].getFeedbackNotAckTag())) {
+					prWriter->setBit(ad[i].getFeedbackNotAckTag());
+				}
+			} catch (AlarmException &e) {
+				if (e.getType() != AlarmException::ExceptionType::NO_FEEDBACK_NOT_ACK_TAG) {
+					// Re-throw exception
+					throw;
+				}
+			}
 
-            // Get tag value
-            int tv = prReader->getInt(ad[i].getTag());
+			try {
+				// HW alarm acknowledgment
+				if (prReader->getBitValue(ad[i].getHWAckTag())) {
+					db->ackAlarm(ad[i].getId());
+				}
+			} catch (AlarmException &e) {
+				if (e.getType() != AlarmException::ExceptionType::NO_HW_ACK_TAG) {
+					// Re-throw exception
+					throw;
+				}
+			}
 
-            // Check alarm state
-            tr = ad[i].checkTrigger(tv);
-
-        } else if (ad[i].getTag().getType() == TT_REAL) {
-
-            // Get tag value
-            float tv = prReader->getReal(ad[i].getTag());
-
-            // Check alarm state
-            tr = ad[i].checkTrigger(tv);
-
-        }
-
-        if (tr.trigger) {
-            // Set alarm
-            db->setAlarm(ad[i]);
-
-        } else if (tr.activeUpdate) {
-            // Update alarm state
-            db->updateAlarmState(ad[i], tr.active);
-        }
-
-        // Feedback Tags
-        if (ad[i].isPending()) {
-
-            try {
-                // Set bit informs controller that alarm is not acknowledgment
-                if (!prReader->getBitValue(ad[i].getFeedbackNotAckTag())) {
-                    prWriter->setBit(ad[i].getFeedbackNotAckTag());
-                }
-
-            } catch (AlarmException &e) {
-                if (e.getType() != AlarmException::ExceptionType::NO_FEEDBACK_NOT_ACK_TAG) {
-                    // Re-throw exception
-                    throw;
-                }
-            }
-
-            try {
-                // HW alarm acknowledgment
-                if (prReader->getBitValue(ad[i].getHWAckTag())) {
-                    db->ackAlarm(ad[i].getId());
-                }
-            } catch (AlarmException &e) {
-                if (e.getType() != AlarmException::ExceptionType::NO_HW_ACK_TAG) {
-                    // Re-throw exception
-                    throw;
-                }
-            }
-
-        } else {
-
-            try {
-                // Reset bit informs controller that alarm is not acknowledgment
-                if (prReader->getBitValue(ad[i].getFeedbackNotAckTag())) {
-                    prWriter->resetBit(ad[i].getFeedbackNotAckTag());
-                }
-
-            } catch (AlarmException &e) {
-                if (e.getType() != AlarmException::ExceptionType::NO_FEEDBACK_NOT_ACK_TAG) {
-                    // Re-throw exception
-                    throw;
-                }
-            }
-
-        }
-
-    }
+		} else {
+			try {
+				// Reset bit informs controller that alarm is not acknowledgment
+				if (prReader->getBitValue(ad[i].getFeedbackNotAckTag())) {
+					prWriter->resetBit(ad[i].getFeedbackNotAckTag());
+				}
+			} catch (AlarmException &e) {
+				if (e.getType() != AlarmException::ExceptionType::NO_FEEDBACK_NOT_ACK_TAG) {
+					// Re-throw exception
+					throw;
+				}
+			}
+		}
+	}
 }
+
+}  // namespace onh

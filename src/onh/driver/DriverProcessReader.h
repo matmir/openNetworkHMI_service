@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_DRIVERPROCESSREADER_H_
-#define SRC_ONH_DRIVER_DRIVERPROCESSREADER_H_
+#ifndef ONH_DRIVER_DRIVERPROCESSREADER_H_
+#define ONH_DRIVER_DRIVERPROCESSREADER_H_
 
 #include <vector>
 #include "DriverRegisterTypes.h"
@@ -25,92 +25,90 @@
 
 namespace onh {
 
-	/**
-	 * Base driver process data reader class
-	 */
-	class DriverProcessReader {
+/**
+ * Base driver process data reader class
+ */
+class DriverProcessReader {
+	public:
+		DriverProcessReader();
+		virtual ~DriverProcessReader();
 
-		public:
+		/**
+		 * Get bit value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Bit value
+		 */
+		virtual bool getBitValue(processDataAddress addr) = 0;
 
-			DriverProcessReader();
-			virtual ~DriverProcessReader();
+		/**
+		 * Get bits value from process data
+		 *
+		 * @param addr Process data addresses
+		 *
+		 * @return Bits values
+		 */
+		virtual std::vector<bool> getBitsValue(std::vector<processDataAddress> addr) = 0;
 
-			/**
-			 * Get bit value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Bit value
-			 */
-			virtual bool getBitValue(processDataAddress addr) = 0;
+		/**
+		 * Get byte value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Byte value
+		 */
+		virtual BYTE getByte(processDataAddress addr) = 0;
 
-			/**
-			 * Get bits value from process data
-			 *
-			 * @param addr Process data addresses
-			 *
-			 * @return Bits values
-			 */
-			virtual std::vector<bool> getBitsValue(std::vector<processDataAddress> addr) = 0;
+		/**
+		 * Get word value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Word value
+		 */
+		virtual WORD getWord(processDataAddress addr) = 0;
 
-			/**
-			 * Get byte value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Byte value
-			 */
-			virtual BYTE getByte(processDataAddress addr) = 0;
+		/**
+		 * Get double word value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Double word value
+		 */
+		virtual DWORD getDWord(processDataAddress addr) = 0;
 
-			/**
-			 * Get word value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Word value
-			 */
-			virtual WORD getWord(processDataAddress addr) = 0;
+		/**
+		 * Get int value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Int value
+		 */
+		virtual int getInt(processDataAddress addr) = 0;
 
-			/**
-			 * Get double word value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Double word value
-			 */
-			virtual DWORD getDWord(processDataAddress addr) = 0;
+		/**
+		 * Get real value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Real value
+		 */
+		virtual float getReal(processDataAddress addr) = 0;
 
-			/**
-			 * Get int value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Int value
-			 */
-			virtual int getInt(processDataAddress addr) = 0;
+		/**
+		 * Update reader process data (copy from driver)
+		 */
+		virtual void updateProcessData() = 0;
 
-			/**
-			 * Get real value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Real value
-			 */
-			virtual float getReal(processDataAddress addr) = 0;
+		/**
+		 * Create new driver process reader
+		 *
+		 * @return Pointer to the new driver process reader
+		 */
+		virtual DriverProcessReader* createNew() = 0;
+};
 
-			/**
-			 * Update reader process data (copy from driver)
-			 */
-			virtual void updateProcessData() = 0;
+}  // namespace onh
 
-			/**
-			 * Create new driver process reader
-			 *
-			 * @return Pointer to the new driver process reader
-			 */
-			virtual DriverProcessReader* createNew() = 0;
-	};
-
-}
-
-#endif /* SRC_ONH_DRIVER_DRIVERPROCESSREADER_H_ */
+#endif  // ONH_DRIVER_DRIVERPROCESSREADER_H_

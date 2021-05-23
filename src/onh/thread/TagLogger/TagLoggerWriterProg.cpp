@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,14 @@
 
 #include "TagLoggerWriterProg.h"
 
-using namespace onh;
+namespace onh {
 
 TagLoggerWriterProg::TagLoggerWriterProg(const TagLoggerDB& tldb,
 											const TagLoggerBufferController& tlbc,
 											unsigned int updateInterval,
 											const GuardDataController<ThreadExitData> &gdcTED,
 											const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(gdcTED, gdcCTD, updateInterval, "taglogger", "tagLogWriter_")
-{
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "taglogger", "tagLogWriter_") {
 	// Create DB access
 	db = new TagLoggerDB(tldb);
 
@@ -35,7 +34,6 @@ TagLoggerWriterProg::TagLoggerWriterProg(const TagLoggerDB& tldb,
 }
 
 TagLoggerWriterProg::~TagLoggerWriterProg() {
-
 	if (db)
 		delete db;
 
@@ -46,52 +44,44 @@ TagLoggerWriterProg::~TagLoggerWriterProg() {
 }
 
 void TagLoggerWriterProg::operator()() {
+	try {
+		getLogger().write("Start main loop");
 
-    try {
-
-    	getLogger().write("Start main loop");
-
-    	if (!db)
+		if (!db)
 			throw Exception("No db object");
 
 		if (!tagLoggerBuffer)
 			throw Exception("No buffer object");
 
 		// Run until tag logger thread is working or buffer has data
-        while(!exitWriterProg()) {
+		while(!exitWriterProg()) {
+			// Start thread cycle time measure
+			startCycleMeasure();
 
-            // Start thread cycle time measure
-            startCycleMeasure();
+			// Write data to DB
+			writeDataToDB();
 
-            // Write data to DB
-            writeDataToDB();
+			// Wait
+			threadWait();
 
-            // Wait
-            threadWait();
+			// Stop thread cycle time measure
+			stopCycleMeasure();
+		}
+	} catch (Exception &e) {
+		getLogger().write(e.what());
 
-            // Stop thread cycle time measure
-            stopCycleMeasure();
-        }
-
-    } catch (Exception &e) {
-
-    	getLogger().write(e.what());
-
-        // Exit application
-    	exit("Tag logger writer");
-    }
+		// Exit application
+		exit("Tag logger writer");
+	}
 }
 
 bool TagLoggerWriterProg::exitWriterProg() {
-
 	bool ret = false;
 
 	// Check exit thread flag
 	if (isExitFlag()) {
-
 		// Check tag logger finish flag and data count
 		if (tagLoggerBuffer->isFinished() && tagLoggerBuffer->isEmpty()) {
-
 			ret = true;
 		}
 	}
@@ -100,16 +90,16 @@ bool TagLoggerWriterProg::exitWriterProg() {
 }
 
 void TagLoggerWriterProg::writeDataToDB() {
-
 	// Vector with loggers to save in DB
 	std::vector<TagLoggerItem> tagLogger;
 
 	// Read data from buffer
 	tagLoggerBuffer->getData(tagLogger);
 
-	for (unsigned int i=0; i<tagLogger.size(); ++i) {
-
+	for (unsigned int i=0; i < tagLogger.size(); ++i) {
 		// Write to DB
 		db->logTag(tagLogger[i]);
 	}
 }
+
+}  // namespace onh

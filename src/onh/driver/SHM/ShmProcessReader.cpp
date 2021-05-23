@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +20,10 @@
 #include "../DriverUtils.h"
 #include "../DriverException.h"
 
-using namespace onh;
+namespace onh {
 
 ShmProcessReader::ShmProcessReader(const GuardDataController<ShmProcessData>& gdc):
-	driverProcess(gdc)
-{
+	driverProcess(gdc) {
 	updateProcessData();
 }
 
@@ -32,47 +31,40 @@ ShmProcessReader::~ShmProcessReader() {
 }
 
 bool ShmProcessReader::getBitValue(processDataAddress addr) {
-
-    return process.getBit(addr);
+	return process.getBit(addr);
 }
 
 std::vector<bool> ShmProcessReader::getBitsValue(std::vector<processDataAddress> addr) {
-
-    return process.getBits(addr);
+	return process.getBits(addr);
 }
 
 BYTE ShmProcessReader::getByte(processDataAddress addr) {
-
-    return process.getByte(addr);
+	return process.getByte(addr);
 }
 
 WORD ShmProcessReader::getWord(processDataAddress addr) {
-
-    return process.getWord(addr);
+	return process.getWord(addr);
 }
 
 DWORD ShmProcessReader::getDWord(processDataAddress addr) {
-
-    return process.getDWord(addr);
+	return process.getDWord(addr);
 }
 
 int ShmProcessReader::getInt(processDataAddress addr) {
-
-    return process.getInt(addr);
+	return process.getInt(addr);
 }
 
 float ShmProcessReader::getReal(processDataAddress addr) {
-
-    return process.getReal(addr);
+	return process.getReal(addr);
 }
 
 void ShmProcessReader::updateProcessData() {
-
 	// Copy data from driver
 	driverProcess.getData(process);
 }
 
 DriverProcessReader* ShmProcessReader::createNew() {
-
 	return new ShmProcessReader(driverProcess);
 }
+
+}  // namespace onh

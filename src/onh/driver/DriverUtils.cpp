@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,12 @@
 #include "DriverUtils.h"
 #include "DriverException.h"
 
-using namespace onh;
+namespace onh {
 
 void DriverUtils::checkBitAddress(processDataAddress addr) {
-
-    if (addr.bitAddr > 7) {
-        throw DriverException("DriverUtils::checkBitAddress: Wrong bit address");
-    }
+	if (addr.bitAddr > 7) {
+		throw DriverException("DriverUtils::checkBitAddress: Wrong bit address");
+	}
 }
+
+}  // namespace onh

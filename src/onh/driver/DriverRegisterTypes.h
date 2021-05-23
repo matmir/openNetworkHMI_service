@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DRIVER_REGISTER_TYPES
-#define DRIVER_REGISTER_TYPES
+#ifndef ONH_DRIVER_DRIVERREGISTERTYPES_H_
+#define ONH_DRIVER_DRIVERREGISTERTYPES_H_
 
 #include <stdint.h>
 
@@ -26,4 +26,4 @@ typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 
-#endif
+#endif  // ONH_DRIVER_DRIVERREGISTERTYPES_H_

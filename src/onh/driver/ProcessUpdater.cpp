@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,27 +18,25 @@
 
 #include "ProcessUpdater.h"
 
-using namespace onh;
+namespace onh {
 
-ProcessUpdater::ProcessUpdater(const ProcessUpdater &pu)
-{
+ProcessUpdater::ProcessUpdater(const ProcessUpdater &pu) {
 	// Create new instance of the driver updater
 	driverUpdater = pu.driverUpdater->createNew();
 }
 
 ProcessUpdater::ProcessUpdater(DriverProcessUpdater *dpu):
-	driverUpdater(dpu)
-{
+	driverUpdater(dpu) {
 }
 
-ProcessUpdater::~ProcessUpdater()
-{
+ProcessUpdater::~ProcessUpdater() {
 	if (driverUpdater)
 		delete driverUpdater;
 }
 
 void ProcessUpdater::update() {
-
 	// Update process data in driver
 	driverUpdater->updateProcessData();
 }
+
+}  // namespace onh

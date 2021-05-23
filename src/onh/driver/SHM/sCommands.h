@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Mateusz Mirosławski
+ * Copyright (c) 2021 Mateusz Mirosławski
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef S_COMMANDS
-#define S_COMMANDS
+#ifndef ONH_DRIVER_SHM_SCOMMANDS_H_
+#define ONH_DRIVER_SHM_SCOMMANDS_H_
 
 #define DRV_PROC_IN 500
 #define DRV_PROC_OUT 501
@@ -85,4 +85,4 @@
 /// Write real
 #define DRV_WRITE_REAL 134
 
-#endif /* S_COMMANDS */
+#endif  // ONH_DRIVER_SHM_SCOMMANDS_H_

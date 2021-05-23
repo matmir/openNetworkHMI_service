@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,117 +16,114 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef ONH_DB_CONFIG_H_
+#define ONH_DB_CONFIG_H_
 
 #include <string>
-#include "objs/DriverConnection.h"
 #include <vector>
+#include "objs/DriverConnection.h"
 #include "DB.h"
 
 namespace onh {
 
-    /// Forward declaration
-	class DBManager;
+/// Forward declaration
+class DBManager;
 
-    /**
-	 * Class for read/write application configuration from DB
-	 */
-    class Config: public DB {
+/**
+ * Class for read/write application configuration from DB
+ */
+class Config: public DB {
+	public:
+		friend class DBManager;
 
-        public:
+		/**
+		 * Copy constructor
+		 *
+		 * @param cDB Config object to copy
+		 */
+		Config(const Config &cDB);
 
-            friend class DBManager;
+		virtual ~Config();
 
-            /**
-             * Copy constructor
-             *
-             * @param cDB Config object to copy
-             */
-            Config(const Config &cDB);
+		/**
+		 * Assign operator - inactive
+		 */
+		Config& operator=(const Config&) = delete;
 
-            virtual ~Config();
+		/**
+		 * Get string value from configuration DB
+		 *
+		 * @param field Configuration name
+		 */
+		std::string getStringValue(const std::string& field);
 
-            /**
-			 * Assign operator - inactive
-			 */
-            Config& operator=(const Config&) = delete;
+		/**
+		 * Get int value from configuration DB
+		 *
+		 * @param field Configuration name
+		 */
+		int getIntValue(const std::string& field);
 
-            /**
-             * Get string value from configuration DB
-             *
-             * @param field Configuration name
-             */
-            std::string getStringValue(const std::string& field);
+		/**
+		 * Get unsigned int value from configuration DB
+		 *
+		 * @param field Configuration name
+		 */
+		unsigned int getUIntValue(const std::string& field);
 
-            /**
-             * Get int value from configuration DB
-             *
-             * @param field Configuration name
-             */
-            int getIntValue(const std::string& field);
+		/**
+		 * Set int value in configuration DB
+		 *
+		 * @param field Configuration name
+		 */
+		void setValue(const std::string& field, int val);
 
-            /**
-             * Get unsigned int value from configuration DB
-             *
-             * @param field Configuration name
-             */
-            unsigned int getUIntValue(const std::string& field);
+		/**
+		 * Set string value in configuration DB
+		 *
+		 * @param field Configuration name
+		 */
+		void setValue(const std::string& field, const std::string& val);
 
-            /**
-             * Set int value in configuration DB
-             *
-             * @param field Configuration name
-             */
-            void setValue(const std::string& field, int val);
+		/**
+		 * Get Driver connections
+		 *
+		 * @param enabled Get only enabled connections
+		 *
+		 * @return Driver connections
+		 */
+		std::vector<DriverConnection> getDriverConnections(bool enabled = true);
 
-            /**
-             * Set string value in configuration DB
-             *
-             * @param field Configuration name
-             */
-            void setValue(const std::string& field, const std::string& val);
+	private:
+		/**
+		 * Constructor with connection param (allowed only from DBManager)
+		 *
+		 * @param connection Connection handle
+		 */
+		explicit Config(MYSQL *connDB);
 
-            /**
-             * Get Driver connections
-             *
-             * @param enabled Get only enabled connections
-             *
-             * @return Driver connections
-             */
-            std::vector<DriverConnection> getDriverConnections(bool enabled=true);
+		/**
+		 * Get SHM driver configuration
+		 *
+		 * @param id SHM driver identifier
+		 * @return SHM driver configuration
+		 */
+		std::string getShmCfg(unsigned int id);
 
-        private:
+		/**
+		 * Get Modbus driver configuration
+		 *
+		 * @param id Modbus driver identifier
+		 * @return Modbus driver identifier
+		 */
+		modbusM::ModbusCfg getModbusCfg(unsigned int id);
 
-            /**
-             * Constructor with connection param (allowed only from DBManager)
-             *
-             * @param connection Connection handle
-             */
-            Config(MYSQL *connDB);
+		/**
+		 * Check driver connection limit
+		 */
+		void checkDriverConnectionLimit();
+};
 
-            /**
-             * Get SHM driver configuration
-             *
-             * @param id SHM driver identifier
-             * @return SHM driver configuration
-             */
-            std::string getShmCfg(unsigned int id);
+}  // namespace onh
 
-            /**
-             * Get Modbus driver configuration
-             *
-             * @param id Modbus driver identifier
-             * @return Modbus driver identifier
-             */
-            modbusM::ModbusCfg getModbusCfg(unsigned int id);
-
-            /**
-             * Check driver connection limit
-             */
-            void checkDriverConnectionLimit();
-    };
-
-}
-
-#endif // CONFIG_H
+#endif  // ONH_DB_CONFIG_H_

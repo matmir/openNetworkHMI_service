@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,57 +16,54 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ALARMEXCEPTION_H
-#define ALARMEXCEPTION_H
+#ifndef ONH_DB_OBJS_ALARMEXCEPTION_H_
+#define ONH_DB_OBJS_ALARMEXCEPTION_H_
 
 #include "../../utils/Exception.h"
 
 namespace onh {
 
-    /**
-     * Alarm exception class
-     */
-    class AlarmException: public Exception {
+/**
+ * Alarm exception class
+ */
+class AlarmException: public Exception {
+	public:
+		/// Alarm exception type
+		typedef enum {
+			NONE = 0,
+			WRONG_ID,
+			WRONG_MSG,
+			WRONG_TRIGGER,
+			WRONG_TAG_TYPE,
+			NO_FEEDBACK_NOT_ACK_TAG,
+			NO_HW_ACK_TAG,
+		} ExceptionType;
 
-        public:
+		AlarmException();
 
-            /// Alarm exception type
-            typedef enum {
-            	NONE = 0,
-                WRONG_ID,
-                WRONG_MSG,
-                WRONG_TRIGGER,
-				WRONG_TAG_TYPE,
-                NO_FEEDBACK_NOT_ACK_TAG,
-                NO_HW_ACK_TAG,
-            } ExceptionType;
+		virtual ~AlarmException() noexcept;
 
-            AlarmException();
+		/**
+		 * Exception constructor
+		 *
+		 * @param type Exception type
+		 * @param desc Additional exception information
+		 * @param fName Function from which exception was thrown
+		 */
+		explicit AlarmException(ExceptionType type, const std::string& desc = "", const std::string& fName = "");
 
-            virtual ~AlarmException() noexcept override;
+		/**
+		 * Get exception type
+		 *
+		 * @return Exception type
+		 */
+		ExceptionType getType() const;
 
-            /**
-             * Exception constructor
-             *
-             * @param type Exception type
-             * @param desc Additional exception information
-             * @param fName Function from which exception was thrown
-             */
-            AlarmException(ExceptionType type, const std::string& desc = "", const std::string& fName = "");
+	private:
+		/// Exception type
+		ExceptionType exType;
+};
 
-            /**
-             * Get exception type
-             *
-             * @return Exception type
-             */
-            ExceptionType getType() const;
+}  // namespace onh
 
-        private:
-
-            /// Exception type
-            ExceptionType exType;
-    };
-
-}
-
-#endif // ALARMEXCEPTION_H
+#endif  // ONH_DB_OBJS_ALARMEXCEPTION_H_

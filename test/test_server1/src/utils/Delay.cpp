@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,19 +19,16 @@
 #include "Delay.h"
 #include <thread>
 
-using namespace onh;
+namespace onh {
 
 Delay::Delay(unsigned int msec):
-	itsMsec(msec), delayStarted(false), waitPoint(std::chrono::steady_clock::now())
-{
+	itsMsec(msec), delayStarted(false), waitPoint(std::chrono::steady_clock::now()) {
 }
 
-Delay::~Delay()
-{
+Delay::~Delay() {
 }
 
 void Delay::startDelay() {
-
 	// Check if delay is already running
 	if (delayStarted) {
 		throw Exception("Timer already running", "Delay::startDelay");
@@ -48,17 +45,14 @@ void Delay::startDelay() {
 }
 
 void Delay::setDelay(unsigned int msec) {
-
 	itsMsec = msec;
 }
 
 bool Delay::delayPassed() {
-
 	bool ret = false;
 
 	// Check if delay is running
 	if (delayStarted) {
-
 		std::chrono::time_point<std::chrono::steady_clock> tp = std::chrono::steady_clock::now();
 		std::chrono::duration<double, std::milli> tmp = tp - waitPoint;
 
@@ -75,13 +69,11 @@ bool Delay::delayPassed() {
 }
 
 void Delay::stopDelay() {
-
 	delayStarted = false;
 }
 
 void Delay::wait() {
-
-    // Check if delay is already running
+	// Check if delay is already running
 	if (delayStarted) {
 		throw Exception("Timer already running", "Delay::wait");
 	}
@@ -91,10 +83,8 @@ void Delay::wait() {
 }
 
 void Delay::waitAfterStart() {
-
 	// Check if delay is running
 	if (delayStarted) {
-
 		// Sleep till reach time point
 		std::this_thread::sleep_until(waitPoint);
 
@@ -104,3 +94,5 @@ void Delay::waitAfterStart() {
 		throw Exception("Timer is not started", "Delay::waitAfterStart");
 	}
 }
+
+}  // namespace onh

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,11 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DBMANAGER_H
-#define DBMANAGER_H
+#ifndef ONH_DB_DBMANAGER_H_
+#define ONH_DB_DBMANAGER_H_
 
-#include <string>
 #include <mysql.h>
+#include <string>
 #include "AlarmingDB.h"
 #include "Config.h"
 #include "ScriptDB.h"
@@ -30,98 +30,95 @@
 
 namespace onh {
 
-    /**
-	 * Class for manage DB connections
-	 */
-    class DBManager {
+/**
+ * Class for manage DB connections
+ */
+class DBManager {
+	public:
+		/**
+		 * DB manager constructor
+		 *
+		 * @param addr DB address
+		 * @param user DB user
+		 * @param pass DB password
+		 */
+		DBManager(const std::string& db, const std::string& addr, const std::string& user, const std::string& pass);
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		DBManager(const DBManager&) = delete;
 
-            /**
-             * DB manager constructor
-             *
-             * @param addr DB address
-             * @param user DB user
-             * @param pass DB password
-             */
-            DBManager(const std::string& db, const std::string& addr, const std::string& user, const std::string& pass);
+		virtual ~DBManager();
 
-            /**
-			 * Copy constructor - inactive
-			 */
-            DBManager(const DBManager&) = delete;
+		/**
+		 * Assignment operator - inactive
+		 */
+		DBManager& operator=(const DBManager&) = delete;
 
-            virtual ~DBManager();
+		/**
+		 * Get AlarmingDB object
+		 *
+		 * @return AlarmingDB object
+		 */
+		AlarmingDB getAlarmingDB();
 
-            /**
-			 * Assignment operator - inactive
-			 */
-            DBManager& operator=(const DBManager&) = delete;
+		/**
+		 * Get ConfigDB object
+		 *
+		 * @return ConfigDB object
+		 */
+		Config getConfigDB();
 
-            /**
-             * Get AlarmingDB object
-             *
-             * @return AlarmingDB object
-             */
-            AlarmingDB getAlarmingDB();
+		/**
+		 * Get ScriptDB object
+		 *
+		 * @return ScriptDB object
+		 */
+		ScriptDB getScriptDB();
 
-            /**
-             * Get ConfigDB object
-             *
-             * @return ConfigDB object
-             */
-            Config getConfigDB();
+		/**
+		 * Get TagLoggerDB object
+		 *
+		 * @return TagLoggerDB object
+		 */
+		TagLoggerDB getTagLoggerDB();
 
-            /**
-             * Get ScriptDB object
-             *
-             * @return ScriptDB object
-             */
-            ScriptDB getScriptDB();
+		/**
+		 * Get TagLoggerWriterDB object
+		 *
+		 * @return TagLoggerDB object
+		 */
+		TagLoggerDB getTagLoggerWriterDB();
 
-            /**
-             * Get TagLoggerDB object
-             *
-             * @return TagLoggerDB object
-             */
-            TagLoggerDB getTagLoggerDB();
+		/**
+		 * Get database credentials
+		 *
+		 * @return Database credentials
+		 */
+		DBCredentials getCredentials();
 
-            /**
-			 * Get TagLoggerWriterDB object
-			 *
-			 * @return TagLoggerDB object
-			 */
-			TagLoggerDB getTagLoggerWriterDB();
+	private:
+		/// Database credentials
+		DBCredentials dbC;
 
-			/**
-			 * Get database credentials
-			 *
-			 * @return Database credentials
-			 */
-			DBCredentials getCredentials();
+		/// DB connection instance for DB manager
+		MYSQL *connDB;
+		/// DB connection instance for Alarming system
+		MYSQL *connAlarming;
+		/// DB connection instance for Tag logger system
+		MYSQL *connTagLogger;
+		/// DB connection instance for Tag logger writer system
+		MYSQL *connTagLoggerWriter;
+		/// DB connection instance for Script system
+		MYSQL *connScript;
 
-        private:
+		/**
+		 * Initialize DB connections
+		 */
+		void initConnections();
+};
 
-			/// Database credentials
-			DBCredentials dbC;
+}  // namespace onh
 
-            /// DB connection instance for DB manager
-            MYSQL *connDB;
-            /// DB connection instance for Alarming system
-            MYSQL *connAlarming;
-            /// DB connection instance for Tag logger system
-            MYSQL *connTagLogger;
-            /// DB connection instance for Tag logger writer system
-			MYSQL *connTagLoggerWriter;
-            /// DB connection instance for Script system
-            MYSQL *connScript;
-
-            /**
-			 * Initialize DB connections
-			 */
-			void initConnections();
-    };
-
-}
-
-#endif // DBMANAGER_H
+#endif  // ONH_DB_DBMANAGER_H_

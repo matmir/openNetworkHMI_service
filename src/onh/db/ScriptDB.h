@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,74 +16,71 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCRIPTDB_H
-#define SCRIPTDB_H
+#ifndef ONH_DB_SCRIPTDB_H_
+#define ONH_DB_SCRIPTDB_H_
 
-#include "objs/ScriptItem.h"
 #include <vector>
+#include "objs/ScriptItem.h"
 #include "DB.h"
 
 namespace onh {
 
-    /// Forward declaration
-	class DBManager;
+/// Forward declaration
+class DBManager;
 
-    /**
-	 * Class for read/write Script system DB
-	 */
-    class ScriptDB: public DB {
+/**
+ * Class for read/write Script system DB
+ */
+class ScriptDB: public DB {
+	public:
+		friend class DBManager;
 
-        public:
+		/**
+		 * Copy constructor
+		 *
+		 * @param sDB ScriptDB to copy
+		 */
+		ScriptDB(const ScriptDB &sDB);
 
-            friend class DBManager;
+		virtual ~ScriptDB();
 
-            /**
-             * Copy constructor
-             *
-             * @param sDB ScriptDB to copy
-             */
-            ScriptDB(const ScriptDB &sDB);
+		/**
+		 * Assign operator - inactive
+		 */
+		ScriptDB& operator=(const ScriptDB&) = delete;
 
-            virtual ~ScriptDB();
+		/**
+		 * Get script items from DB
+		 *
+		 * @param enabled Get only enabled scripts
+		 *
+		 * @return Vector with Alarm definitions items
+		 */
+		std::vector<ScriptItem> getScripts(bool enabled = true);
 
-            /**
-			 * Assign operator - inactive
-			 */
-            ScriptDB& operator=(const ScriptDB&) = delete;
+		/**
+		 * Set Script run
+		 *
+		 * @param script Script item object
+		 */
+		void setScriptRun(const ScriptItem& script);
 
-            /**
-             * Get script items from DB
-             *
-             * @param enabled Get only enabled scripts
-             *
-             * @return Vector with Alarm definitions items
-             */
-            std::vector<ScriptItem> getScripts(bool enabled=true);
+		/**
+		 * Clear script lock
+		 *
+		 * @param script Script item object
+		 */
+		void clearScriptLock(const ScriptItem& script);
 
-            /**
-             * Set Script run
-             *
-             * @param script Script item object
-             */
-            void setScriptRun(const ScriptItem& script);
+	private:
+		/**
+		 * Constructor with connection param (allowed only from DBManager)
+		 *
+		 * @param connection Connection handle
+		 */
+		explicit ScriptDB(MYSQL *connDB);
+};
 
-            /**
-             * Clear script lock
-             *
-             * @param script Script item object
-             */
-            void clearScriptLock(const ScriptItem& script);
+}  // namespace onh
 
-        private:
-
-            /**
-             * Constructor with connection param (allowed only from DBManager)
-             *
-             * @param connection Connection handle
-             */
-            ScriptDB(MYSQL *connDB);
-    };
-
-}
-
-#endif // SCRIPTDB_H
+#endif  // ONH_DB_SCRIPTDB_H_

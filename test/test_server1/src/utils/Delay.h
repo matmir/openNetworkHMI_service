@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,85 +16,83 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_UTILS_DELAY_H_
-#define SRC_UTILS_DELAY_H_
+#ifndef UTILS_DELAY_H_
+#define UTILS_DELAY_H_
 
 #include <chrono>
 #include "Exception.h"
 
 namespace onh {
 
-	/**
-	 * Delay class
-	 */
-	class Delay {
-        public:
+/**
+ * Delay class
+ */
+class Delay {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param msec Number of milliseconds
+		 */
+		explicit Delay(unsigned int msec);
 
-            /**
-             * Constructor
-             *
-             * @param msec Number of milliseconds
-             */
-            Delay(unsigned int msec);
+		/**
+		 * Copy constructor - inactive
+		 */
+		Delay(const Delay&) = delete;
 
-            /**
-             * Copy constructor - inactive
-             */
-            Delay(const Delay&) = delete;
+		virtual ~Delay();
 
-            virtual ~Delay();
+		/**
+		 * Assign operator - inactive
+		 */
+		Delay& operator=(const Delay&) = delete;
 
-            /**
-			 * Assign operator - inactive
-			 */
-            Delay& operator=(const Delay&) = delete;
+		/**
+		 * Start delay
+		 */
+		void startDelay();
 
-            /**
-             * Start delay
-             */
-            void startDelay();
+		/**
+		 * Set delay time
+		 *
+		 * @param msec Number of milliseconds
+		 */
+		void setDelay(unsigned int msec);
 
-            /**
-             * Set delay time
-             *
-             * @param msec Number of milliseconds
-             */
-            void setDelay(unsigned int msec);
+		/**
+		 * Check if delay passed
+		 *
+		 * @return True if delay passed
+		 */
+		bool delayPassed();
 
-            /**
-             * Check if delay passed
-             *
-             * @return True if delay passed
-             */
-            bool delayPassed();
+		/**
+		 * Stop delay
+		 */
+		void stopDelay();
 
-            /**
-             * Stop delay
-             */
-            void stopDelay();
+		/**
+		 * Wait configured milliseconds
+		 */
+		void wait();
 
-            /**
-             * Wait configured milliseconds
-             */
-            void wait();
+		/**
+		 * Wait rest time after timer started
+		 */
+		void waitAfterStart();
 
-            /**
-             * Wait rest time after timer started
-             */
-            void waitAfterStart();
+	private:
+		/// Configured delay time (milliseconds)
+		unsigned int itsMsec;
 
-        private:
+		/// Flag informs that delay is started
+		bool delayStarted;
 
-            /// Configured delay time (milliseconds)
-            unsigned int itsMsec;
+		/// Wait until this point (waitAfterStart)
+		std::chrono::steady_clock::time_point waitPoint;
+};
 
-            /// Flag informs that delay is started
-            bool delayStarted;
+}  // namespace onh
 
-            /// Wait until this point (waitAfterStart)
-            std::chrono::steady_clock::time_point waitPoint;
-	};
-
-}
-
-#endif /* SRC_UTILS_DELAY_H_ */
+#endif  // UTILS_DELAY_H_

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +18,20 @@
 
 #include "TagLoggerBufferContainer.h"
 
-using namespace onh;
+namespace onh {
 
 TagLoggerBufferContainer::TagLoggerBufferContainer():
-	controllerInsertFinished(false)
-{
+	controllerInsertFinished(false) {
 	buff.controll().lock();
 	buff.controll().getDataRef().clear();
 	buff.controll().unlock();
 }
 
-TagLoggerBufferContainer::~TagLoggerBufferContainer()
-{
+TagLoggerBufferContainer::~TagLoggerBufferContainer() {
 }
 
 TagLoggerBufferController TagLoggerBufferContainer::getController(bool readOnly) {
-
 	return TagLoggerBufferController(buff.getController(false), controllerInsertFinished.getController(false), readOnly);
 }
+
+}  // namespace onh

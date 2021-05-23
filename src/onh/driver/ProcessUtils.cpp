@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,31 +19,34 @@
 #include "ProcessUtils.h"
 #include <sstream>
 
-using namespace onh;
+namespace onh {
 
-void ProcessUtils::triggerTagTypeError(const std::string& tagName, const std::string& fName) {
-
-    std::stringstream s;
-    s << "Tag: " << tagName << " has wrong type";
-    throw TagException(TagException::WRONG_TYPE, s.str(), fName);
+void ProcessUtils::triggerTagTypeError(const std::string& tagName,
+		const std::string& fName) {
+	std::stringstream s;
+	s << "Tag: " << tagName << " has wrong type";
+	throw TagException(TagException::WRONG_TYPE, s.str(), fName);
 }
 
-void ProcessUtils::triggerTagAreaError(const std::string& tagName, const std::string& fName) {
-
-    std::stringstream s;
-    s << "Tag: " << tagName << " has wrong area";
-    throw TagException(TagException::WRONG_AREA, s.str(), fName);
+void ProcessUtils::triggerTagAreaError(const std::string& tagName,
+		const std::string& fName) {
+	std::stringstream s;
+	s << "Tag: " << tagName << " has wrong area";
+	throw TagException(TagException::WRONG_AREA, s.str(), fName);
 }
 
-void ProcessUtils::triggerError(const std::string& msg, const std::string& tagName, const std::string& fName) {
+void ProcessUtils::triggerError(const std::string& msg,
+		const std::string& tagName,
+		const std::string& fName) {
+	std::stringstream s;
 
-    std::stringstream s;
+	if (tagName !="") {
+		s << "(" << tagName << "): " << msg;
+	} else {
+		s << msg;
+	}
 
-    if (tagName !="") {
-        s << "(" << tagName << "): " << msg;
-    } else {
-        s << msg;
-    }
-
-    throw Exception(s.str(), fName);
+	throw Exception(s.str(), fName);
 }
+
+}  // namespace onh

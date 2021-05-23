@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,12 @@
 
 #include "DriverProcessUpdater.h"
 
-using namespace onh;
+namespace onh {
 
 DriverProcessUpdater::DriverProcessUpdater() {
 }
 
 DriverProcessUpdater::~DriverProcessUpdater() {
 }
+
+}  // namespace onh

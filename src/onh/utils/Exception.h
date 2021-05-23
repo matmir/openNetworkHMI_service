@@ -32,7 +32,7 @@ namespace onh {
         public:
 
             Exception();
-            virtual ~Exception() noexcept override;
+            virtual ~Exception() noexcept;
 
             /**
              * Exception constructor with message

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,30 +16,30 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DB_DBCREDENTIALS_H_
-#define SRC_ONH_DB_DBCREDENTIALS_H_
+#ifndef ONH_DB_DBCREDENTIALS_H_
+#define ONH_DB_DBCREDENTIALS_H_
 
 #include <string>
 
 namespace onh {
 
-	/**
-	 * DB credentials structure
-	 */
-	typedef struct {
-		/// Database name
-		std::string db;
+/**
+ * DB credentials structure
+ */
+typedef struct {
+	/// Database name
+	std::string db;
 
-		/// Database address
-		std::string addr;
+	/// Database address
+	std::string addr;
 
-		/// Database user name
-		std::string user;
+	/// Database user name
+	std::string user;
 
-		/// Database user password
-		std::string pass;
+	/// Database user password
+	std::string pass;
+} DBCredentials;
 
-	} DBCredentials;
-}
+}  // namespace onh
 
-#endif /* SRC_ONH_DB_DBCREDENTIALS_H_ */
+#endif  // ONH_DB_DBCREDENTIALS_H_

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DRIVERPOLLINGPROG_H
-#define DRIVERPOLLINGPROG_H
+#ifndef ONH_THREAD_DRIVERPOLLING_DRIVERPOLLINGPROG_H_
+#define ONH_THREAD_DRIVERPOLLING_DRIVERPOLLINGPROG_H_
 
 #include "../../driver/DriverBufferUpdater.h"
 #include "../../utils/Delay.h"
@@ -25,51 +25,48 @@
 
 namespace onh {
 
-    /**
-	 * Driver polling program class
-	 */
-    class DriverPollingProg: public ThreadProgram {
+/**
+ * Driver polling program class
+ */
+class DriverPollingProg: public ThreadProgram {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param dbu Driver buffer updater
+		 * @param connId Driver connection identifier
+		 * @param updateInterval Thread update interval (milliseconds)
+		 * @param gdcTED Thread exit data controller
+		 * @param gdcCTD Thread cycle time controller
+		 */
+		DriverPollingProg(const DriverBufferUpdater& dbu,
+							unsigned int connId,
+							unsigned int updateInterval,
+							const GuardDataController<ThreadExitData> &gdcTED,
+							const GuardDataController<CycleTimeData> &gdcCTD);
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		DriverPollingProg(const DriverPollingProg&) = delete;
 
-            /**
-             * Constructor
-             *
-             * @param dbu Driver buffer updater
-             * @param connId Driver connection identifier
-             * @param updateInterval Thread update interval (milliseconds)
-             * @param gdcTED Thread exit data controller
-             * @param gdcCTD Thread cycle time controller
-             */
-            DriverPollingProg(const DriverBufferUpdater& dbu,
-            					unsigned int connId,
-            					unsigned int updateInterval,
-								const GuardDataController<ThreadExitData> &gdcTED,
-								const GuardDataController<CycleTimeData> &gdcCTD);
+		virtual ~DriverPollingProg();
 
-            /**
-			 * Copy constructor - inactive
-			 */
-			DriverPollingProg(const DriverPollingProg&) = delete;
+		/**
+		 * Thread program function
+		 */
+		void operator()() override;
 
-            virtual ~DriverPollingProg() override;
+		/**
+		 * Assignment operator - inactive
+		 */
+		DriverPollingProg& operator=(const DriverPollingProg&) = delete;
 
-            /**
-			 * Thread program function
-			 */
-			virtual void operator()() override;
+	private:
+		/// Driver buffer updater
+		DriverBufferUpdater *drvUpdater;
+};
 
-			/**
-			 * Assignment operator - inactive
-			 */
-			DriverPollingProg& operator=(const DriverPollingProg&) = delete;
+}  // namespace onh
 
-        private:
-
-            /// Driver buffer updater
-            DriverBufferUpdater *drvUpdater;
-    };
-
-}
-
-#endif // DRIVERPOLLINGPROG_H
+#endif  // ONH_THREAD_DRIVERPOLLING_DRIVERPOLLINGPROG_H_

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,30 +18,28 @@
 
 #include "modbusexception.h"
 
-using namespace modbusM;
+namespace modbusM {
 
 ModbusException::ModbusException():
-    errorMessage(""), functionName(""), allMessage("none")
-{
+	errorMessage(""), functionName(""), allMessage("none") {
 }
 
 ModbusException::ModbusException(const std::string& exceptionMSG):
-    errorMessage(exceptionMSG), functionName(""), allMessage(exceptionMSG)
-{
+	errorMessage(exceptionMSG), functionName(""), allMessage(exceptionMSG) {
 }
 
-ModbusException::ModbusException(const std::string& exceptionMSG, const std::string& funcName):
-    errorMessage(exceptionMSG), functionName(funcName)
-{
+ModbusException::ModbusException(const std::string& exceptionMSG,
+									const std::string& funcName):
+	errorMessage(exceptionMSG), functionName(funcName) {
 	allMessage = functionName + ": ";
 	allMessage += errorMessage;
 }
 
-ModbusException::~ModbusException() noexcept
-{
+ModbusException::~ModbusException() noexcept {
 }
 
 const char* ModbusException::what() const noexcept {
-
-    return allMessage.c_str();
+	return allMessage.c_str();
 }
+
+}  // namespace modbusM

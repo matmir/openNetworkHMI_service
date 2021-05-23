@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,71 +16,67 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef COMMANDLIST_H_INCLUDED
-#define COMMANDLIST_H_INCLUDED
+#ifndef ONH_THREAD_SOCKET_PARSER_COMMANDLIST_H_
+#define ONH_THREAD_SOCKET_PARSER_COMMANDLIST_H_
 
 namespace onh {
 
-    /**
-     * Query commands definition
-     */
-    enum parserCMD {
+/**
+ * Query commands definition
+ */
+enum parserCMD {
+	GET_BIT = 10,
+	SET_BIT = 11,
+	RESET_BIT = 12,
+	INVERT_BIT = 13,
 
-        GET_BIT=10,
-        SET_BIT=11,
-        RESET_BIT=12,
-        INVERT_BIT=13,
+	GET_BITS = 20,
+	SET_BITS = 21,
 
-        GET_BITS=20,
-        SET_BITS=21,
+	GET_BYTE = 30,
+	WRITE_BYTE = 31,
 
-        GET_BYTE=30,
-        WRITE_BYTE=31,
+	GET_WORD = 32,
+	WRITE_WORD = 33,
 
-        GET_WORD=32,
-        WRITE_WORD=33,
+	GET_DWORD = 34,
+	WRITE_DWORD = 35,
 
-        GET_DWORD=34,
-        WRITE_DWORD=35,
+	GET_INT = 36,
+	WRITE_INT = 37,
 
-        GET_INT=36,
-        WRITE_INT=37,
+	GET_REAL = 38,
+	WRITE_REAL = 39,
 
-        GET_REAL=38,
-        WRITE_REAL=39,
+	MULTI_CMD = 50,
 
-        MULTI_CMD=50,
+	ACK_ALARM = 90,
 
-        ACK_ALARM=90,
+	GET_THREAD_CYCLE_TIME = 500,
 
-        GET_THREAD_CYCLE_TIME=500,
+	EXIT_APP = 600
+};
 
-        EXIT_APP=600
+/**
+ * Reply commands definition
+ */
+enum parserReply {
+	OK = 0,
+	NOK = -1,
 
-    };
+	NOT_EXIST = 5,
+	WRONG_VALUE = 6,
+	WRONG_TAG_TYPE = 7,
+	WRONG_TAG_AREA = 8,
+	WRONG_ADDR = 9,
 
-    /**
-     * Reply commands definition
-     */
-    enum parserReply {
+	INTERNAL_ERR = 20,
 
-        OK=0,
-        NOK=-1,
+	SQL_ERROR = 50,
 
-        NOT_EXIST=5,
-        WRONG_VALUE=6,
-        WRONG_TAG_TYPE=7,
-        WRONG_TAG_AREA=8,
-        WRONG_ADDR=9,
+	UNKNOWN_CMD = 99
+};
 
-        INTERNAL_ERR=20,
+}  // namespace onh
 
-        SQL_ERROR=50,
-
-        UNKNOWN_CMD=99
-
-    };
-
-}
-
-#endif // COMMANDLIST_H_INCLUDED
+#endif  // ONH_THREAD_SOCKET_PARSER_COMMANDLIST_H_

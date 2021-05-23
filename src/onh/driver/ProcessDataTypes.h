@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,27 +21,27 @@
 
 namespace onh {
 
-    /**
-	 * Driver process data areas
-	 */
-    typedef enum {
-        PDA_INPUT = 1,
-        PDA_OUTPUT = 2,
-        PDA_MEMORY = 3
-    } processDataArea;
+/**
+ * Driver process data areas
+ */
+typedef enum {
+	PDA_INPUT = 1,
+	PDA_OUTPUT = 2,
+	PDA_MEMORY = 3
+} processDataArea;
 
-    /**
-	 * Structure of the process data address
-	 */
-    typedef struct {
-        /// Process data area
-        processDataArea area;
-        /// Process data byte address
-        unsigned int byteAddr;
-        /// Process data bit address
-        unsigned int bitAddr;
-    } processDataAddress;
+/**
+ * Structure of the process data address
+ */
+typedef struct {
+	/// Process data area
+	processDataArea area;
+	/// Process data byte address
+	unsigned int byteAddr;
+	/// Process data bit address
+	unsigned int bitAddr;
+} processDataAddress;
 
-}
+}  // namespace onh
 
-#endif /* ONH_DRIVER_PROCESSDATATYPES_H_ */
+#endif  // ONH_DRIVER_PROCESSDATATYPES_H_

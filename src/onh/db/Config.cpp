@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,166 +20,142 @@
 #include <sstream>
 #include "../driver/Modbus/modbusmasterCfg.h"
 
-using namespace onh;
+namespace onh {
 
 Config::Config(MYSQL *connDB):
-    DB(connDB)
-{
+	DB(connDB) {
 }
 
 Config::Config(const Config &cDB):
-    DB(cDB)
-{
+	DB(cDB) {
 }
 
-Config::~Config()
-{
+Config::~Config() {
 }
 
 std::string Config::getStringValue(const std::string& field) {
+	if (field == "")
+		throw Exception("Field is empty", "Config::getStringValue");
 
-    if (field == "")
-        throw Exception("Field is empty", "Config::getStringValue");
-
-    DBResult *res = 0;
+	DBResult *res = 0;
 
 	// Return value
-    std::string val;
+	std::string val;
 
-    try {
+	try {
+		// Query
+		res = executeQuery("SELECT * FROM configuration WHERE cName='"+field+"'");
 
-        // Query
-        res = executeQuery("SELECT * FROM configuration WHERE cName='"+field+"'");
+		// Load data
+		res->nextRow();
 
-        // Load data
-        res->nextRow();
+		// Parse data
+		val = res->getString("cValue");
+	} catch (DBException &e) {
+		std::stringstream s;
+		s << "Config::getStringValue (" << field << ")";
+		throw Exception(e.what(), s.str());
+	}
 
-        // Parse data
-        val = res->getString("cValue");
+	// Release memory
+	delete res;
 
-    } catch (DBException &e) {
-
-        std::stringstream s;
-        s << "Config::getStringValue (" << field << ")";
-        throw Exception(e.what(), s.str());
-    }
-
-    // Release memory
-    delete res;
-
-    return val;
+	return val;
 }
 
 int Config::getIntValue(const std::string& field) {
+	if (field == "")
+		throw Exception("Field is empty", "Config::getIntValue");
 
-    if (field == "")
-        throw Exception("Field is empty", "Config::getIntValue");
-
-    DBResult *res = 0;
+	DBResult *res = 0;
 
 	// Return value
-    int iVal;
+	int iVal;
 
-    try {
+	try {
+		// Query
+		res = executeQuery("SELECT * FROM configuration WHERE cName='"+field+"'");
 
-        // Query
-        res = executeQuery("SELECT * FROM configuration WHERE cName='"+field+"'");
+		// Load data
+		res->nextRow();
 
-        // Load data
-        res->nextRow();
+		// Parse data
+		iVal = res->getInt("cValue");
+	} catch (DBException &e) {
+		std::stringstream s;
+		s << "Config::getIntValue (" << field << ")";
+		throw Exception(e.what(), s.str());
+	}
 
-        // Parse data
-        iVal = res->getInt("cValue");
+	// Release memory
+	delete res;
 
-    } catch (DBException &e) {
-
-        std::stringstream s;
-        s << "Config::getIntValue (" << field << ")";
-        throw Exception(e.what(), s.str());
-    }
-
-    // Release memory
-    delete res;
-
-    return iVal;
+	return iVal;
 }
 
 unsigned int Config::getUIntValue(const std::string& field) {
+	if (field == "")
+		throw Exception("Field is empty", "Config::getUIntValue");
 
-    if (field == "")
-        throw Exception("Field is empty", "Config::getUIntValue");
-
-    DBResult *res = 0;
+	DBResult *res = 0;
 
 	// Return value
-    unsigned int iVal;
+	unsigned int iVal;
 
-    try {
+	try {
+		// Query
+		res = executeQuery("SELECT * FROM configuration WHERE cName='"+field+"'");
 
-        // Query
-        res = executeQuery("SELECT * FROM configuration WHERE cName='"+field+"'");
+		// Load data
+		res->nextRow();
 
-        // Load data
-        res->nextRow();
+		// Parse data
+		iVal = res->getUInt("cValue");
+	} catch (DBException &e) {
+		std::stringstream s;
+		s << "Config::getUIntValue (" << field << ")";
+		throw Exception(e.what(), s.str());
+	}
 
-        // Parse data
-        iVal = res->getUInt("cValue");
+	// Release memory
+	delete res;
 
-    } catch (DBException &e) {
-
-        std::stringstream s;
-        s << "Config::getUIntValue (" << field << ")";
-        throw Exception(e.what(), s.str());
-    }
-
-    // Release memory
-    delete res;
-
-    return iVal;
+	return iVal;
 }
 
 void Config::setValue(const std::string& field, int val) {
+	if (field == "")
+		throw Exception("Field is empty", "Config::setValue (int)");
 
-    if (field == "")
-        throw Exception("Field is empty", "Config::setValue (int)");
+	// Convert to string
+	std::stringstream ss;
+	ss << val;
 
-    // Convert to string
-    std::stringstream ss;
-    ss << val;
-
-    try {
-
-        // Query
-        executeSaveQuery("UPDATE configuration SET cValue='"+ss.str()+"' WHERE cName='"+field+"'");
-
-    } catch (DBException &e) {
-
-        std::stringstream s;
-        s << "Config::setValue (int) (" << field << ")";
-        throw Exception(e.what(), s.str());
-    }
+	try {
+		// Query
+		executeSaveQuery("UPDATE configuration SET cValue='"+ss.str()+"' WHERE cName='"+field+"'");
+	} catch (DBException &e) {
+		std::stringstream s;
+		s << "Config::setValue (int) (" << field << ")";
+		throw Exception(e.what(), s.str());
+	}
 }
 
 void Config::setValue(const std::string& field, const std::string& val) {
+	if (field == "")
+		throw Exception("Field is empty", "Config::setValue (string)");
 
-    if (field == "")
-        throw Exception("Field is empty", "Config::setValue (string)");
-
-    try {
-
-        // Query
-        executeSaveQuery("UPDATE configuration SET cValue='"+val+"' WHERE cName='"+field+"'");
-
-    } catch (DBException &e) {
-
-        std::stringstream s;
-        s << "Config::setValue (string) (" << field << ")";
-        throw Exception(e.what(), s.str());
-    }
+	try {
+		// Query
+		executeSaveQuery("UPDATE configuration SET cValue='"+val+"' WHERE cName='"+field+"'");
+	} catch (DBException &e) {
+		std::stringstream s;
+		s << "Config::setValue (string) (" << field << ")";
+		throw Exception(e.what(), s.str());
+	}
 }
 
 std::string Config::getShmCfg(unsigned int id) {
-
 	// No data
 	bool noData = false;
 
@@ -192,7 +168,6 @@ std::string Config::getShmCfg(unsigned int id) {
 	DBResult *result = 0;
 
 	try {
-
 		// Prepare query
 		q << "SELECT * FROM driver_shm WHERE dsId = "<< id << ";";
 
@@ -200,7 +175,6 @@ std::string Config::getShmCfg(unsigned int id) {
 		result = executeQuery(q.str());
 
 		if (result->rowsCount() == 1) {
-
 			// Read data
 			result->nextRow();
 
@@ -214,9 +188,7 @@ std::string Config::getShmCfg(unsigned int id) {
 		} else {
 			noData = true;
 		}
-
 	} catch (DBException &e) {
-
 		if (result)
 			delete result;
 
@@ -230,7 +202,6 @@ std::string Config::getShmCfg(unsigned int id) {
 }
 
 modbusM::ModbusCfg Config::getModbusCfg(unsigned int id) {
-
 	// No data
 	bool noData = false;
 
@@ -243,7 +214,6 @@ modbusM::ModbusCfg Config::getModbusCfg(unsigned int id) {
 	DBResult *result = 0;
 
 	try {
-
 		// Prepare query
 		q << "SELECT * FROM driver_modbus WHERE dmId = "<< id << ";";
 
@@ -251,12 +221,11 @@ modbusM::ModbusCfg Config::getModbusCfg(unsigned int id) {
 		result = executeQuery(q.str());
 
 		if (result->rowsCount() == 1) {
-
 			// Read data
 			result->nextRow();
 
 			// Get data
-			mb.mode = ((result->getUInt("dmMode")==modbusM::MM_RTU)?(modbusM::MM_RTU):(modbusM::MM_TCP));
+			mb.mode = ((result->getUInt("dmMode") == modbusM::MM_RTU)?(modbusM::MM_RTU):(modbusM::MM_TCP));
 			mb.slaveID = result->getInt("dmSlaveID");
 			mb.registerCount = result->getInt("dmRegCount");
 			mb.polling = result->getUInt("dmPollingInterval");
@@ -280,9 +249,7 @@ modbusM::ModbusCfg Config::getModbusCfg(unsigned int id) {
 		} else {
 			noData = true;
 		}
-
 	} catch (DBException &e) {
-
 		if (result)
 			delete result;
 
@@ -296,7 +263,6 @@ modbusM::ModbusCfg Config::getModbusCfg(unsigned int id) {
 }
 
 std::vector<DriverConnection> Config::getDriverConnections(bool enabled) {
-
 	// Check driver connection limit
 	checkDriverConnectionLimit();
 
@@ -312,7 +278,6 @@ std::vector<DriverConnection> Config::getDriverConnections(bool enabled) {
 	DBResult *result = 0;
 
 	try {
-
 		// Prepare query
 		q << "SELECT * FROM driver_connections WHERE dcEnable=" << ((enabled)?("1"):("0")) << ";";
 
@@ -321,14 +286,13 @@ std::vector<DriverConnection> Config::getDriverConnections(bool enabled) {
 
 		// Read data
 		while (result->nextRow()) {
-
 			// Clear put variable
 			dcp = dc;
 
 			dcp.setId(result->getUInt("dcId"));
 			dcp.setName(result->getString("dcName"));
 			dcp.setType(static_cast<DriverType>(result->getUInt("dcType")));
-			dcp.setEnable(((result->getInt("dcEnable")==1)?(true):(false)));
+			dcp.setEnable(((result->getInt("dcEnable") == 1)?(true):(false)));
 
 			if (dcp.getType() == DriverType::DT_Modbus) {
 				dcp.setModbusCfg(getModbusCfg(result->getUInt("dcConfigModbus")));
@@ -343,9 +307,7 @@ std::vector<DriverConnection> Config::getDriverConnections(bool enabled) {
 		// Release memory
 		delete result;
 		result = 0;
-
 	} catch (DBException &e) {
-
 		if (result)
 			delete result;
 
@@ -356,13 +318,11 @@ std::vector<DriverConnection> Config::getDriverConnections(bool enabled) {
 }
 
 void Config::checkDriverConnectionLimit() {
-
 	DBResult *result = 0;
 	std::string q;
 	unsigned int cnt = 0;
 
 	try {
-
 		// Prepare query
 		q = "SELECT count(*) as 'cnt' FROM driver_connections;";
 
@@ -376,9 +336,7 @@ void Config::checkDriverConnectionLimit() {
 		// Release memory
 		delete result;
 		result = 0;
-
 	} catch (DBException &e) {
-
 		if (result)
 			delete result;
 
@@ -387,7 +345,10 @@ void Config::checkDriverConnectionLimit() {
 
 	// Check limit
 	if (cnt > DriverConnection::MAX_CONN) {
-		throw Exception("Driver connection limit exceeded. Max allowed connections number is "+std::to_string(DriverConnection::MAX_CONN),
+		throw Exception("Driver connection limit exceeded. Max allowed connections number is "
+							+std::to_string(DriverConnection::MAX_CONN),
 							"Config::checkDriverConnectionLimit");
 	}
 }
+
+}  // namespace onh

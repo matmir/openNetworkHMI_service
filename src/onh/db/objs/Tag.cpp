@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,10 @@
 #include "Tag.h"
 #include "../DB.h"
 
-using namespace onh;
+namespace onh {
 
 Tag::Tag():
-    tid(0), tConnId(0), tName(""), tType(TT_BIT), tAddress({PDA_INPUT, 0, 0})
-{
+	tid(0), tConnId(0), tName(""), tType(TT_BIT), tAddress({PDA_INPUT, 0, 0}) {
 }
 
 Tag::Tag(unsigned int id,
@@ -31,7 +30,6 @@ Tag::Tag(unsigned int id,
 		const std::string& name,
 		const TagType& type,
 		const processDataAddress& address) {
-
 	setId(id);
 	setConnId(cId);
 	setName(name);
@@ -39,24 +37,20 @@ Tag::Tag(unsigned int id,
 	setAddress(address);
 }
 
-Tag::~Tag()
-{
+Tag::~Tag() {
 }
 
 void Tag::checkId(unsigned int id) const {
-
 	if (id == 0)
 		throw TagException(TagException::WRONG_ID, "Invalid tag identifier", "Tag::checkId");
 }
 
 void Tag::checkConnId(unsigned int id) const {
-
 	if (id == 0)
 		throw TagException(TagException::WRONG_ID, "Invalid driver connection identifier", "Tag::checkConnId");
 }
 
 void Tag::checkName(const std::string& nm) const {
-
 	// Check empty
 	if (nm.size() == 0)
 		throw TagException(TagException::WRONG_NAME, "Tag name is empty", "Tag::checkName");
@@ -67,7 +61,6 @@ void Tag::checkName(const std::string& nm) const {
 }
 
 void Tag::checkType(const TagType& type) const {
-
 	bool typeOK = false;
 
 	// Check type
@@ -85,7 +78,6 @@ void Tag::checkType(const TagType& type) const {
 }
 
 void Tag::checkArea(const processDataArea& area) const {
-
 	bool areaOK = false;
 
 	// Check type
@@ -100,108 +92,92 @@ void Tag::checkArea(const processDataArea& area) const {
 }
 
 void Tag::checkBitAddress(unsigned int bitAddr) const {
-
 	// Check bit range
 	if (bitAddr > 7)
 		throw TagException(TagException::BIT_ADDRESS_OUT_OF_RANGE, "Bit address is out of range", "Tag::checkBitAddress");
 }
 
 unsigned int Tag::getId() const {
-
 	checkId(tid);
 
-    return tid;
+	return tid;
 }
 
 void Tag::setId(unsigned int id) {
+	checkId(id);
 
-    checkId(id);
-
-    tid = id;
+	tid = id;
 }
 
 unsigned int Tag::getConnId() const {
-
 	checkConnId(tConnId);
 
-    return tConnId;
+	return tConnId;
 }
 
 void Tag::setConnId(unsigned int id) {
-
 	checkConnId(id);
 
-    tConnId = id;
+	tConnId = id;
 }
 
 std::string Tag::getName() const {
+	checkName(tName);
 
-    checkName(tName);
-
-    return tName;
+	return tName;
 }
 
 void Tag::setName(const std::string& nm) {
+	checkName(nm);
 
-    checkName(nm);
-
-    tName = nm;
+	tName = nm;
 }
 
 const TagType& Tag::getType() const {
-
 	checkType(tType);
 
-    return tType;
+	return tType;
 }
 
 void Tag::setType(const TagType& type) {
-
 	checkType(type);
 
-    tType = type;
+	tType = type;
 }
 
 const processDataArea& Tag::getArea() const {
-
 	checkArea(tAddress.area);
 
-    return tAddress.area;
+	return tAddress.area;
 }
 
 void Tag::setArea(const processDataArea& area) {
-
 	checkArea(area);
 
 	tAddress.area = area;
 }
 
 unsigned int Tag::getByteAddress() const {
-
-    return tAddress.byteAddr;
+	return tAddress.byteAddr;
 }
 
 void Tag::setByteAddress(unsigned int byteAddr) {
-
 	tAddress.byteAddr = byteAddr;
 }
 
 unsigned int Tag::getBitAddress() const {
-
 	checkBitAddress(tAddress.bitAddr);
 
-    return tAddress.bitAddr;
+	return tAddress.bitAddr;
 }
 
 void Tag::setBitAddress(unsigned int bitAddr) {
-
 	checkBitAddress(bitAddr);
 
-    tAddress.bitAddr = bitAddr;
+	tAddress.bitAddr = bitAddr;
 }
 
 const processDataAddress& Tag::getAddress() const {
-
 	checkArea(tAddress.area);
 	checkBitAddress(tAddress.bitAddr);
 
@@ -209,8 +185,9 @@ const processDataAddress& Tag::getAddress() const {
 }
 
 void Tag::setAddress(const processDataAddress& addr) {
-
 	setArea(addr.area);
 	setByteAddress(addr.byteAddr);
 	setBitAddress(addr.bitAddr);
 }
+
+}  // namespace onh

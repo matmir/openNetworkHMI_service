@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,56 +16,53 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCRIPTEXCEPTION_H
-#define SCRIPTEXCEPTION_H
+#ifndef ONH_DB_OBJS_SCRIPTEXCEPTION_H_
+#define ONH_DB_OBJS_SCRIPTEXCEPTION_H_
 
 #include "../../utils/Exception.h"
 
 namespace onh {
 
-    /**
-     * Script exception class
-     */
-    class ScriptException: public Exception
-    {
-        public:
+/**
+ * Script exception class
+ */
+class ScriptException: public Exception {
+	public:
+		/// SCript exception type
+		typedef enum {
+			NONE = 0,
+			WRONG_ID,
+			WRONG_NAME,
+			WRONG_TAG_TYPE,
+			NO_TAG,
+			NO_FEEDBACK_RUN_TAG
+		} ExceptionType;
 
-            /// SCript exception type
-            typedef enum {
-            	NONE = 0,
-                WRONG_ID,
-                WRONG_NAME,
-				WRONG_TAG_TYPE,
-				NO_TAG,
-                NO_FEEDBACK_RUN_TAG
-            } ExceptionType;
+		ScriptException();
 
-            ScriptException();
+		virtual ~ScriptException() noexcept;
 
-            virtual ~ScriptException() noexcept override;
+		/**
+		 * Exception constructor
+		 *
+		 * @param type Exception type
+		 * @param desc Additional exception information
+		 * @param fName Function from which exception was thrown
+		 */
+		explicit ScriptException(ExceptionType type, const std::string& desc = "", const std::string& fName = "");
 
-            /**
-             * Exception constructor
-             *
-             * @param type Exception type
-             * @param desc Additional exception information
-             * @param fName Function from which exception was thrown
-             */
-            ScriptException(ExceptionType type, const std::string& desc = "", const std::string& fName = "");
+		/**
+		 * Get exception type
+		 *
+		 * @return Exception type
+		 */
+		ExceptionType getType() const;
 
-            /**
-             * Get exception type
-             *
-             * @return Exception type
-             */
-            ExceptionType getType() const;
+	private:
+		/// Exception type
+		ExceptionType exType;
+};
 
-        private:
+}  // namespace onh
 
-            /// Exception type
-            ExceptionType exType;
-    };
-
-}
-
-#endif // SCRIPTEXCEPTION_H
+#endif  // ONH_DB_OBJS_SCRIPTEXCEPTION_H_

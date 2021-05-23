@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,101 +19,92 @@
 #include "TagLoggerDB.h"
 #include <sstream>
 
-using namespace onh;
+namespace onh {
 
 TagLoggerDB::TagLoggerDB(const TagLoggerDB &tlDB):
-    DB(tlDB)
-{
+	DB(tlDB) {
 }
 
 TagLoggerDB::TagLoggerDB(MYSQL *connDB):
-    DB(connDB)
-{
+	DB(connDB) {
 }
 
-TagLoggerDB::~TagLoggerDB()
-{
+TagLoggerDB::~TagLoggerDB() {
 }
 
 std::vector<TagLoggerItem> TagLoggerDB::getLoggers(bool enabled) {
+	// Query
+	std::stringstream q;
 
-    // Query
-    std::stringstream q;
+	// Return vector
+	std::vector<TagLoggerItem> vTagLoggers;
 
-    // Return vector
-    std::vector<TagLoggerItem> vTagLoggers;
+	// Return value
+	Tag tg;
+	TagType tt;
+	processDataArea ta;
+	TagLoggerItem tl;
 
-    // Return value
-    Tag tg;
-    TagType tt;
-    processDataArea ta;
-    TagLoggerItem tl;
+	DBResult *result = 0;
 
-    DBResult *result = 0;
+	try {
+		// Prepare query
+		q << "SELECT * FROM log_tags lt, tags t, driver_connections dc WHERE lt.lttid=t.tid AND t.tConnId=dc.dcId ";
+		q << "AND lt.ltEnable=" << ((enabled)?("1"):("0")) << ";";
 
-    try {
+		// Query
+		result = executeQuery(q.str());
 
-        // Prepare query
-        q << "SELECT * FROM log_tags lt, tags t, driver_connections dc WHERE lt.lttid=t.tid AND t.tConnId=dc.dcId ";
-        q << "AND lt.ltEnable=" << ((enabled)?("1"):("0")) << ";";
+		// Read data
+		while (result->nextRow()) {
+			// Tag type
+			tt = (TagType)result->getUInt("tType");
 
-        // Query
-        result = executeQuery(q.str());
+			// Tag area
+			ta = (processDataArea)result->getUInt("tArea");
 
-        // Read data
-        while (result->nextRow()) {
+			// Update tag object values
+			tg.setId(result->getUInt("tid"));
+			tg.setConnId(result->getUInt("tConnId"));
+			tg.setName(result->getString("tName"));
+			tg.setType(tt);
+			tg.setArea(ta);
+			tg.setByteAddress(result->getUInt("tByteAddress"));
+			tg.setBitAddress(result->getUInt("tBitAddress"));
 
-            // Tag type
-        	tt = (TagType)result->getUInt("tType");
+			// Tag logger
+			tl.setId(result->getUInt("ltid"));
+			tl.setTag(tg);
+			tl.setInterval((TagLoggerItem::intervals)result->getUInt("ltInterval"));
+			tl.setIntervalSec(result->getUInt("ltIntervalS"));
 
-            // Tag area
-        	ta = (processDataArea)result->getUInt("tArea");
+			if (result->isNull("ltLastUPD")) {
+				tl.setLastUpdate("2000-01-01 07:00:00.000");
+			} else {
+				tl.setLastUpdate(result->getString("ltLastUPD"));
+			}
 
-            // Update tag object values
-            tg.setId(result->getUInt("tid"));
-            tg.setConnId(result->getUInt("tConnId"));
-            tg.setName(result->getString("tName"));
-            tg.setType(tt);
-            tg.setArea(ta);
-            tg.setByteAddress(result->getUInt("tByteAddress"));
-            tg.setBitAddress(result->getUInt("tBitAddress"));
+			tl.setLastValue(result->getString("ltLastValue"));
+			tl.setEnable(((result->getInt("ltEnable") == 1)?(true):(false)));
 
-            // Tag logger
-            tl.setId(result->getUInt("ltid"));
-            tl.setTag(tg);
-            tl.setInterval((TagLoggerItem::intervals)result->getUInt("ltInterval"));
-            tl.setIntervalSec(result->getUInt("ltIntervalS"));
+			// Put into the vector
+			vTagLoggers.push_back(tl);
+		}
 
-            if (result->isNull("ltLastUPD")) {
-                tl.setLastUpdate("2000-01-01 07:00:00.000");
-            } else {
-                tl.setLastUpdate(result->getString("ltLastUPD"));
-            }
+		// Release memory
+		delete result;
+		result = 0;
+	} catch (DBException &e) {
+		if (result)
+			delete result;
 
-            tl.setLastValue(result->getString("ltLastValue"));
-            tl.setEnable(((result->getInt("ltEnable")==1)?(true):(false)));
+		throw Exception(e.what(), "TagLoggerDB::getLoggers");
+	}
 
-            // Put into the vector
-            vTagLoggers.push_back(tl);
-        }
-
-        // Release memory
-        delete result;
-        result = 0;
-
-    } catch (DBException &e) {
-
-        if (result)
-            delete result;
-
-        throw Exception(e.what(), "TagLoggerDB::getLoggers");
-    }
-
-    return vTagLoggers;
+	return vTagLoggers;
 }
 
 void TagLoggerDB::logTag(const TagLoggerItem& loggerItem) {
-
 	/*
 		On table log_xxx must be a trigger!
 
@@ -130,7 +121,6 @@ void TagLoggerDB::logTag(const TagLoggerItem& loggerItem) {
 
 	// Prepare table names
 	switch (loggerItem.getTag().getType()) {
-
 		case TT_BIT: {
 			tableName = "log_BIT_";
 			tableColumns = "lbtid, lbValue, lbTimeStamp";
@@ -158,16 +148,16 @@ void TagLoggerDB::logTag(const TagLoggerItem& loggerItem) {
 	}
 
 	try {
-
 		// Prepare query
-		q << "INSERT INTO " << tableName << loggerItem.getId() << " (" << tableColumns << ") VALUES (" << loggerItem.getTag().getId() << ", ";
+		q << "INSERT INTO " << tableName << loggerItem.getId();
+		q << " (" << tableColumns << ") VALUES (" << loggerItem.getTag().getId() << ", ";
 		q << loggerItem.getCurrentTimeValue().value << ", '" << loggerItem.getCurrentUpdate() << "');";
 
 		// Query
 		executeSaveQuery(q.str());
-
 	} catch (DBException &e) {
-
-        throw Exception(e.what(), "TagLoggerDB::logTag");
-    }
+		throw Exception(e.what(), "TagLoggerDB::logTag");
+	}
 }
+
+}  // namespace onh

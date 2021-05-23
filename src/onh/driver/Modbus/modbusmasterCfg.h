@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,55 +16,56 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBUSMASTERCFG_H_
-#define MODBUSMASTERCFG_H_
+#ifndef ONH_DRIVER_MODBUS_MODBUSMASTERCFG_H_
+#define ONH_DRIVER_MODBUS_MODBUSMASTERCFG_H_
 
 #include <string>
 #include "../DriverRegisterTypes.h"
 
 namespace modbusM {
 
+/**
+ * Modbus driver mode (TCP/RTU)
+ */
+typedef enum {
+	MM_RTU = 0,
+	MM_TCP
+} ModbusMode;
+
+/**
+ * Modbus configuration structure
+ */
+typedef struct ModbusCfg {
 	/**
-	 * Modbus driver mode (TCP/RTU)
+	 * Common modbus configuration
 	 */
-	typedef enum {
-		MM_RTU = 0,
-		MM_TCP
-	} ModbusMode;
+	ModbusMode mode;
+	BYTE slaveID;
+	WORD registerCount;
+	unsigned int polling;
 
 	/**
-	 * Modbus configuration structure
+	 * Modbus TCP configuration
 	 */
-	typedef struct ModbusCfg {
+	std::string TCP_addr;
+	int TCP_port;
+	bool TCP_use_slaveID;
 
-		/**
-		 * Common modbus configuration
-		 */
-		ModbusMode mode;
-		BYTE slaveID;
-		WORD registerCount;
-		unsigned int polling;
+	/**
+	 * Modbus RTU configuration
+	 */
+	std::string RTU_port;
+	int RTU_baud;
+	char RTU_parity;
+	int RTU_dataBit;
+	int RTU_stopBit;
 
-		/**
-		 * Modbus TCP configuration
-		 */
-		std::string TCP_addr;
-		int TCP_port;
-		bool TCP_use_slaveID;
+	ModbusCfg(): mode(MM_TCP), slaveID(0), registerCount(0), polling(0),
+				TCP_addr(""), TCP_port(0), TCP_use_slaveID(false),
+				RTU_port(""), RTU_baud(0), RTU_parity(0), RTU_dataBit(0),
+				RTU_stopBit(0) {}
+} ModbusCfg;
 
-		/**
-		 * Modbus RTU configuration
-		 */
-		std::string RTU_port;
-		int RTU_baud;
-		char RTU_parity;
-		int RTU_dataBit;
-		int RTU_stopBit;
+}  // namespace modbusM
 
-		ModbusCfg(): mode(MM_TCP), slaveID(0), registerCount(0), polling(0), TCP_addr(""),
-					TCP_port(0), TCP_use_slaveID(false), RTU_port(""), RTU_baud(0), RTU_parity(0), RTU_dataBit(0), RTU_stopBit(0) {}
-	} ModbusCfg;
-
-}
-
-#endif /* MODBUSMASTERCFG_H_ */
+#endif  // ONH_DRIVER_MODBUS_MODBUSMASTERCFG_H_

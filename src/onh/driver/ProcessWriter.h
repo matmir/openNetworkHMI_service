@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROCESSWRITER_H
-#define PROCESSWRITER_H
+#ifndef ONH_DRIVER_PROCESSWRITER_H_
+#define ONH_DRIVER_PROCESSWRITER_H_
 
 #include <vector>
 #include <map>
@@ -28,119 +28,116 @@
 
 namespace onh {
 
-    /// Forward declaration
-	class DriverManager;
+/// Forward declaration
+class DriverManager;
 
-	/**
-	 * Process writer class
-	 */
-    class ProcessWriter {
+/**
+ * Process writer class
+ */
+class ProcessWriter {
+	public:
+		friend class DriverManager;
 
-        public:
+		/**
+		 * Copy constructor
+		 *
+		 * @param pw ProcessWriter object to copy
+		 */
+		ProcessWriter(const ProcessWriter &pw);
 
-            friend class DriverManager;
+		virtual ~ProcessWriter();
 
-            /**
-             * Copy constructor
-             *
-             * @param pw ProcessWriter object to copy
-             */
-            ProcessWriter(const ProcessWriter &pw);
+		/**
+		 * Assign operator - inactive
+		 */
+		ProcessWriter& operator=(const ProcessWriter&) = delete;
 
-            virtual ~ProcessWriter();
+		/**
+		 * Set bit in process data
+		 *
+		 * @param tg Tag object
+		 */
+		void setBit(const Tag& tg);
 
-            /**
-			 * Assign operator - inactive
-			 */
-            ProcessWriter& operator=(const ProcessWriter&) = delete;
+		/**
+		 * Reset bit in process data
+		 *
+		 * @param tg Tag object
+		 */
+		void resetBit(const Tag& tg);
 
-            /**
-             * Set bit in process data
-             *
-             * @param tg Tag object
-             */
-            void setBit(const Tag& tg);
+		/**
+		 * Invert bit in process data
+		 *
+		 * @param tg Tag object
+		 */
+		void invertBit(const Tag& tg);
 
-            /**
-             * Reset bit in process data
-             *
-             * @param tg Tag object
-             */
-            void resetBit(const Tag& tg);
+		/**
+		 * Set bits in process data
+		 *
+		 * @param tg tags Tags array
+		 */
+		void setBits(const std::vector<Tag>& tags);
 
-            /**
-             * Invert bit in process data
-             *
-             * @param tg Tag object
-             */
-            void invertBit(const Tag& tg);
+		/**
+		 * Write byte in process data
+		 *
+		 * @param tg Tag object
+		 * @param val Byte value
+		 */
+		void writeByte(const Tag& tg, BYTE val);
 
-            /**
-             * Set bits in process data
-             *
-             * @param tg tags Tags array
-             */
-            void setBits(const std::vector<Tag>& tags);
+		/**
+		 * Write word in process data
+		 *
+		 * @param tg Tag object
+		 * @param val Word value
+		 */
+		void writeWord(const Tag& tg, WORD val);
 
-            /**
-             * Write byte in process data
-             *
-             * @param tg Tag object
-             * @param val Byte value
-             */
-            void writeByte(const Tag& tg, BYTE val);
+		/**
+		 * Write double word in process data
+		 *
+		 * @param tg Tag object
+		 * @param val Double word value
+		 */
+		void writeDWord(const Tag& tg, DWORD val);
 
-            /**
-             * Write word in process data
-             *
-             * @param tg Tag object
-             * @param val Word value
-             */
-            void writeWord(const Tag& tg, WORD val);
+		/**
+		 * Write INT in process data
+		 *
+		 * @param tg Tag object
+		 * @param val INT value
+		 */
+		void writeInt(const Tag& tg, int val);
 
-            /**
-             * Write double word in process data
-             *
-             * @param tg Tag object
-             * @param val Double word value
-             */
-            void writeDWord(const Tag& tg, DWORD val);
+		/**
+		 * Write Real in process data.
+		 *
+		 * @param tg Tag object
+		 * @param val Real value
+		 */
+		void writeReal(const Tag& tg, float val);
 
-            /**
-             * Write INT in process data
-             *
-             * @param tg Tag object
-             * @param val INT value
-             */
-            void writeInt(const Tag& tg, int val);
+	private:
+		/**
+		 * Constructor (allowed only from DriverManager)
+		 */
+		ProcessWriter();
 
-            /**
-             * Write Real in process data.
-             *
-             * @param tg Tag object
-             * @param val Real value
-             */
-            void writeReal(const Tag& tg, float val);
+		/**
+		 * Add Driver process writer to process writer (allowed only from DriverManager)
+		 *
+		 * @param id Driver process writer identifier
+		 * @param dpw Driver process writer
+		 */
+		void addWriter(unsigned int id, DriverProcessWriter *dpw);
 
-        private:
+		/// Driver process data writer
+		std::map<unsigned int, DriverProcessWriter*> driverWriter;
+};
 
-            /**
-             * Constructor (allowed only from DriverManager)
-             */
-            ProcessWriter();
+}  // namespace onh
 
-            /**
-			 * Add Driver process writer to process writer (allowed only from DriverManager)
-			 *
-			 * @param id Driver process writer identifier
-			 * @param dpw Driver process writer
-			 */
-			void addWriter(unsigned int id, DriverProcessWriter *dpw);
-
-            /// Driver process data writer
-            std::map<unsigned int, DriverProcessWriter*> driverWriter;
-    };
-
-}
-
-#endif // PROCESSWRITER_H
+#endif  // ONH_DRIVER_PROCESSWRITER_H_

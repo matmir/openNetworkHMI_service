@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,74 +16,70 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DB_H
-#define DB_H
+#ifndef ONH_DB_DB_H_
+#define ONH_DB_DB_H_
 
-#include <string>
 #include <mysql.h>
+#include <string>
 #include "DBResult.h"
 
 namespace onh {
 
-    /**
-	 * Database access base class
-	 */
-    class DB {
+/**
+ * Database access base class
+ */
+class DB {
+	public:
+		/**
+		 * DB constructor
+		 *
+		 * @param connection DB handle
+		 */
+		explicit DB(MYSQL *connDB);
 
-        public:
+		/**
+		 * Check string vale if contain invalid characters
+		 *
+		 * @param val String value
+		 * @return True if string is valid
+		 */
+		static bool checkStringValue(std::string val);
 
-            /**
-             * DB constructor
-             *
-             * @param connection DB handle
-             */
-            DB(MYSQL *connDB);
+		virtual ~DB();
 
-            /**
-             * Check string vale if contain invalid characters
-             *
-             * @param val String value
-             * @return True if string is valid
-             */
-            static bool checkStringValue(std::string val);
+		/**
+		 * Assign operator - inactive
+		 */
+		DB& operator=(const DB&) = delete;
 
-            virtual ~DB();
+	protected:
+		/**
+		 * Copy constructor
+		 *
+		 * @param rhs DB object to copy
+		 */
+		DB(const DB &rhs);
 
-            /**
-			 * Assign operator - inactive
-			 */
-            DB& operator=(const DB&) = delete;
+		/**
+		 * Execute read query to the DB
+		 *
+		 * @param q SQL query
+		 *
+		 * @return Handle for DBResult object
+		 */
+		DBResult* executeQuery(const std::string &q);
 
-        protected:
+		/**
+		 * Execute save query to the DB
+		 *
+		 * @param q SQL query
+		 */
+		void executeSaveQuery(const std::string &q);
 
-            /**
-             * Copy constructor
-             *
-             * @param rhs DB object to copy
-             */
-            DB(const DB &rhs);
+		/// DB connection instance
+		MYSQL *conn;
+};
 
-            /**
-             * Execute read query to the DB
-             *
-             * @param q SQL query
-             *
-             * @return Handle for DBResult object
-             */
-            DBResult* executeQuery(const std::string &q);
+}  // namespace onh
 
-            /**
-             * Execute save query to the DB
-             *
-             * @param q SQL query
-             */
-            void executeSaveQuery(const std::string &q);
-
-            /// DB connection instance
-            MYSQL *conn;
-
-    };
-
-}
-
-#endif // DB_H
+#endif  // ONH_DB_DB_H_

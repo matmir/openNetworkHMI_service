@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBUSMASTER_H
-#define MODBUSMASTER_H
+#ifndef ONH_DRIVER_MODBUS_MODBUSMASTER_H_
+#define ONH_DRIVER_MODBUS_MODBUSMASTER_H_
 
 #include <string.h>
 #include <sys/types.h>
@@ -29,87 +29,85 @@
 
 namespace modbusM {
 
-    /**
-     * ModbusMaster class
-     */
-    class ModbusMaster {
+/**
+ * ModbusMaster class
+ */
+class ModbusMaster {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param cfg Modbus configuration structure
+		 */
+		explicit ModbusMaster(const ModbusCfg& cfg);
 
-        public:
-    		/**
-    		 * Constructor
-    		 *
-    		 * @param cfg Modbus configuration structure
-    		 */
-            ModbusMaster(const ModbusCfg& cfg);
+		/**
+		 * Copy constructor - inactive
+		 */
+		ModbusMaster(const ModbusMaster&) = delete;
 
-            /**
-			 * Copy constructor - inactive
-			 */
-            ModbusMaster(const ModbusMaster&) = delete;
+		~ModbusMaster();
 
-            ~ModbusMaster();
+		/**
+		 * Assign operator - inactive
+		 */
+		ModbusMaster& operator=(const ModbusMaster&) = delete;
 
-            /**
-			 * Assign operator - inactive
-			 */
-            ModbusMaster& operator=(const ModbusMaster&) = delete;
+		/**
+		 * Connect to the slave
+		 *
+		 * @return True if connected
+		 */
+		void connect();
 
-            /**
-             * Connect to the slave
-             *
-             * @return True if connected
-             */
-            void connect();
+		/**
+		 * Disconnect from slave
+		 */
+		void disconnect();
 
-            /**
-             * Disconnect from slave
-             */
-            void disconnect();
+		/**
+		 * Read input registers from controller
+		 *
+		 * @param regAddress Register start address
+		 * @param quantity Number of registers to read
+		 * @param buff Buffer on register values
+		 */
+		void READ_INPUT_REGISTERS(WORD regAddress, WORD quantity, WORD *buff);
 
-            /**
-             * Read input registers from controller
-             *
-             * @param regAddress Register start address
-             * @param quantity Number of registers to read
-             * @param buff Buffer on register values
-             */
-            void READ_INPUT_REGISTERS(WORD regAddress, WORD quantity, WORD *buff);
+		/**
+		 * Read holding registers from controller
+		 *
+		 * @param regAddress Register start address
+		 * @param quantity Number of registers to read
+		 * @param buff Buffer on register values
+		 */
+		void READ_HOLDING_REGISTERS(WORD regAddress, WORD quantity, WORD *buff);
 
-            /**
-             * Read holding registers from controller
-             *
-             * @param regAddress Register start address
-             * @param quantity Number of registers to read
-             * @param buff Buffer on register values
-             */
-            void READ_HOLDING_REGISTERS(WORD regAddress, WORD quantity, WORD *buff);
+		/**
+		 * Write single holding register in controller
+		 *
+		 * @param regAddress Register start address
+		 * @param value Register value
+		 */
+		void WRITE_SINGLE_REGISTER(WORD regAddress, WORD value);
 
-            /**
-             * Write single holding register in controller
-             *
-             * @param regAddress Register start address
-             * @param value Register value
-             */
-            void WRITE_SINGLE_REGISTER(WORD regAddress, WORD value);
+		/**
+		 * Write multiple holding registers in controller
+		 *
+		 * @param regAddress Register start address
+		 * @param quantity Number of registers to write
+		 * @param values Buffer with register values
+		 */
+		void WRITE_MULTIPLE_REGISTERS(WORD regAddress, WORD quantity, WORD *values);
 
-            /**
-             * Write multiple holding registers in controller
-             *
-             * @param regAddress Register start address
-             * @param quantity Number of registers to write
-             * @param values Buffer with register values
-             */
-            void WRITE_MULTIPLE_REGISTERS(WORD regAddress, WORD quantity, WORD *values);
+	private:
+		/// Modbus communication structure
+		modbus_t *mb;
 
-        private:
+		/// Modbus configuration structure
+		ModbusCfg config;
+};
 
-            /// Modbus communication structure
-            modbus_t *mb;
+}  // namespace modbusM
 
-            /// Modbus configuration structure
-            ModbusCfg config;
-    };
-
-}
-
-#endif // MODBUSMASTER_H
+#endif  // ONH_DRIVER_MODBUS_MODBUSMASTER_H_

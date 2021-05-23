@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBSPROCESSDATA_INCLUDED
-#define MODBSPROCESSDATA_INCLUDED
+#ifndef ONH_DRIVER_MODBUS_MODBUSPROCESSDATA_H_
+#define ONH_DRIVER_MODBUS_MODBUSPROCESSDATA_H_
 
 #include <vector>
 #include "ModbusRegisters.h"
@@ -26,132 +26,129 @@
 
 namespace onh {
 
-    /**
-	 * Modbus process data class
-	 */
-    class ModbusProcessData {
+/**
+ * Modbus process data class
+ */
+class ModbusProcessData {
+	public:
+		/**
+		 * Default constructor
+		 */
+		ModbusProcessData();
 
-    	public:
+		/**
+		 * Constructor
+		 *
+		 * @param regCnt Process registers count
+		 */
+		explicit ModbusProcessData(WORD regCnt);
 
-    		/**
-    		 * Default constructor
-    		 */
-    		ModbusProcessData();
+		/**
+		 * Constructor
+		 *
+		 * @param mr Modbus registers structure
+		 */
+		explicit ModbusProcessData(const ModbusRegisters &mr);
 
-    		/**
-			 * Constructor
-			 *
-			 * @param regCnt Process registers count
-			 */
-			ModbusProcessData(WORD regCnt);
+		/**
+		 * Copy constructor
+		 */
+		ModbusProcessData(const ModbusProcessData &mpd);
 
-			/**
-			 * Constructor
-			 *
-			 * @param mr Modbus registers structure
-			 */
-			ModbusProcessData(const ModbusRegisters &mr);
+		~ModbusProcessData();
 
-    		/**
-			 * Copy constructor
-			 */
-    		ModbusProcessData(const ModbusProcessData &mpd);
+		/**
+		 * Assign operator
+		 */
+		ModbusProcessData& operator=(const ModbusProcessData &mpd);
 
-    		~ModbusProcessData();
+		/**
+		 * Get bit from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Bit value from process data
+		 */
+		bool getBit(processDataAddress addr) const;
 
-    		/**
-			 * Assign operator
-			 */
-    		ModbusProcessData& operator=(const ModbusProcessData &mpd);
+		/**
+		 * Get bits from process data
+		 *
+		 * @param addr Vector with bits addresses
+		 *
+		 * @return Vector with bits value
+		 */
+		std::vector<bool> getBits(const std::vector<processDataAddress>& addr) const;
 
-    		/**
-			 * Get bit from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Bit value from process data
-			 */
-			bool getBit(processDataAddress addr) const;
+		/**
+		 * Get byte from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Byte value from process data
+		 */
+		BYTE getByte(processDataAddress addr) const;
 
-			/**
-			 * Get bits from process data
-			 *
-			 * @param addr Vector with bits addresses
-			 *
-			 * @return Vector with bits value
-			 */
-			std::vector<bool> getBits(const std::vector<processDataAddress>& addr) const;
+		/**
+		 * Get WORD from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Word value from process data
+		 */
+		WORD getWord(processDataAddress addr) const;
 
-			/**
-			 * Get byte from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Byte value from process data
-			 */
-			BYTE getByte(processDataAddress addr) const;
+		/**
+		 * Get DWORD from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Double word value from process data
+		 */
+		DWORD getDWord(processDataAddress addr) const;
 
-			/**
-			 * Get WORD from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Word value from process data
-			 */
-			WORD getWord(processDataAddress addr) const;
+		/**
+		 * Get INT from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Int value from process data
+		 */
+		int getInt(processDataAddress addr) const;
 
-			/**
-			 * Get DWORD from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Double word value from process data
-			 */
-			DWORD getDWord(processDataAddress addr) const;
+		/**
+		 * Get REAL from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Real value from process data
+		 */
+		float getReal(processDataAddress addr) const;
 
-			/**
-			 * Get INT from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Int value from process data
-			 */
-			int getInt(processDataAddress addr) const;
+		/**
+		 * Get max Byte address
+		 *
+		 * @return Max Byte address
+		 */
+		unsigned int getMaxByte() const;
 
-			/**
-			 * Get REAL from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Real value from process data
-			 */
-			float getReal(processDataAddress addr) const;
+		/**
+		 * Get registers count
+		 *
+		 * @return Registers count
+		 */
+		WORD getRegCount() const;
 
-    		/**
-    		 * Get max Byte address
-    		 *
-    		 * @return Max Byte address
-    		 */
-    		unsigned int getMaxByte() const;
+		/**
+		 * Clear modbus registers
+		 */
+		void clear();
 
-    		/**
-    		 * Get registers count
-    		 *
-    		 * @return Registers count
-    		 */
-    		WORD getRegCount() const;
+	private:
+		/// Process registers count
+		ModbusRegisters mreg;
+};
 
-    		/**
-    		 * Clear modbus registers
-    		 */
-    		void clear();
+}  // namespace onh
 
-    	private:
-
-			/// Process registers count
-    		ModbusRegisters mreg;
-    };
-
-}
-
-#endif // MODBSPROCESSDATA_INCLUDED
+#endif  // ONH_DRIVER_MODBUS_MODBUSPROCESSDATA_H_

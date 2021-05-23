@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Mateusz Mirosławski
+ * Copyright (c) 2021 Mateusz Mirosławski
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef S_MEMORY
-#define S_MEMORY
+#ifndef ONH_DRIVER_SHM_SMEMORY_H_
+#define ONH_DRIVER_SHM_SMEMORY_H_
 
 #include "processData.h"
 #include <pthread.h>
@@ -62,7 +62,6 @@
  * Command data structure
  */
 typedef struct {
-
 	/// Command number
 	int command;
 
@@ -71,14 +70,12 @@ typedef struct {
 
 	/// Command data length
 	int len;
-
 } extCMD;
 
 /**
  * Client - Server communication structure
  */
 typedef struct {
-
 	/// Command data structure.
 	extCMD data;
 
@@ -94,33 +91,28 @@ typedef struct {
 
 	/// Server set this variable to 1 when he finished writing reply data
 	int replyIn;
-
 } smCS;
 
 /**
  * Shared memory process data structure
  */
 typedef struct {
-
 	/// Process data
 	processData procDT;
 
 	/// Synchronization mutex
 	pthread_mutex_t processMutex;
-
 } smProcess;
 
 /**
  * Shared memory structure
  */
 typedef struct {
-
 	/// Client - Server communication structure
 	smCS cs;
 
 	/// Process data exchange structure
 	smProcess process;
-
 } sMemory;
 
-#endif
+#endif  // ONH_DRIVER_SHM_SMEMORY_H_

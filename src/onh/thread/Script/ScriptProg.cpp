@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +16,16 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptProg.h"
-
 #include <stdlib.h>
-#include <sstream>
 #include <sys/stat.h>
 #include <errno.h>
+#include <sstream>
+#include "ScriptProg.h"
 #include "../../utils/Exception.h"
 #include "../../utils/DateUtils.h"
 #include "../../db/ScriptDB.h"
 
-using namespace onh;
+namespace onh {
 
 ScriptProg::ScriptProg(const ProcessReader& pr,
 						const ProcessWriter& pw,
@@ -36,172 +35,151 @@ ScriptProg::ScriptProg(const ProcessReader& pr,
 						bool tstEnv,
 						const GuardDataController<ThreadExitData> &gdcTED,
 						const GuardDataController<CycleTimeData> &gdcCTD):
-    ThreadProgram(gdcTED, gdcCTD, updateInterval, "script", "scriptLog_"), executeScript(execScript), testEnv(tstEnv)
-{
-    // Process reader
-    prReader = new ProcessReader(pr);
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "script", "scriptLog_"), executeScript(execScript), testEnv(tstEnv) {
+	// Process reader
+	prReader = new ProcessReader(pr);
 
-    // Process writer
-    prWriter = new ProcessWriter(pw);
+	// Process writer
+	prWriter = new ProcessWriter(pw);
 
-    // Script DB access
-    db = new ScriptDB(sdb);
+	// Script DB access
+	db = new ScriptDB(sdb);
 
-    dirReady = false;
+	dirReady = false;
 
-    // Create script redirected output directory log
-    if (mkdir("logs/scriptOutput", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
-        if (errno == EEXIST) {
-            dirReady = true;
-        }
-    } else {
-        dirReady = true;
-    }
+	// Create script redirected output directory log
+	if (mkdir("logs/scriptOutput", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
+		if (errno == EEXIST) {
+			dirReady = true;
+		}
+	} else {
+		dirReady = true;
+	}
 }
 
-ScriptProg::~ScriptProg()
-{
-    if (prReader)
-        delete prReader;
-    if (prWriter)
-        delete prWriter;
-    if (db)
-        delete db;
+ScriptProg::~ScriptProg() {
+	if (prReader)
+		delete prReader;
+	if (prWriter)
+		delete prWriter;
+	if (db)
+		delete db;
 
-    getLogger().write("Script system close");
+	getLogger().write("Script system close");
 }
 
 void ScriptProg::operator()() {
+	try {
+		getLogger().write("Start main loop");
 
-    try {
+		if (!prReader)
+			throw Exception("No reader object");
 
-    	getLogger().write("Start main loop");
+		if (!prWriter)
+			throw Exception("No writer object");
+		if (!db)
+			throw Exception("No DB object!");
 
-        if (!prReader)
-            throw Exception("No reader object");
+		if (!dirReady)
+			throw Exception("Log directory for script output does not exist");
 
-        if (!prWriter)
-            throw Exception("No writer object");
-        if (!db)
-            throw Exception("No DB object!");
+		while(!isExitFlag()) {
+			// Start thread cycle time measure
+			startCycleMeasure();
 
-        if (!dirReady)
-            throw Exception("Log directory for script output does not exist");
-
-        while(!isExitFlag()) {
-
-            // Start thread cycle time measure
-            startCycleMeasure();
-
-            // Update process reader
+			// Update process reader
 			prReader->updateProcessData();
 
-            // Check scripts tags
-            checkScripts();
+			// Check scripts tags
+			checkScripts();
 
-            // Wait
-            threadWait();
+			// Wait
+			threadWait();
 
-            // Stop thread cycle time measure
-            stopCycleMeasure();
-        }
+			// Stop thread cycle time measure
+			stopCycleMeasure();
+		}
+	} catch (Exception &e) {
+		getLogger().write(e.what());
 
-    } catch (Exception &e) {
-
-    	getLogger().write(e.what());
-
-        // Exit application
-    	exit("Script system");
-    }
+		// Exit application
+		exit("Script system");
+	}
 }
 
 void ScriptProg::checkScripts() {
+	// Get scripts
+	std::vector<ScriptItem> sc = db->getScripts();
 
-    // Get scripts
-    std::vector<ScriptItem> sc = db->getScripts();
+	std::string cmd;
 
-    std::string cmd;
+	for (unsigned int i=0; i < sc.size(); ++i) {
+		// Run script - check flags
+		if (!sc[i].isRunning() && !sc[i].isLocked()) {
+			// Check trigger Tag value - only true triggers script
+			if (prReader->getBitValue(sc[i].getTag())) {
+				// Prepare log file name (script output)
+				std::string logFile = "logs/scriptOutput/";
+				logFile += DateUtils::getTimestampString(false, '-', '_', '_');
+				logFile += "_"+sc[i].getName()+".log";
 
-    for (unsigned int i=0; i<sc.size(); ++i) {
+				// Check environment - if 'test' we need to call script from test environment in Symfony
+				if (testEnv) {
+					cmd = "APP_ENV=test ";
+				} else {
+					cmd = "";
+				}
 
-        // Run script - check flags
-        if (!sc[i].isRunning() && !sc[i].isLocked()) {
+				// Prepare command (run in background)
+				cmd += executeScript+" "+sc[i].getName()+" > "+logFile+" 2>&1 &";
 
-            // Check trigger Tag value - only true triggers script
-            if (prReader->getBitValue(sc[i].getTag())) {
+				// Set run flag
+				db->setScriptRun(sc[i]);
 
-                // Prepare log file name (script output)
-                std::string logFile = "logs/scriptOutput/";
-                logFile += DateUtils::getTimestampString(false, '-', '_', '_');
-                logFile += "_"+sc[i].getName()+".log";
+				// Run script
+				system(cmd.c_str());
 
-                // Check environment - if 'test' we need to call script from test environment in Symfony
-                if (testEnv) {
-                	cmd = "APP_ENV=test ";
-                } else {
-                	cmd = "";
-                }
+				getLogger().write("Run script: "+cmd);
+			}
+		}
 
-                // Prepare command (run in background)
-                cmd += executeScript+" "+sc[i].getName()+" > "+logFile+" 2>&1 &";
+		// Set feedback tag
+		if (sc[i].isRunning()) {
+			try {
+				// Set bit informs controller that script is running
+				if (!prReader->getBitValue(sc[i].getFeedbackRunTag()))
+					prWriter->setBit(sc[i].getFeedbackRunTag());
+			} catch (ScriptException &e) {
+				if (e.getType() != ScriptException::ExceptionType::NO_FEEDBACK_RUN_TAG) {
+					// Re-throw exception
+					throw;
+				}
+			}
 
-                // Set run flag
-                db->setScriptRun(sc[i]);
+		} else {
+			try {
+				// Reset bit informs controller that script is running
+				if (prReader->getBitValue(sc[i].getFeedbackRunTag()))
+					prWriter->resetBit(sc[i].getFeedbackRunTag());
+			} catch (ScriptException &e) {
+				if (e.getType() != ScriptException::ExceptionType::NO_FEEDBACK_RUN_TAG) {
+					// Re-throw exception
+					throw;
+				}
+			}
+		}
 
-                // Run script
-                system(cmd.c_str());
+		// Check lock flag
+		if (sc[i].isLocked() && !sc[i].isRunning()) {
+			// Check trigger tag value
+			if (!prReader->getBitValue(sc[i].getTag())) {
+				// Reset lock flag
+				db->clearScriptLock(sc[i]);
 
-                getLogger().write("Run script: "+cmd);
-
-            }
-
-        }
-
-        // Set feedback tag
-        if (sc[i].isRunning()) {
-
-            try {
-                // Set bit informs controller that script is running
-                if (!prReader->getBitValue(sc[i].getFeedbackRunTag()))
-                    prWriter->setBit(sc[i].getFeedbackRunTag());
-
-            } catch (ScriptException &e) {
-                if (e.getType() != ScriptException::ExceptionType::NO_FEEDBACK_RUN_TAG) {
-                    // Re-throw exception
-                    throw;
-                }
-            }
-
-        } else {
-
-            try {
-                // Reset bit informs controller that script is running
-                if (prReader->getBitValue(sc[i].getFeedbackRunTag()))
-                    prWriter->resetBit(sc[i].getFeedbackRunTag());
-
-            } catch (ScriptException &e) {
-                if (e.getType() != ScriptException::ExceptionType::NO_FEEDBACK_RUN_TAG) {
-                    // Re-throw exception
-                    throw;
-                }
-            }
-
-        }
-
-        // Check lock flag
-        if (sc[i].isLocked() && !sc[i].isRunning()) {
-
-            // Check trigger tag value
-            if (!prReader->getBitValue(sc[i].getTag())) {
-
-                // Reset lock flag
-                db->clearScriptLock(sc[i]);
-
-                getLogger().write("Script unlocked: "+sc[i].getName());
-
-            }
-
-        }
-
-    }
+				getLogger().write("Script unlocked: "+sc[i].getName());
+			}
+		}
+	}
 }
+
+}  // namespace onh

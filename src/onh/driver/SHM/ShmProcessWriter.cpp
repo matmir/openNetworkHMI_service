@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,28 +16,26 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ShmProcessWriter.h"
-#include "../DriverUtils.h"
 #include <pthread.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include "../DriverException.h"
-#include "sCommands.h"
 #include <string.h>
 #include <sstream>
+#include "ShmProcessWriter.h"
+#include "../DriverUtils.h"
+#include "../DriverException.h"
+#include "sCommands.h"
 
-using namespace onh;
+namespace onh {
 
 ShmProcessWriter::ShmProcessWriter(const std::string& segmentName, sMemory *smem, const MutexAccess& lock):
-	shmName(segmentName), shm(smem), driverLock(lock)
-{
+	shmName(segmentName), shm(smem), driverLock(lock) {
 }
 
 ShmProcessWriter::~ShmProcessWriter() {
 }
 
 extCMD ShmProcessWriter::putRequest(extCMD cmd) {
-
 	// Check SHM
 	if (shm == MAP_FAILED || shm == 0) {
 		throw DriverException("SHM ("+shmName+") is not initialized", "ShmProcessWriter::putRequest");
@@ -54,7 +52,6 @@ extCMD ShmProcessWriter::putRequest(extCMD cmd) {
 
 	// Check if shm is ready to put data
 	if ((shm->cs.requestIn == 0) && (shm->cs.replyIn == 0)) {
-
 		// Copy command data
 		shm->cs.data = cmd;
 
@@ -102,7 +99,6 @@ extCMD ShmProcessWriter::putRequest(extCMD cmd) {
 		}
 
 	} else {
-
 		throw DriverException("SHM is not ready to put data", "ShmProcessWriter::putRequest");
 	}
 
@@ -110,73 +106,64 @@ extCMD ShmProcessWriter::putRequest(extCMD cmd) {
 }
 
 void ShmProcessWriter::modifyBit(processDataAddress addr, int drvFunc) {
+	// Check bit address
+	DriverUtils::DriverUtils::checkBitAddress(addr);
 
-    // Check bit address
-    DriverUtils::DriverUtils::checkBitAddress(addr);
+	// Check byte address
+	if (addr.byteAddr >= PROCESS_DT_SIZE) {
+		throw DriverException("Byte address is out of range", "ShmProcessWriter::modifyBit");
+	}
 
-    // Check byte address
-    if (addr.byteAddr >= PROCESS_DT_SIZE) {
+	// Prepare command
+	extCMD cmd;
+	extCMD cmd_reply;
+	cmd.command = drvFunc;
+	cmd.len = 3;
 
-    	throw DriverException("Byte address is out of range", "ShmProcessWriter::modifyBit");
-    }
+	// Process area
+	switch (addr.area) {
+		case PDA_INPUT: cmd.value[0] = DRV_PROC_IN; break;
+		case PDA_OUTPUT: cmd.value[0] = DRV_PROC_OUT; break;
+		case PDA_MEMORY: cmd.value[0] = DRV_PROC_MEM; break;
+		default: throw DriverException("Wrong address area", "ShmProcessWriter::modifyBit"); break;
+	}
 
-    // Prepare command
-    extCMD cmd;
-    extCMD cmd_reply;
-    cmd.command = drvFunc;
-    cmd.len = 3;
+	// Byte address
+	cmd.value[1] = addr.byteAddr;
+	// Bit address
+	cmd.value[2] = addr.bitAddr;
 
-    // Process area
-    switch (addr.area) {
-        case PDA_INPUT: cmd.value[0] = DRV_PROC_IN; break;
-        case PDA_OUTPUT: cmd.value[0] = DRV_PROC_OUT; break;
-        case PDA_MEMORY: cmd.value[0] = DRV_PROC_MEM; break;
-        default: throw DriverException("Wrong address area", "ShmProcessWriter::modifyBit"); break;
-    }
+	// Send command
+	cmd_reply = putRequest(cmd);
 
-    // Byte address
-    cmd.value[1] = addr.byteAddr;
-    // Bit address
-    cmd.value[2] = addr.bitAddr;
-
-    // Send command
-    cmd_reply = putRequest(cmd);
-
-    if (cmd_reply.command != DRV_CMD_OK) {
-
-    	throw DriverException("Controller respond is ERROR", "ShmProcessWriter::modifyBit");
-    }
+	if (cmd_reply.command != DRV_CMD_OK) {
+		throw DriverException("Controller respond is ERROR", "ShmProcessWriter::modifyBit");
+	}
 }
 
 void ShmProcessWriter::setBit(processDataAddress addr) {
-
 	driverLock.lock();
 
 	try {
-
 		modifyBit(addr, DRV_SET_BIT);
 
 		driverLock.unlock();
-
 	} catch(...) {
-        // Unlock access to the driver
-    	driverLock.unlock();
+		// Unlock access to the driver
+		driverLock.unlock();
 
-        // Re-throw exception
-        throw;
-    }
+		// Re-throw exception
+		throw;
+	}
 }
 
 void ShmProcessWriter::resetBit(processDataAddress addr) {
-
 	driverLock.lock();
 
 	try {
-
 		modifyBit(addr, DRV_RESET_BIT);
 
 		driverLock.unlock();
-
 	} catch(...) {
 		// Unlock access to the driver
 		driverLock.unlock();
@@ -187,15 +174,12 @@ void ShmProcessWriter::resetBit(processDataAddress addr) {
 }
 
 void ShmProcessWriter::invertBit(processDataAddress addr) {
-
 	driverLock.lock();
 
-    try {
-
+	try {
 		modifyBit(addr, DRV_INVERT_BIT);
 
 		driverLock.unlock();
-
 	} catch(...) {
 		// Unlock access to the driver
 		driverLock.unlock();
@@ -206,15 +190,12 @@ void ShmProcessWriter::invertBit(processDataAddress addr) {
 }
 
 void ShmProcessWriter::setBits(std::vector<processDataAddress> addr) {
-
 	driverLock.lock();
 
 	try {
-
 		// Maximum number bits to set (one bit need 3 ints of data)
 		unsigned int maxTags = CMD_DATA_SIZE / 3;
 		if (addr.size() > maxTags) {
-
 			std::stringstream s;
 			s << "Too much bits to set - max numbers bits to set is " << maxTags << " received " << addr.size();
 
@@ -231,14 +212,12 @@ void ShmProcessWriter::setBits(std::vector<processDataAddress> addr) {
 		int dto = 0;
 
 		// Prepare command data
-		for (unsigned int i=0; i<addr.size(); ++i) {
-
+		for (unsigned int i=0; i < addr.size(); ++i) {
 			// Check bit address
 			DriverUtils::checkBitAddress(addr[i]);
 
 			// Check byte address
 			if (addr[i].byteAddr >= PROCESS_DT_SIZE) {
-
 				throw DriverException("Byte address is out of range", "ShmProcessWriter::setBits");
 			}
 
@@ -257,19 +236,16 @@ void ShmProcessWriter::setBits(std::vector<processDataAddress> addr) {
 
 			// Set offset (for next tag)
 			dto += 3;
-
 		}
 
 		// Send command
 		cmd_reply = putRequest(cmd);
 
 		if (cmd_reply.command != DRV_CMD_OK) {
-
 			throw DriverException("Controller respond is ERROR", "ShmProcessWriter::setBits");
 		}
 
 		driverLock.unlock();
-
 	} catch(...) {
 		// Unlock access to the driver
 		driverLock.unlock();
@@ -280,17 +256,14 @@ void ShmProcessWriter::setBits(std::vector<processDataAddress> addr) {
 }
 
 void ShmProcessWriter::writeByte(processDataAddress addr, BYTE val) {
-
 	driverLock.lock();
 
 	try {
-
 		// Check bit address
 		DriverUtils::checkBitAddress(addr);
 
 		// Check byte address
 		if (addr.byteAddr >= PROCESS_DT_SIZE) {
-
 			throw DriverException("Byte address is out of range", "ShmProcessWriter::writeByte");
 		}
 
@@ -317,12 +290,10 @@ void ShmProcessWriter::writeByte(processDataAddress addr, BYTE val) {
 		cmd_reply = putRequest(cmd);
 
 		if (cmd_reply.command != DRV_CMD_OK) {
-
 			throw DriverException("Controller respond is ERROR", "ShmProcessWriter::writeByte");
 		}
 
 		driverLock.unlock();
-
 	} catch(...) {
 		// Unlock access to the driver
 		driverLock.unlock();
@@ -333,17 +304,14 @@ void ShmProcessWriter::writeByte(processDataAddress addr, BYTE val) {
 }
 
 void ShmProcessWriter::writeWord(processDataAddress addr, WORD val) {
-
 	driverLock.lock();
 
 	try {
-
 		// Check bit address
 		DriverUtils::checkBitAddress(addr);
 
 		// Check byte address
 		if (addr.byteAddr >= PROCESS_DT_SIZE-1) {
-
 			throw DriverException("Byte address is out of range", "ShmProcessWriter::writeWord");
 		}
 
@@ -370,12 +338,10 @@ void ShmProcessWriter::writeWord(processDataAddress addr, WORD val) {
 		cmd_reply = putRequest(cmd);
 
 		if (cmd_reply.command != DRV_CMD_OK) {
-
 			throw DriverException("Controller respond is ERROR", "ShmProcessWriter::writeWord");
 		}
 
 		driverLock.unlock();
-
 	} catch(...) {
 		// Unlock access to the driver
 		driverLock.unlock();
@@ -386,17 +352,14 @@ void ShmProcessWriter::writeWord(processDataAddress addr, WORD val) {
 }
 
 void ShmProcessWriter::writeDWord(processDataAddress addr, DWORD val) {
-
 	driverLock.lock();
 
 	try {
-
 		// Check bit address
 		DriverUtils::checkBitAddress(addr);
 
 		// Check byte address
 		if (addr.byteAddr >= PROCESS_DT_SIZE-3) {
-
 			throw DriverException("Byte address is out of range", "ShmProcessWriter::writeDWord");
 		}
 
@@ -425,12 +388,10 @@ void ShmProcessWriter::writeDWord(processDataAddress addr, DWORD val) {
 		cmd_reply = putRequest(cmd);
 
 		if (cmd_reply.command != DRV_CMD_OK) {
-
 			throw DriverException("Controller respond is ERROR", "ShmProcessWriter::writeDWord");
 		}
 
 		driverLock.unlock();
-
 	} catch(...) {
 		// Unlock access to the driver
 		driverLock.unlock();
@@ -441,17 +402,14 @@ void ShmProcessWriter::writeDWord(processDataAddress addr, DWORD val) {
 }
 
 void ShmProcessWriter::writeInt(processDataAddress addr, int val) {
-
 	driverLock.lock();
 
 	try {
-
 		// Check bit address
 		DriverUtils::checkBitAddress(addr);
 
 		// Check byte address
 		if (addr.byteAddr >= PROCESS_DT_SIZE-3) {
-
 			throw DriverException("Byte address is out of range", "ShmProcessWriter::writeInt");
 		}
 
@@ -478,12 +436,10 @@ void ShmProcessWriter::writeInt(processDataAddress addr, int val) {
 		cmd_reply = putRequest(cmd);
 
 		if (cmd_reply.command != DRV_CMD_OK) {
-
 			throw DriverException("Controller respond is ERROR", "ShmProcessWriter::writeInt");
 		}
 
 		driverLock.unlock();
-
 	} catch(...) {
 		// Unlock access to the driver
 		driverLock.unlock();
@@ -494,17 +450,14 @@ void ShmProcessWriter::writeInt(processDataAddress addr, int val) {
 }
 
 void ShmProcessWriter::writeReal(processDataAddress addr, float val) {
-
 	driverLock.lock();
 
 	try {
-
 		// Check bit address
 		DriverUtils::checkBitAddress(addr);
 
 		// Check byte address
 		if (addr.byteAddr >= PROCESS_DT_SIZE-3) {
-
 			throw DriverException("Byte address is out of range", "ShmProcessWriter::writeReal");
 		}
 
@@ -532,12 +485,10 @@ void ShmProcessWriter::writeReal(processDataAddress addr, float val) {
 		cmd_reply = putRequest(cmd);
 
 		if (cmd_reply.command != DRV_CMD_OK) {
-
 			throw DriverException("Controller respond is ERROR", "ShmProcessWriter::writeReal");
 		}
 
 		driverLock.unlock();
-
 	} catch(...) {
 		// Unlock access to the driver
 		driverLock.unlock();
@@ -548,16 +499,13 @@ void ShmProcessWriter::writeReal(processDataAddress addr, float val) {
 }
 
 DriverProcessWriter* ShmProcessWriter::createNew() {
-
 	return new ShmProcessWriter(shmName, shm, driverLock);
 }
 
 void ShmProcessWriter::sendServerExitCommand() {
-
 	driverLock.lock();
 
 	try {
-
 		// Prepare command
 		extCMD cmd;
 		extCMD cmd_reply;
@@ -568,12 +516,10 @@ void ShmProcessWriter::sendServerExitCommand() {
 		cmd_reply = putRequest(cmd);
 
 		if (cmd_reply.command != DRV_CMD_OK) {
-
 			throw DriverException("Controller respond is ERROR", "ShmProcessWriter::sendServerExitCommand");
 		}
 
 		driverLock.unlock();
-
 	} catch(...) {
 		// Unlock access to the driver
 		driverLock.unlock();
@@ -582,3 +528,5 @@ void ShmProcessWriter::sendServerExitCommand() {
 		throw;
 	}
 }
+
+}  // namespace onh

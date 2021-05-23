@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROCESSDATA
-#define PROCESSDATA
+#ifndef ONH_DRIVER_SHM_PROCESSDATA_H_
+#define ONH_DRIVER_SHM_PROCESSDATA_H_
 
 #include "../DriverRegisterTypes.h"
 
@@ -36,7 +36,6 @@ typedef struct {
 
 	/// Process data memory
 	BYTE mem[PROCESS_DT_SIZE];
-
 } processData;
 
-#endif /* PROCESSDATA */
+#endif  // ONH_DRIVER_SHM_PROCESSDATA_H_

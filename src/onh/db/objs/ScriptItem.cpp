@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,49 +18,46 @@
 
 #include "ScriptItem.h"
 
-using namespace onh;
+namespace onh {
 
 ScriptItem::ScriptItem():
-    scid(0),
-    scTag(0),
-    scName(""),
-    scRun(false),
-    scLock(false),
+	scid(0),
+	scTag(0),
+	scName(""),
+	scRun(false),
+	scLock(false),
 	scFeedbackRun(0),
-    scEnable(false)
-{
+	scEnable(false) {
 }
 
 ScriptItem::ScriptItem(unsigned int id,
-                        const Tag& tag,
-                        const std::string& name,
-                        bool run,
-                        bool lock,
-                        bool enabled):
-    scTag(0),
-    scRun(run),
-    scLock(lock),
+						const Tag& tag,
+						const std::string& name,
+						bool run,
+						bool lock,
+						bool enabled):
+	scTag(0),
+	scRun(run),
+	scLock(lock),
 	scFeedbackRun(0),
-    scEnable(enabled)
-{
+	scEnable(enabled) {
 	setId(id);
 	setTag(tag);
 	setName(name);
 }
 
 ScriptItem::ScriptItem(unsigned int id,
-                        const Tag& tag,
-                        const std::string& name,
-                        bool run,
-                        bool lock,
-                        const Tag& feedbackRun,
-                        bool enabled):
-    scTag(0),
-    scRun(run),
-    scLock(lock),
+						const Tag& tag,
+						const std::string& name,
+						bool run,
+						bool lock,
+						const Tag& feedbackRun,
+						bool enabled):
+	scTag(0),
+	scRun(run),
+	scLock(lock),
 	scFeedbackRun(0),
-    scEnable(enabled)
-{
+	scEnable(enabled) {
 	setId(id);
 	setTag(tag);
 	setName(name);
@@ -70,64 +67,58 @@ ScriptItem::ScriptItem(unsigned int id,
 ScriptItem::ScriptItem(const ScriptItem& rhs):
 	scid(rhs.scid),
 	scName(rhs.scName),
-    scRun(rhs.scRun),
-    scLock(rhs.scLock),
-    scEnable(rhs.scEnable)
-{
-
+	scRun(rhs.scRun),
+	scLock(rhs.scLock),
+	scEnable(rhs.scEnable) {
 	if (rhs.scTag)
 		scTag = new Tag(*rhs.scTag);
 	else
 		scTag = 0;
 
-    if (rhs.scFeedbackRun)
-    	scFeedbackRun = new Tag(*rhs.scFeedbackRun);
-    else
-    	scFeedbackRun = 0;
+	if (rhs.scFeedbackRun)
+		scFeedbackRun = new Tag(*rhs.scFeedbackRun);
+	else
+		scFeedbackRun = 0;
 }
 
-ScriptItem::~ScriptItem()
-{
+ScriptItem::~ScriptItem() {
 	if (scTag)
 		delete scTag;
 
-    if (scFeedbackRun)
-        delete scFeedbackRun;
+	if (scFeedbackRun)
+		delete scFeedbackRun;
 }
 
 ScriptItem& ScriptItem::operator=(const ScriptItem& rhs) {
+	// Self assignment check
+	if (this != &rhs) {
+		scid = rhs.scid;
+		scName = rhs.scName;
+		scRun = rhs.scRun;
+		scLock = rhs.scLock;
+		scEnable = rhs.scEnable;
 
-    // Self assignment check
-    if (this != &rhs) {
-
-    	scid = rhs.scid;
-    	scName = rhs.scName;
-        scRun = rhs.scRun;
-        scLock = rhs.scLock;
-        scEnable = rhs.scEnable;
-
-        if (scTag) {
-        	delete scTag;
-        	scTag = 0;
-        }
-        if (rhs.scTag)
+		if (scTag) {
+			delete scTag;
+			scTag = 0;
+		}
+		if (rhs.scTag)
 			scTag = new Tag(*rhs.scTag);
 
-        // Feedback run Tag
-        if (scFeedbackRun) {
-        	delete scFeedbackRun;
-        	scFeedbackRun = 0;
-        }
-        if (rhs.scFeedbackRun) {
-        	scFeedbackRun = new Tag(*rhs.scFeedbackRun);
-        }
-    }
+		// Feedback run Tag
+		if (scFeedbackRun) {
+			delete scFeedbackRun;
+			scFeedbackRun = 0;
+		}
+		if (rhs.scFeedbackRun) {
+			scFeedbackRun = new Tag(*rhs.scFeedbackRun);
+		}
+	}
 
-    return *this;
+	return *this;
 }
 
 void ScriptItem::checkId(unsigned int id) const {
-
 	if (id == 0)
 		throw ScriptException(ScriptException::ExceptionType::WRONG_ID,
 								"Invalid script identifier",
@@ -135,21 +126,18 @@ void ScriptItem::checkId(unsigned int id) const {
 }
 
 unsigned int ScriptItem::getId() const {
+	checkId(scid);
 
-    checkId(scid);
-
-    return scid;
+	return scid;
 }
 
 void ScriptItem::setId(unsigned int id) {
-
 	checkId(id);
 
-    scid = id;
+	scid = id;
 }
 
 const Tag& ScriptItem::getTag() const {
-
 	if (!scTag)
 		throw ScriptException(ScriptException::ExceptionType::NO_TAG,
 				"Missing tag object in script item",
@@ -157,11 +145,10 @@ const Tag& ScriptItem::getTag() const {
 
 	checkBitTagType(*scTag);
 
-    return *scTag;
+	return *scTag;
 }
 
 void ScriptItem::setTag(const Tag& tag) {
-
 	checkBitTagType(tag);
 
 	if (scTag) {
@@ -173,7 +160,6 @@ void ScriptItem::setTag(const Tag& tag) {
 }
 
 void ScriptItem::checkScriptName(const std::string& nm) const {
-
 	if (nm.length() == 0)
 		throw ScriptException(ScriptException::ExceptionType::WRONG_NAME,
 									"Script name is empty",
@@ -181,41 +167,34 @@ void ScriptItem::checkScriptName(const std::string& nm) const {
 }
 
 std::string ScriptItem::getName() const {
-
 	checkScriptName(scName);
 
-    return scName;
+	return scName;
 }
 
 void ScriptItem::setName(const std::string& name) {
-
 	checkScriptName(name);
 
-    scName = name;
+	scName = name;
 }
 
 bool ScriptItem::isRunning() const {
-
-    return scRun;
+	return scRun;
 }
 
 void ScriptItem::setRun(bool run) {
-
-    scRun = run;
+	scRun = run;
 }
 
 bool ScriptItem::isLocked() const {
-
-    return scLock;
+	return scLock;
 }
 
 void ScriptItem::setLock(bool lock) {
-
-    scLock = lock;
+	scLock = lock;
 }
 
 void ScriptItem::checkBitTagType(const Tag& tg) const {
-
 	if (tg.getType() != TT_BIT)
 		throw ScriptException(ScriptException::ExceptionType::WRONG_TAG_TYPE,
 									"Wrong tag type - need BIT type",
@@ -223,35 +202,33 @@ void ScriptItem::checkBitTagType(const Tag& tg) const {
 }
 
 void ScriptItem::setFeedbackRunTag(const Tag& feedbackTag) {
-
 	checkBitTagType(feedbackTag);
 
-    if (scFeedbackRun) {
-        delete scFeedbackRun;
-        scFeedbackRun = 0;
-    }
+	if (scFeedbackRun) {
+		delete scFeedbackRun;
+		scFeedbackRun = 0;
+	}
 
-    scFeedbackRun = new Tag(feedbackTag);
+	scFeedbackRun = new Tag(feedbackTag);
 }
 
 const Tag& ScriptItem::getFeedbackRunTag() const {
-
-    if (!scFeedbackRun)
-        throw ScriptException(ScriptException::NO_FEEDBACK_RUN_TAG,
-        							"No feedback run tag",
+	if (!scFeedbackRun)
+		throw ScriptException(ScriptException::NO_FEEDBACK_RUN_TAG,
+									"No feedback run tag",
 									"ScriptItem::getFeedbackRunTag");
 
-    checkBitTagType(*scFeedbackRun);
+	checkBitTagType(*scFeedbackRun);
 
-    return *scFeedbackRun;
+	return *scFeedbackRun;
 }
 
 bool ScriptItem::isEnabled() const {
-
-    return scEnable;
+	return scEnable;
 }
 
 void ScriptItem::setEnable(bool enable) {
-
-    scEnable = enable;
+	scEnable = enable;
 }
+
+}  // namespace onh

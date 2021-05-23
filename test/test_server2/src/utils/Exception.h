@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,57 +16,55 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_UTILS_EXCEPTION_H
-#define SRC_UTILS_EXCEPTION_H
+#ifndef UTILS_EXCEPTION_H_
+#define UTILS_EXCEPTION_H_
 
 #include <exception>
 #include <string>
 
 namespace onh {
 
-    /**
-     * Base exception class
-     */
-    class Exception: public std::exception {
+/**
+ * Base exception class
+ */
+class Exception: public std::exception {
+	public:
+		Exception();
+		~Exception() noexcept override;
 
-        public:
+		/**
+		 * Exception constructor with message
+		 *
+		 * @param exceptionMSG Exception additional info
+		 */
+		explicit Exception(const std::string& exceptionMSG);
 
-            Exception();
-            virtual ~Exception() noexcept override;
+		/**
+		 * Exception constructor with message and function name
+		 *
+		 * @param exceptionMSG Exception additional info
+		 * @param funcName Function from which exception was thrown
+		 */
+		Exception(const std::string& exceptionMSG, const std::string& funcName);
 
-            /**
-             * Exception constructor with message
-             *
-             * @param exceptionMSG Exception additional info
-             */
-            Exception(const std::string& exceptionMSG);
+		/**
+		 * Get exception message
+		 *
+		 * @return Exception message
+		 */
+		const char* what() const noexcept override;
 
-            /**
-             * Exception constructor with message and function name
-             *
-             * @param exceptionMSG Exception additional info
-             * @param funcName Function from which exception was thrown
-             */
-            Exception(const std::string& exceptionMSG, const std::string& funcName);
+	protected:
+		/// String with the error message
+		std::string errorMessage;
 
-            /**
-             * Get exception message
-             *
-             * @return Exception message
-             */
-            virtual const char* what() const noexcept override;
+		/// Function from which exception was thrown
+		std::string functionName;
 
-        protected:
-            /// String with the error message
-            std::string errorMessage;
+		/// Full error message
+		std::string allMessage;
+};
 
-            /// Function from which exception was thrown
-            std::string functionName;
+}  // namespace onh
 
-            /// Full error message
-            std::string allMessage;
-    };
-
-}
-
-#endif // SRC_UTILS_EXCEPTION_H
+#endif  // UTILS_EXCEPTION_H_

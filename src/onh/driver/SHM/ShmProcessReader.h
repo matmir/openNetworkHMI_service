@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_SHM_SHMPROCESSREADER_H_
-#define SRC_ONH_DRIVER_SHM_SHMPROCESSREADER_H_
+#ifndef ONH_DRIVER_SHM_SHMPROCESSREADER_H_
+#define ONH_DRIVER_SHM_SHMPROCESSREADER_H_
 
 #include "../DriverProcessReader.h"
 #include "ShmProcessData.h"
@@ -25,121 +25,118 @@
 
 namespace onh {
 
-	/// Forward declaration
-	class ShmDriver;
+/// Forward declaration
+class ShmDriver;
 
-	/**
-	 * SHM driver process data reader class
-	 */
-	class ShmProcessReader: public DriverProcessReader {
+/**
+ * SHM driver process data reader class
+ */
+class ShmProcessReader: public DriverProcessReader {
+	public:
+		friend class ShmDriver;
 
-		public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ShmProcessReader(const ShmProcessReader&) = delete;
 
-			friend class ShmDriver;
+		virtual ~ShmProcessReader();
 
-			/**
-			 * Copy constructor - inactive
-			 */
-			ShmProcessReader(const ShmProcessReader&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		ShmProcessReader& operator=(const ShmProcessReader&) = delete;
 
-			virtual ~ShmProcessReader() override;
+		/**
+		 * Get bit value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Bit value
+		 */
+		bool getBitValue(processDataAddress addr) override;
 
-			/**
-			 * Assign operator - inactive
-			 */
-			ShmProcessReader& operator=(const ShmProcessReader&) = delete;
+		/**
+		 * Get bits value from process data
+		 *
+		 * @param addr Process data addresses
+		 *
+		 * @return Bits values
+		 */
+		std::vector<bool> getBitsValue(std::vector<processDataAddress> addr) override;
 
-			/**
-			 * Get bit value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Bit value
-			 */
-			virtual bool getBitValue(processDataAddress addr) override;
+		/**
+		 * Get byte value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Byte value
+		 */
+		BYTE getByte(processDataAddress addr) override;
 
-			/**
-			 * Get bits value from process data
-			 *
-			 * @param addr Process data addresses
-			 *
-			 * @return Bits values
-			 */
-			virtual std::vector<bool> getBitsValue(std::vector<processDataAddress> addr) override;
+		/**
+		 * Get word value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Word value
+		 */
+		WORD getWord(processDataAddress addr) override;
 
-			/**
-			 * Get byte value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Byte value
-			 */
-			virtual BYTE getByte(processDataAddress addr) override;
+		/**
+		 * Get double word value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Double word value
+		 */
+		DWORD getDWord(processDataAddress addr) override;
 
-			/**
-			 * Get word value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Word value
-			 */
-			virtual WORD getWord(processDataAddress addr) override;
+		/**
+		 * Get int value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Int value
+		 */
+		int getInt(processDataAddress addr) override;
 
-			/**
-			 * Get double word value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Double word value
-			 */
-			virtual DWORD getDWord(processDataAddress addr) override;
+		/**
+		 * Get real value from process data
+		 *
+		 * @param addr Process data address
+		 *
+		 * @return Real value
+		 */
+		float getReal(processDataAddress addr) override;
 
-			/**
-			 * Get int value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Int value
-			 */
-			virtual int getInt(processDataAddress addr) override;
+		/**
+		 * Update reader process data (copy from driver)
+		 */
+		void updateProcessData() override;
 
-			/**
-			 * Get real value from process data
-			 *
-			 * @param addr Process data address
-			 *
-			 * @return Real value
-			 */
-			virtual float getReal(processDataAddress addr) override;
+		/**
+		 * Create new driver process reader
+		 *
+		 * @return Pointer to the new driver process reader
+		 */
+		DriverProcessReader* createNew();
 
-			/**
-			 * Update reader process data (copy from driver)
-			 */
-			virtual void updateProcessData() override;
+	private:
+		/**
+		 * Constructor (allowed only from ShmDriver)
+		 *
+		 * @param gdc Shm process data controller
+		 */
+		explicit ShmProcessReader(const GuardDataController<ShmProcessData>& gdc);
 
-			/**
-			 * Create new driver process reader
-			 *
-			 * @return Pointer to the new driver process reader
-			 */
-			virtual DriverProcessReader* createNew();
+		/// Copy of the driver process data
+		ShmProcessData process;
 
-		private:
+		/// Driver process data controller
+		GuardDataController<ShmProcessData> driverProcess;
+};
 
-			/**
-			 * Constructor (allowed only from ShmDriver)
-			 *
-			 * @param gdc Shm process data controller
-			 */
-			ShmProcessReader(const GuardDataController<ShmProcessData>& gdc);
+}  // namespace onh
 
-			/// Copy of the driver process data
-			ShmProcessData process;
-
-			/// Driver process data controller
-			GuardDataController<ShmProcessData> driverProcess;
-	};
-
-}
-
-#endif /* SRC_ONH_DRIVER_SHM_SHMPROCESSREADER_H_ */
+#endif  // ONH_DRIVER_SHM_SHMPROCESSREADER_H_

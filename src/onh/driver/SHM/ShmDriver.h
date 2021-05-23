@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_SHM_SHMDRIVER_H_
-#define SRC_ONH_DRIVER_SHM_SHMDRIVER_H_
+#ifndef ONH_DRIVER_SHM_SHMDRIVER_H_
+#define ONH_DRIVER_SHM_SHMDRIVER_H_
 
 #include "../Driver.h"
 #include "../../utils/GuardDataContainer.h"
@@ -26,90 +26,87 @@
 
 namespace onh {
 
-	/**
-	 * Shared memory client class
-	 */
-	class ShmDriver: public Driver {
+/**
+ * Shared memory client class
+ */
+class ShmDriver: public Driver {
+	public:
+		/**
+		 * Default Shared memory client constructor
+		 *
+		 * @param segmentName Shared memory segment name
+		 * @param connId Driver connection identifier
+		 */
+		ShmDriver(const std::string& segmentName, unsigned int connId);
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ShmDriver(const ShmDriver&) = delete;
 
-            /**
-             * Default Shared memory client constructor
-             *
-             * @param segmentName Shared memory segment name
-             * @param connId Driver connection identifier
-             */
-            ShmDriver(const std::string& segmentName, unsigned int connId);
+		virtual ~ShmDriver();
 
-            /**
-			 * Copy constructor - inactive
-			 */
-            ShmDriver(const ShmDriver&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		ShmDriver& operator=(const ShmDriver&) = delete;
 
-            virtual ~ShmDriver() override;
+		/**
+		 * Get driver buffer handle
+		 *
+		 * @return Driver buffer handle
+		 */
+		DriverBuffer* getBuffer() override;
 
-            /**
-			 * Assign operator - inactive
-			 */
-            ShmDriver& operator=(const ShmDriver&) = delete;
+		/**
+		 * Get driver process data reader
+		 *
+		 * @return Driver process data reader handle
+		 */
+		DriverProcessReader* getReader() override;
 
-            /**
-             * Get driver buffer handle
-             *
-             * @return Driver buffer handle
-             */
-            virtual DriverBuffer* getBuffer() override;
+		/**
+		 * Get driver process data writer
+		 *
+		 * @return Driver process data writer handle
+		 */
+		DriverProcessWriter* getWriter() override;
 
-            /**
-			 * Get driver process data reader
-			 *
-			 * @return Driver process data reader handle
-			 */
-			virtual DriverProcessReader* getReader() override;
+		/**
+		 * Get driver process data updater
+		 *
+		 * @return Driver process data updater handle
+		 */
+		DriverProcessUpdater* getUpdater() override;
 
-			/**
-			 * Get driver process data writer
-			 *
-			 * @return Driver process data writer handle
-			 */
-			virtual DriverProcessWriter* getWriter() override;
+	private:
+		/// Shared memory id
+		int sfd;
 
-			/**
-			 * Get driver process data updater
-			 *
-			 * @return Driver process data updater handle
-			 */
-			virtual DriverProcessUpdater* getUpdater() override;
+		/// Shared memory size
+		const int smSize = sizeof(sMemory);
 
-        private:
+		/// Shared memory structure
+		sMemory *shm;
 
-            /// Shared memory id
-			int sfd;
+		/// Shared memory segment name
+		std::string shmName;
 
-			/// Shared memory size
-            const int smSize = sizeof(sMemory);
+		/// Driver access protection
+		MutexContainer driverLock;
 
-            /// Shared memory structure
-            sMemory *shm;
+		/// Copy of the controller process data
+		GuardDataContainer<ShmProcessData> process;
 
-            /// Shared memory segment name
-            std::string shmName;
+		/**
+		 * Trigger error (write log and throw exception)
+		 *
+		 * @param msg Exception message
+		 * @param fName Function from which exception was thrown
+		 */
+		void triggerError(const std::string& msg, const std::string& fName);
+};
 
-            /// Driver access protection
-            MutexContainer driverLock;
+}  // namespace onh
 
-            /// Copy of the controller process data
-            GuardDataContainer<ShmProcessData> process;
-
-            /**
-             * Trigger error (write log and throw exception)
-             *
-             * @param msg Exception message
-             * @param fName Function from which exception was thrown
-             */
-            void triggerError(const std::string& msg, const std::string& fName);
-	};
-
-}
-
-#endif /* SRC_ONH_DRIVER_SHM_SHMDRIVER_H_ */
+#endif  // ONH_DRIVER_SHM_SHMDRIVER_H_

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_DRIVER_MODBUS_MODBUSPROCESSUPDATER_H_
-#define SRC_ONH_DRIVER_MODBUS_MODBUSPROCESSUPDATER_H_
+#ifndef ONH_DRIVER_MODBUS_MODBUSPROCESSUPDATER_H_
+#define ONH_DRIVER_MODBUS_MODBUSPROCESSUPDATER_H_
 
 #include "../DriverProcessUpdater.h"
 #include "ModbusProcessData.h"
@@ -25,59 +25,57 @@
 
 namespace onh {
 
-	/// Forward declaration
-	class ModbusDriver;
+/// Forward declaration
+class ModbusDriver;
 
-	/**
-	 * Modbus driver process data updater class
-	 */
-	class ModbusProcessUpdater: public DriverProcessUpdater {
+/**
+ * Modbus driver process data updater class
+ */
+class ModbusProcessUpdater: public DriverProcessUpdater {
+	public:
+		friend class ModbusDriver;
 
-		public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ModbusProcessUpdater(const ModbusProcessUpdater&) = delete;
 
-			friend class ModbusDriver;
+		virtual ~ModbusProcessUpdater();
 
-			/**
-			 * Copy constructor - inactive
-			 */
-			ModbusProcessUpdater(const ModbusProcessUpdater&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		ModbusProcessUpdater& operator=(const ModbusProcessUpdater&) = delete;
 
-			virtual ~ModbusProcessUpdater() override;
+		/**
+		 * Update process data (copy from load buffer)
+		 */
+		void updateProcessData() override;
 
-			/**
-			 * Assign operator - inactive
-			 */
-			ModbusProcessUpdater& operator=(const ModbusProcessUpdater&) = delete;
+		/**
+		 * Create new driver process updater
+		 *
+		 * @return Pointer to the new driver process updater
+		 */
+		DriverProcessUpdater* createNew() override;
 
-			/**
-			 * Update process data (copy from load buffer)
-			 */
-			virtual void updateProcessData() override;
+	private:
+		/**
+		 * Constructor with parameters (allowed only from ShmDriver)
+		 *
+		 * @param mbuff Buffer data controller
+		 * @param gdc Process data controller (write mode)
+		 */
+		ModbusProcessUpdater(const GuardDataController<ModbusProcessData> &mbuff,
+							const GuardDataController<ModbusProcessData> &gdc);
 
-			/**
-			 * Create new driver process updater
-			 *
-			 * @return Pointer to the new driver process updater
-			 */
-			virtual DriverProcessUpdater* createNew() override;
+		/// Driver buffer data controller
+		GuardDataController<ModbusProcessData> buff;
 
-		private:
+		/// Driver process data controller (write mode)
+		GuardDataController<ModbusProcessData> process;
+};
 
-			/**
-			 * Constructor with parameters (allowed only from ShmDriver)
-			 *
-			 * @param mbuff Buffer data controller
-			 * @param gdc Process data controller (write mode)
-			 */
-			ModbusProcessUpdater(const GuardDataController<ModbusProcessData> &mbuff, const GuardDataController<ModbusProcessData> &gdc);
+}  // namespace onh
 
-			/// Driver buffer data controller
-			GuardDataController<ModbusProcessData> buff;
-
-			/// Driver process data controller (write mode)
-			GuardDataController<ModbusProcessData> process;
-	};
-
-}
-
-#endif /* SRC_ONH_DRIVER_MODBUS_MODBUSPROCESSUPDATER_H_ */
+#endif  // ONH_DRIVER_MODBUS_MODBUSPROCESSUPDATER_H_

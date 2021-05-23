@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef THREADPROGRAM_H
-#define THREADPROGRAM_H
+#ifndef ONH_THREAD_THREADPROGRAM_H_
+#define ONH_THREAD_THREADPROGRAM_H_
 
 #include "ThreadExitData.h"
 #include "../utils/GuardDataController.h"
@@ -27,112 +27,110 @@
 
 namespace onh {
 
-	/**
-	 * Thread program base class
-	 */
-    class ThreadProgram {
+/**
+ * Thread program base class
+ */
+class ThreadProgram {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param gdcTED Thread exit data controller
+		 * @param thCCC Thread cycle time controller
+		 * @param updateInterval Thread wait time (ms)
+		 * @param dirName Name of the directory where to write log files
+		 * @param fPrefix Log file name prefix
+		 */
+		ThreadProgram(const GuardDataController<ThreadExitData> &gdcTED,
+				const GuardDataController<CycleTimeData> &gdcCTD,
+				unsigned int updateInterval,
+				const std::string& dirName,
+				const std::string& fPrefix = "");
 
-        public:
-            /**
-             * Constructor
-             *
-             * @param gdcTED Thread exit data controller
-             * @param thCCC Thread cycle time controller
-             * @param updateInterval Thread wait time (ms)
-             * @param dirName Name of the directory where to write log files
-             * @param fPrefix Log file name prefix
-             */
-            ThreadProgram(const GuardDataController<ThreadExitData> &gdcTED,
-            		const GuardDataController<CycleTimeData> &gdcCTD,
-					unsigned int updateInterval,
-            		const std::string& dirName,
-					const std::string& fPrefix = "");
+		/**
+		 * Copy constructor - inactive
+		 */
+		ThreadProgram(const ThreadProgram&) = delete;
 
-            /**
-             * Copy constructor - inactive
-             */
-            ThreadProgram(const ThreadProgram&) = delete;
+		/**
+		 * Destructor
+		 */
+		virtual ~ThreadProgram();
 
-            /**
-             * Destructor
-             */
-            virtual ~ThreadProgram();
+		/**
+		 * Thread program function
+		 */
+		virtual void operator()() = 0;
 
-            /**
-             * Thread program function
-             */
-            virtual void operator()() = 0;
+		/**
+		 * Assignment operator - inactive
+		 */
+		ThreadProgram& operator=(const ThreadProgram&) = delete;
 
-            /**
-             * Assignment operator - inactive
-             */
-            ThreadProgram& operator=(const ThreadProgram&) = delete;
+	private:
+		/// Thread program cycle time
+		CycleTime thCycle;
 
-        private:
-            /// Thread program cycle time
-            CycleTime thCycle;
+		/// Timer delay object
+		Delay thDelay;
 
-            /// Timer delay object
-			Delay thDelay;
+		/// Thread exit data controller
+		GuardDataController<ThreadExitData> thExitController;
 
-			/// Thread exit data controller
-            GuardDataController<ThreadExitData> thExitController;
+		/// Thread cycle time data controller
+		GuardDataController<CycleTimeData> thCycleTimeController;
 
-			/// Thread cycle time data controller
-			GuardDataController<CycleTimeData> thCycleTimeController;
+		/// Logger object
+		Logger* log;
 
-			/// Logger object
-			Logger* log;
+	protected:
+		/**
+		 * Start measure cycle time of the thread
+		 */
+		void startCycleMeasure();
 
-        protected:
+		/**
+		 * Stop measure cycle time of the thread
+		 */
+		void stopCycleMeasure();
 
-            /**
-             * Start measure cycle time of the thread
-             */
-            void startCycleMeasure();
+		/**
+		 * Check if thread need to be closed
+		 *
+		 * @return True if thread need to be closed
+		 */
+		bool isExitFlag();
 
-            /**
-             * Stop measure cycle time of the thread
-             */
-            void stopCycleMeasure();
+		/**
+		 * Trigger exit from thread
+		 *
+		 * @param info Additional info about exit
+		 */
+		void exit(const std::string& info);
 
-            /**
-             * Check if thread need to be closed
-             *
-             * @return True if thread need to be closed
-             */
-            bool isExitFlag();
+		/**
+		 * Thread wait
+		 */
+		void threadWait();
 
-            /**
-             * Trigger exit from thread
-             *
-             * @param info Additional info about exit
-             */
-            void exit(const std::string& info);
+		/**
+		 * Thread wait (no blocking)
+		 */
+		void threadWaitStart();
 
-            /**
-             * Thread wait
-             */
-            void threadWait();
+		/**
+		 * Thread wait after start called (blocking)
+		 */
+		void threadWaitAfterStart();
 
-            /**
-             * Thread wait (no blocking)
-             */
-            void threadWaitStart();
+		/**
+		 * Get logger instance
+		 *
+		 * @return Logger instance
+		 */
+		Logger& getLogger();
+};
 
-            /**
-             * Thread wait after start called (blocking)
-             */
-            void threadWaitAfterStart();
+}  // namespace onh
 
-            /**
-			 * Get logger instance
-			 *
-			 * @return Logger instance
-			 */
-            Logger& getLogger();
-    };
-
-}
-
-#endif // THREADPROGRAM_H
+#endif  // ONH_THREAD_THREADPROGRAM_H_

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,40 +16,38 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DRIVEREXCEPTION_H
-#define DRIVEREXCEPTION_H
+#ifndef ONH_DRIVER_DRIVEREXCEPTION_H_
+#define ONH_DRIVER_DRIVEREXCEPTION_H_
 
 #include "../utils/Exception.h"
 
 namespace onh {
 
-    /**
-     * Driver exception class
-     */
-    class DriverException: public Exception {
+/**
+ * Driver exception class
+ */
+class DriverException: public Exception {
+	public:
+		DriverException();
 
-        public:
+		/**
+		 * Exception constructor with message
+		 *
+		 * @param desc Exception error
+		 */
+		explicit DriverException(const std::string& desc);
 
-            DriverException();
+		/**
+		 * Exception constructor with message and function name
+		 *
+		 * @param desc Exception error
+		 * @param fName Function from which exception was thrown
+		 */
+		DriverException(const std::string& desc, const std::string& fName);
 
-            /**
-             * Exception constructor with message
-             *
-             * @param desc Exception error
-             */
-            DriverException(const std::string& desc);
+		virtual ~DriverException() noexcept;
+};
 
-            /**
-             * Exception constructor with message and function name
-             *
-             * @param desc Exception error
-             * @param fName Function from which exception was thrown
-             */
-            DriverException(const std::string& desc, const std::string& fName);
+}  // namespace onh
 
-            virtual ~DriverException() noexcept override;
-    };
-
-}
-
-#endif // DRIVEREXCEPTION_H
+#endif  // ONH_DRIVER_DRIVEREXCEPTION_H_

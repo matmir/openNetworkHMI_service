@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,58 +16,54 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DRIVERBUFFERUPDATER_H
-#define DRIVERBUFFERUPDATER_H
+#ifndef ONH_DRIVER_DRIVERBUFFERUPDATER_H_
+#define ONH_DRIVER_DRIVERBUFFERUPDATER_H_
 
 #include "DriverBuffer.h"
 
 namespace onh {
 
-    /// Forward declaration
-	class DriverManager;
+/// Forward declaration
+class DriverManager;
 
-    /**
-	 * Controller buffer updater class
-	 */
-    class DriverBufferUpdater {
+/**
+ * Controller buffer updater class
+ */
+class DriverBufferUpdater {
+	public:
+		friend class DriverManager;
 
-        public:
+		/**
+		 * Copy constructor
+		 *
+		 * @param dbu DriverBufferUpdater to copy
+		 */
+		DriverBufferUpdater(const DriverBufferUpdater &dbu);
 
-            friend class DriverManager;
+		virtual ~DriverBufferUpdater();
 
-            /**
-             * Copy constructor
-             *
-             * @param dbu DriverBufferUpdater to copy
-             */
-            DriverBufferUpdater(const DriverBufferUpdater &dbu);
+		/**
+		 * Assign operator - inactive
+		 */
+		DriverBufferUpdater& operator=(const DriverBufferUpdater&) = delete;
 
-            virtual ~DriverBufferUpdater();
+		/**
+		 * Update driver buffer
+		 */
+		void update();
 
-            /**
-			 * Assign operator - inactive
-			 */
-            DriverBufferUpdater& operator=(const DriverBufferUpdater&) = delete;
+	private:
+		/**
+		 * Constructor with parameters (allowed only from ProcessManager)
+		 *
+		 * @param dbh Driver buffer handle
+		 */
+		explicit DriverBufferUpdater(DriverBuffer *dbh);
 
-            /**
-             * Update driver buffer
-             */
-            void update();
+		/// Driver buffer handle
+		DriverBuffer *drvBuffer;
+};
 
-        private:
+}  // namespace onh
 
-            /**
-             * Constructor with parameters (allowed only from ProcessManager)
-             *
-             * @param dbh Driver buffer handle
-             */
-            DriverBufferUpdater(DriverBuffer *dbh);
-
-            /// Driver buffer handle
-            DriverBuffer *drvBuffer;
-
-    };
-
-}
-
-#endif // DRIVERBUFFERUPDATER_H
+#endif  // ONH_DRIVER_DRIVERBUFFERUPDATER_H_

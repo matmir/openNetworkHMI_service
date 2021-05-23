@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,86 +16,83 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ALARMINGDB_H
-#define ALARMINGDB_H
+#ifndef ONH_DB_ALARMINGDB_H_
+#define ONH_DB_ALARMINGDB_H_
 
-#include "objs/AlarmDefinitionItem.h"
 #include <vector>
+#include "objs/AlarmDefinitionItem.h"
 #include "DB.h"
 
 namespace onh {
 
-    /// Forward declaration
-	class DBManager;
+/// Forward declaration
+class DBManager;
 
-	/// Forward declaration
-	class ParserDB;
+/// Forward declaration
+class ParserDB;
 
-    /**
-	 * Class for read/write Alarm system DB
-	 */
-    class AlarmingDB: public DB {
+/**
+ * Class for read/write Alarm system DB
+ */
+class AlarmingDB: public DB {
+	public:
+		friend class DBManager;
+		friend class ParserDB;
 
-        public:
+		/**
+		 * Copy constructor
+		 *
+		 * @param aDB AlarmDB object to copy
+		 */
+		AlarmingDB(const AlarmingDB &aDB);
 
-            friend class DBManager;
-            friend class ParserDB;
+		virtual ~AlarmingDB();
 
-            /**
-             * Copy constructor
-             *
-             * @param aDB AlarmDB object to copy
-             */
-            AlarmingDB(const AlarmingDB &aDB);
+		/**
+		 * Assign operator - inactive
+		 */
+		AlarmingDB& operator=(const AlarmingDB&) = delete;
 
-            virtual ~AlarmingDB();
+		/**
+		 * Get Alarm definition items from DB
+		 *
+		 * @param enabled Get only enabled alarm definitions
+		 *
+		 * @return Vector with Alarm definitions items
+		 */
+		std::vector<AlarmDefinitionItem> getAlarms(bool enabled = true);
 
-            /**
-			 * Assign operator - inactive
-			 */
-            AlarmingDB& operator=(const AlarmingDB&) = delete;
+		/**
+		 * Set Alarm (put into pending table)
+		 *
+		 * @param alarm Alarm definition item object
+		 */
+		void setAlarm(const AlarmDefinitionItem& alarm);
 
-            /**
-             * Get Alarm definition items from DB
-             *
-             * @param enabled Get only enabled alarm definitions
-             *
-             * @return Vector with Alarm definitions items
-             */
-            std::vector<AlarmDefinitionItem> getAlarms(bool enabled=true);
+		/**
+		 * Update alarm state (active/inactive)
+		 *
+		 * @param alarm Alarm definition item object
+		 * @param state Alarm state
+		 */
+		void updateAlarmState(const AlarmDefinitionItem& alarm, bool state);
 
-            /**
-             * Set Alarm (put into pending table)
-             *
-             * @param alarm Alarm definition item object
-             */
-            void setAlarm(const AlarmDefinitionItem& alarm);
+		/**
+		 * Acknowledge pending alarm (apadid) or all pending alarms.
+		 *
+		 * @param apadid Alarm definition identifier (alarm to acknowledge)
+		 */
+		void ackAlarm(unsigned int apadid = 0);
 
-            /**
-             * Update alarm state (active/inactive)
-             *
-             * @param alarm Alarm definition item object
-             * @param state Alarm state
-             */
-            void updateAlarmState(const AlarmDefinitionItem& alarm, bool state);
+	private:
+		/**
+		 * Constructor with connection param (allowed only from DBManager)
+		 *
+		 * @param connection Connection handle
+		 */
+		explicit AlarmingDB(MYSQL *connDB);
+};
 
-            /**
-             * Acknowledge pending alarm (apadid) or all pending alarms.
-             *
-             * @param apadid Alarm definition identifier (alarm to acknowledge)
-             */
-            void ackAlarm(unsigned int apadid=0);
+}  // namespace onh
 
-        private:
-
-            /**
-             * Constructor with connection param (allowed only from DBManager)
-             *
-             * @param connection Connection handle
-             */
-            AlarmingDB(MYSQL *connDB);
-    };
-
-}
-
-#endif // ALARMINGDB_H
+#endif  // ONH_DB_ALARMINGDB_H_

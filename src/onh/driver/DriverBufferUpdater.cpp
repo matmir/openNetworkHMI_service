@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,28 +19,26 @@
 #include "DriverBufferUpdater.h"
 #include "DriverException.h"
 
-using namespace onh;
+namespace onh {
 
 DriverBufferUpdater::DriverBufferUpdater(DriverBuffer *dbh):
-    drvBuffer(dbh)
-{
+	drvBuffer(dbh) {
 }
 
 DriverBufferUpdater::DriverBufferUpdater(const DriverBufferUpdater &dbu):
-    drvBuffer(dbu.drvBuffer)
-{
+	drvBuffer(dbu.drvBuffer) {
 }
 
-DriverBufferUpdater::~DriverBufferUpdater()
-{
+DriverBufferUpdater::~DriverBufferUpdater() {
 }
 
 void DriverBufferUpdater::update() {
+	if (!drvBuffer) {
+		throw DriverException("Missing driver buffer object",
+								"DriverBufferUpdater::update");
+	}
 
-    if (!drvBuffer) {
-        throw DriverException("Missing driver buffer object", "DriverBufferUpdater::update");
-    }
-
-    drvBuffer->updateBuffer();
-
+	drvBuffer->updateBuffer();
 }
+
+}  // namespace onh

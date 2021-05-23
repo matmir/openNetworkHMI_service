@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,172 +20,170 @@
 #include <stdlib.h>
 #include <sstream>
 
-#include "Application.h"
 #include "appConfig.h"
+#include "Application.h"
 
-using namespace onh;
+namespace onh {
 
 Application::Application(bool test):
-    drvManager(nullptr), thManager(nullptr), dbManager(nullptr), cfg(nullptr), testEnv(test)
-{
-    // Create logger
-    log = new Logger("mainProg","main_");
+	drvManager(nullptr),
+	thManager(nullptr),
+	dbManager(nullptr),
+	cfg(nullptr),
+	testEnv(test) {
+	// Create logger
+	log = new Logger("mainProg", "main_");
 }
 
 Application::~Application() {
-
 	if (drvManager) {
-        delete drvManager;
+		delete drvManager;
 	}
 	if (thManager) {
-        delete thManager;
+		delete thManager;
 	}
 	if (cfg) {
-        delete cfg;
+		delete cfg;
 	}
 	if (dbManager) {
-        delete dbManager;
+		delete dbManager;
 	}
 
 	log->write("Bye");
 
-    if (log) {
-        delete log;
-    }
+	if (log) {
+		delete log;
+	}
 }
 
 int Application::start() {
+	int ret = 0;
+	std::stringstream appVersion;
+	appVersion << PROJECT_NAME << " (v" << PROJECT_VERSION << ")";
 
-    int ret = 0;
-    std::stringstream appVersion;
-    appVersion << PROJECT_NAME << " (v" << PROJECT_VERSION << ")";
+	try {
+		log->write("Application "+appVersion.str()+" is starting...");
 
-    try {
+		// Initialize database connection
+		initDB();
 
-    	log->write("Application "+appVersion.str()+" is starting...");
+		// Initialize drivers
+		initDriver();
 
-        // Initialize database connection
-        initDB();
+		// Initialize thread manager
+		initThreadManager();
 
-        // Initialize drivers
-        initDriver();
+		// Run all threads
+		runThreads();
+	} catch (std::exception &e) {
+		log->write(e.what());
 
-        // Initialize thread manager
-        initThreadManager();
+		ret = EXIT_FAILURE;
+	} catch (...) {
+		log->write("Unknown exception");
 
-        // Run all threads
-        runThreads();
+		ret = EXIT_FAILURE;
+	}
 
-    } catch (std::exception &e) {
-
-        log->write(e.what());
-
-        ret = EXIT_FAILURE;
-    } catch (...) {
-
-        log->write("Unknown exception");
-
-        ret = EXIT_FAILURE;
-
-    }
-
-    return ret;
-
+	return ret;
 }
 
 void Application::runThreads() {
-
 	log->write("Starting threads...");
-    thManager->run();
+	thManager->run();
 
-    log->write("All threads are closed");
-    log->write("Application closed by: "+thManager->getExitInfo());
+	log->write("All threads are closed");
+	log->write("Application closed by: "+thManager->getExitInfo());
 }
 
 void Application::initDB() {
+	// Get DB connection data
+	std::ifstream confFile("dbConn.conf");
 
-    // Get DB connection data
-    std::ifstream confFile("dbConn.conf");
+	// Check if file is opened without errors
+	if (confFile.fail()) {
+		throw Exception("DB configuration file is not opened",
+						"Application::initDB");
+	}
 
-    // Check if file is opened without errors
-    if (confFile.fail()) {
-    	throw Exception("DB configuration file is not opened", "Application::initDB");
-    }
+	std::string confLine;
+	std::vector<std::string> dbConf;
+	while (std::getline(confFile, confLine)) {
+		dbConf.push_back(confLine);
+	}
 
-    std::string confLine;
-    std::vector<std::string> dbConf;
-    while (std::getline(confFile, confLine)) {
-        dbConf.push_back(confLine);
-    }
+	// Check data
+	if (dbConf.size() != 4) {
+		throw Exception("Invalid DB configuration file", "Application::initDB");
+	}
 
-    // Check data
-    if (dbConf.size() != 4) {
-        throw Exception("Invalid DB configuration file", "Application::initDB");
-    }
+	// DB access prepare
+	dbManager = new DBManager(dbConf[0], dbConf[1], dbConf[2], dbConf[3]);
 
-    // DB access prepare
-    dbManager = new DBManager(dbConf[0], dbConf[1], dbConf[2], dbConf[3]);
+	cfg = new Config(dbManager->getConfigDB());
 
-    cfg = new Config(dbManager->getConfigDB());
-
-    // Clear restart flag
-    cfg->setValue("serverRestart", 0);
+	// Clear restart flag
+	cfg->setValue("serverRestart", 0);
 }
 
 void Application::initDriver() {
-
 	// Init driver manager
-    drvManager = new DriverManager(cfg->getDriverConnections());
+	drvManager = new DriverManager(cfg->getDriverConnections());
 }
 
 void Application::initThreadManager() {
-
 	// Check managers
 	if (!drvManager)
-		throw Exception("Driver manager not initialized", "Application::initThreadManager");
+		throw Exception("Driver manager not initialized",
+						"Application::initThreadManager");
 
 	if (!dbManager)
-		throw Exception("Database manager not initialized", "Application::initThreadManager");
+		throw Exception("Database manager not initialized",
+						"Application::initThreadManager");
 
 	if (!cfg)
-		throw Exception("Configuration not initialized", "Application::initThreadManager");
+		throw Exception("Configuration not initialized",
+						"Application::initThreadManager");
 
-    // Initialize thread manager
-    thManager = new ThreadManager();
+	// Initialize thread manager
+	thManager = new ThreadManager();
 
-    // Init process updater threads
-	thManager->initProcessUpdater(drvManager->getProcessUpdaters(), cfg->getUIntValue("processUpdateInterval"));
+	// Init process updater threads
+	thManager->initProcessUpdater(drvManager->getProcessUpdaters(),
+									cfg->getUIntValue("processUpdateInterval"));
 
-    // Init driver polling thread
+	// Init driver polling thread
 	thManager->initDriverPolling(drvManager->getDriverBufferUpdaters());
 
-    // Init alarming thread
-    thManager->initAlarmingThread(drvManager->getProcessReader(),
-    								drvManager->getProcessWriter(),
+	// Init alarming thread
+	thManager->initAlarmingThread(drvManager->getProcessReader(),
+									drvManager->getProcessWriter(),
 									dbManager->getAlarmingDB(),
 									cfg->getUIntValue("alarmingUpdateInterval"));
 
-    // Init tag logger thread
-    thManager->initTagLoggerThread(drvManager->getProcessReader(),
+	// Init tag logger thread
+	thManager->initTagLoggerThread(drvManager->getProcessReader(),
 									dbManager->getTagLoggerDB(),
 									cfg->getUIntValue("tagLoggerUpdateInterval"));
 
-    // Init tag logger writer thread
-    thManager->initTagLoggerWriterThread(dbManager->getTagLoggerWriterDB(),
+	// Init tag logger writer thread
+	thManager->initTagLoggerWriterThread(dbManager->getTagLoggerWriterDB(),
 											cfg->getUIntValue("tagLoggerUpdateInterval"));
 
-    // Init script thread
-    thManager->initScriptThread(drvManager->getProcessReader(),
-    							drvManager->getProcessWriter(),
+	// Init script thread
+	thManager->initScriptThread(drvManager->getProcessReader(),
+								drvManager->getProcessWriter(),
 								dbManager->getScriptDB(),
 								cfg->getUIntValue("scriptSystemUpdateInterval"),
 								cfg->getStringValue("scriptSystemExecuteScript"),
 								testEnv);
 
-    // Init socket thread
-    thManager->initSocketThread(drvManager->getProcessReader(),
+	// Init socket thread
+	thManager->initSocketThread(drvManager->getProcessReader(),
 								drvManager->getProcessWriter(),
 								dbManager->getCredentials(),
 								cfg->getIntValue("socketPort"),
 								cfg->getIntValue("socketMaxConn"));
 }
+
+}  // namespace onh

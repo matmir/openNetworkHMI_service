@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,23 @@
 
 #include "ModbusProcessUpdater.h"
 
-using namespace onh;
+namespace onh {
 
-ModbusProcessUpdater::ModbusProcessUpdater(const GuardDataController<ModbusProcessData> &mbuff, const GuardDataController<ModbusProcessData> &gdc):
-	buff(mbuff), process(gdc)
-{
+ModbusProcessUpdater::ModbusProcessUpdater(const GuardDataController<ModbusProcessData> &mbuff,
+											const GuardDataController<ModbusProcessData> &gdc):
+	buff(mbuff), process(gdc) {
 }
 
 ModbusProcessUpdater::~ModbusProcessUpdater() {
 }
 
 void ModbusProcessUpdater::updateProcessData() {
-
 	// Copy data from buffer registers to the process data registers
 	process.setData(buff);
 }
 
 DriverProcessUpdater* ModbusProcessUpdater::createNew() {
-
 	return new ModbusProcessUpdater(buff, process);
 }
+
+}  // namespace onh

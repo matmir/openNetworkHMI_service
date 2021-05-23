@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,26 +16,24 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../utils/Delay.h"
-#include "ShmDriver.h"
-#include "sCommands.h"
-#include "ShmProcessReader.h"
-#include "ShmProcessWriter.h"
-#include "ShmProcessUpdater.h"
-#include <sstream>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/shm.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <sstream>
+#include "../../utils/Delay.h"
+#include "ShmDriver.h"
+#include "sCommands.h"
+#include "ShmProcessReader.h"
+#include "ShmProcessWriter.h"
+#include "ShmProcessUpdater.h"
 
-using namespace onh;
+namespace onh {
 
 ShmDriver::ShmDriver(const std::string& segmentName, unsigned int connId):
-	Driver("shm_"+std::to_string(connId)+"_"), sfd(0), shm(0), shmName(segmentName)
-{
-
+	Driver("shm_"+std::to_string(connId)+"_"), sfd(0), shm(0), shmName(segmentName) {
 	if (shmName == "") {
 		triggerError("SHM segment name is empty", "ShmDriver::ShmDriver");
 	}
@@ -54,7 +52,6 @@ ShmDriver::ShmDriver(const std::string& segmentName, unsigned int connId):
 }
 
 ShmDriver::~ShmDriver() {
-
 	// Unmap shared memory
 	munmap(shm, smSize);
 
@@ -65,28 +62,25 @@ ShmDriver::~ShmDriver() {
 }
 
 void ShmDriver::triggerError(const std::string& msg, const std::string& fName) {
-
-    std::string s = fName + ": " + msg;
-    getLog().write(s);
-    throw DriverException(msg, fName);
+	std::string s = fName + ": " + msg;
+	getLog().write(s);
+	throw DriverException(msg, fName);
 }
 
 DriverBuffer* ShmDriver::getBuffer() {
-
-    return nullptr;
+	return nullptr;
 }
 
 DriverProcessReader* ShmDriver::getReader() {
-
 	return new ShmProcessReader(process.getController());
 }
 
 DriverProcessWriter* ShmDriver::getWriter() {
-
 	return new ShmProcessWriter(shmName, shm, driverLock.getAccess());
 }
 
 DriverProcessUpdater* ShmDriver::getUpdater() {
-
 	return new ShmProcessUpdater(shmName, shm, process.getController(false), driverLock.getAccess());
 }
+
+}  // namespace onh

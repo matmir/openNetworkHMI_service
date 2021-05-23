@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_APPLICATION_H_
-#define SRC_APPLICATION_H_
+#ifndef APPLICATION_H_
+#define APPLICATION_H_
 
 #include <onhSHMcpp/ShmServer.h>
 
@@ -25,9 +25,7 @@
  * Shared memory server application class
  */
 class Application {
-
 	public:
-
 		/**
 		 * Application constructor
 		 *
@@ -54,7 +52,6 @@ class Application {
 		void run();
 
 	private:
-
 		/// SHM server
 		onh::ShmServer shmServer;
 
@@ -77,4 +74,4 @@ class Application {
 		void tagLoggerSim();
 };
 
-#endif /* SRC_APPLICATION_H_ */
+#endif  // APPLICATION_H_

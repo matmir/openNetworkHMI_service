@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,26 +19,22 @@
 #include "SocketException.h"
 #include <sstream>
 
-using namespace onh;
+namespace onh {
 
 SocketException::SocketException():
-	Exception()
-{
+	Exception() {
 }
 
 SocketException::SocketException(const std::string& desc):
-    Exception(desc)
-{
+	Exception(desc) {
 }
 
 SocketException::SocketException(const std::string& desc, const std::string& fName):
-    Exception(desc, fName)
-{
+	Exception(desc, fName) {
 }
 
 SocketException::SocketException(const std::string& desc, int errorNumber, const std::string& fName):
-    Exception(desc, fName)
-{
+	Exception(desc, fName) {
 	std::stringstream s;
 
 	s << allMessage;
@@ -52,3 +48,4 @@ SocketException::SocketException(const std::string& desc, int errorNumber, const
 SocketException::~SocketException() noexcept {
 }
 
+}  // namespace onh

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,10 @@
 #include "DBResult.h"
 #include <sstream>
 
-using namespace onh;
+namespace onh {
 
 DBResult::DBResult(MYSQL *DBConn):
-    conn(0), result(0), fields(0), row(0), fieldsCount(0)
-{
+	conn(0), result(0), fields(0), row(0), fieldsCount(0) {
 	conn = DBConn;
 
 	// Get data from DB
@@ -38,7 +37,7 @@ DBResult::DBResult(MYSQL *DBConn):
 	// Get fields count
 	fieldsCount = mysql_num_fields(result);
 
-	if (fieldsCount==0 && mysql_errno(conn)) {
+	if (fieldsCount == 0 && mysql_errno(conn)) {
 		std::stringstream s;
 		s << "Get fields count error: " << mysql_error(conn);
 		throw DBException(s.str(), "DBResult::DBResult");
@@ -56,19 +55,16 @@ DBResult::DBResult(MYSQL *DBConn):
 	}
 }
 
-DBResult::~DBResult()
-{
-    // Release memory
-    mysql_free_result(result);
+DBResult::~DBResult() {
+	// Release memory
+	mysql_free_result(result);
 }
 
 unsigned int DBResult::getFieldPos(const std::string &fName) {
+	unsigned int pos = 0;
+	bool ok = false;
 
-    unsigned int pos = 0;
-    bool ok = false;
-
-	for (unsigned int i=0; i<fieldsCount; ++i) {
-
+	for (unsigned int i=0; i < fieldsCount; ++i) {
 		if (fName == fields[i].name) {
 			pos = i;
 			ok = true;
@@ -77,44 +73,41 @@ unsigned int DBResult::getFieldPos(const std::string &fName) {
 	}
 
 	if (!ok) {
-        std::stringstream s;
-        s << "Field: " << fName << " does not exist in result array";
-        throw DBException(s.str(), "DBResult::getFieldPos");
+		std::stringstream s;
+		s << "Field: " << fName << " does not exist in result array";
+		throw DBException(s.str(), "DBResult::getFieldPos");
 	}
 
 	return pos;
 }
 
 bool DBResult::nextRow() {
+	// Get row from result
+	row = mysql_fetch_row(result);
 
-    // Get row from result
-    row = mysql_fetch_row(result);
+	if (mysql_errno(conn)) {
+		std::stringstream s;
+		s << "Error getting next row: " << mysql_error(conn);
+		throw DBException(s.str(), "DBResult::nextRow");
+	}
 
-    if (mysql_errno(conn)) {
-        std::stringstream s;
-        s << "Error getting next row: " << mysql_error(conn);
-        throw DBException(s.str(), "DBResult::nextRow");
-    }
-
-    return (row==NULL)?(false):(true);
+	return (row == NULL)?(false):(true);
 }
 
 std::string DBResult::getString(const std::string &fName) {
+	if (!row) {
+		throw DBException("No data in row structure", "DBResult::getString");
+	}
 
-    if (!row) {
-        throw DBException("No data in row structure", "DBResult::getString");
-    }
-
-    return row[getFieldPos(fName)];
+	return row[getFieldPos(fName)];
 }
 
 int DBResult::getInt(const std::string &fName) {
+	if (!row) {
+		throw DBException("No data in row structure", "DBResult::getInt");
+	}
 
-    if (!row) {
-        throw DBException("No data in row structure", "DBResult::getInt");
-    }
-
-    int val = 0;
+	int val = 0;
 	std::istringstream iss(row[getFieldPos(fName)]);
 	iss >> val;
 
@@ -122,12 +115,11 @@ int DBResult::getInt(const std::string &fName) {
 }
 
 unsigned int DBResult::getUInt(const std::string &fName) {
+	if (!row) {
+		throw DBException("No data in row structure", "DBResult::getUInt");
+	}
 
-    if (!row) {
-        throw DBException("No data in row structure", "DBResult::getUInt");
-    }
-
-    unsigned int val = 0;
+	unsigned int val = 0;
 	std::istringstream iss(row[getFieldPos(fName)]);
 	iss >> val;
 
@@ -135,12 +127,11 @@ unsigned int DBResult::getUInt(const std::string &fName) {
 }
 
 unsigned long int DBResult::getUInt64(const std::string &fName) {
+	if (!row) {
+		throw DBException("No data in row structure", "DBResult::getUInt64");
+	}
 
-    if (!row) {
-        throw DBException("No data in row structure", "DBResult::getUInt64");
-    }
-
-    unsigned long int val = 0;
+	unsigned long int val = 0;
 	std::istringstream iss(row[getFieldPos(fName)]);
 	iss >> val;
 
@@ -148,12 +139,11 @@ unsigned long int DBResult::getUInt64(const std::string &fName) {
 }
 
 float DBResult::getReal(const std::string &fName) {
+	if (!row) {
+		throw DBException("No data in row structure", "DBResult::getReal");
+	}
 
-    if (!row) {
-        throw DBException("No data in row structure", "DBResult::getReal");
-    }
-
-    float val = 0;
+	float val = 0;
 	std::istringstream iss(row[getFieldPos(fName)]);
 	iss >> val;
 
@@ -161,11 +151,11 @@ float DBResult::getReal(const std::string &fName) {
 }
 
 bool DBResult::isNull(const std::string &fName) {
-
-    return (row[getFieldPos(fName)]==NULL)?(true):(false);
+	return (row[getFieldPos(fName)] == NULL)?(true):(false);
 }
 
 unsigned long int DBResult::rowsCount() {
-
-    return mysql_num_rows(result);
+	return mysql_num_rows(result);
 }
+
+}  // namespace onh

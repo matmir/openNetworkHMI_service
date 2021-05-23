@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,55 +16,52 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef COMMANDPARSEREXCEPTION_H
-#define COMMANDPARSEREXCEPTION_H
+#ifndef ONH_THREAD_SOCKET_PARSER_COMMANDPARSEREXCEPTION_H_
+#define ONH_THREAD_SOCKET_PARSER_COMMANDPARSEREXCEPTION_H_
 
 #include "../../../utils/Exception.h"
 
 namespace onh {
 
-    /**
-     * Command parser exception class
-     */
-    class CommandParserException: public Exception {
+/**
+ * Command parser exception class
+ */
+class CommandParserException: public Exception {
+	public:
+		/// Command exception type
+		enum ExceptionType {
+			NONE = 0,
+			WRONG_DATA,
+			WRONG_DATA_COUNT,
+			CONVERSION_COMMAND,
+			UNKNOWN_COMMAND
+		};
 
-        public:
+		CommandParserException();
 
-            /// Command exception type
-            enum ExceptionType {
-                NONE = 0,
-                WRONG_DATA,
-                WRONG_DATA_COUNT,
-                CONVERSION_COMMAND,
-                UNKNOWN_COMMAND
-            };
+		virtual ~CommandParserException() noexcept;
 
-            CommandParserException();
+		/**
+		 * Exception constructor
+		 *
+		 * @param type Exception type
+		 * @param desc Additional exception information
+		 * @param fName Function from which exception was thrown
+		 */
+		explicit CommandParserException(ExceptionType type, const std::string& desc = "", const std::string& fName = "");
 
-            virtual ~CommandParserException() noexcept override;
+		/**
+		 * Get exception type
+		 *
+		 * @return Exception type
+		 */
+		ExceptionType getType() const;
 
-            /**
-             * Exception constructor
-             *
-             * @param type Exception type
-             * @param desc Additional exception information
-             * @param fName Function from which exception was thrown
-             */
-            CommandParserException(ExceptionType type, const std::string& desc = "", const std::string& fName = "");
+	private:
+		/// Exception type
+		ExceptionType exType;
+};
 
-            /**
-             * Get exception type
-             *
-             * @return Exception type
-             */
-            ExceptionType getType() const;
+}  // namespace onh
 
-        private:
-
-            /// Exception type
-            ExceptionType exType;
-    };
-
-}
-
-#endif // COMMANDPARSEREXCEPTION_H
+#endif  // ONH_THREAD_SOCKET_PARSER_COMMANDPARSEREXCEPTION_H_

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,21 +19,20 @@
 #include "ModbusUpdater.h"
 #include <iostream>
 
-using namespace onh;
+namespace onh {
 
 ModbusUpdater::ModbusUpdater(modbusM::ModbusMaster* drv,
 								const MutexAccess &drvLock,
 								const GuardDataController<ModbusProcessData> &mbuff):
-	driver(drv), driverLock(drvLock), buff(mbuff), tempBuff{nullptr, nullptr, 0, 0}
-{
+	driver(drv), driverLock(drvLock), buff(mbuff), tempBuff{nullptr, nullptr, 0, 0} {
 	ModbusProcessData tmp;
-    // Init temporary buffer
-    buff.getData(tmp);
+	// Init temporary buffer
+	buff.getData(tmp);
 
-    tempBuff.regCount = tmp.getRegCount();
-    tempBuff.maxByteCount = tmp.getMaxByte();
-    tempBuff.holdingReg = new WORD[tempBuff.regCount];
-    tempBuff.inputReg = new WORD[tempBuff.regCount];
+	tempBuff.regCount = tmp.getRegCount();
+	tempBuff.maxByteCount = tmp.getMaxByte();
+	tempBuff.holdingReg = new WORD[tempBuff.regCount];
+	tempBuff.inputReg = new WORD[tempBuff.regCount];
 }
 
 ModbusUpdater::~ModbusUpdater() {
@@ -45,43 +44,40 @@ ModbusUpdater::~ModbusUpdater() {
 }
 
 void ModbusUpdater::updateBuffer() {
-
 	// Check driver
 	if (!driver)
 		throw DriverException("Missing driver instance", "ModbusUpdater::updateBuffer");
 
-    // Clear temporary load buffers
-    clearTempReg();
+	// Clear temporary load buffers
+	clearTempReg();
 
-    driverLock.lock();
+	driverLock.lock();
 
-    try {
+	try {
+		// Read input registers
+		driver->READ_INPUT_REGISTERS(0x00, tempBuff.regCount, tempBuff.inputReg);
 
-        // Read input registers
-        driver->READ_INPUT_REGISTERS(0x00, tempBuff.regCount, tempBuff.inputReg);
+		// Read holding registers
+		driver->READ_HOLDING_REGISTERS(0x00, tempBuff.regCount, tempBuff.holdingReg);
+	} catch (modbusM::ModbusException &e) {
+		driverLock.unlock();
 
-        // Read holding registers
-        driver->READ_HOLDING_REGISTERS(0x00, tempBuff.regCount, tempBuff.holdingReg);
+		throw DriverException(e.what(), "ModbusUpdater::updateBuffer");
+	}
 
-    } catch (modbusM::ModbusException &e) {
+	driverLock.unlock();
 
-        driverLock.unlock();
-
-        throw DriverException(e.what(), "ModbusUpdater::updateBuffer");
-    }
-
-    driverLock.unlock();
-
-    // Copy loaded data to the buffer
-    buff.setData(tempBuff);
+	// Copy loaded data to the buffer
+	buff.setData(ModbusProcessData(tempBuff));
 }
 
 void ModbusUpdater::clearTempReg() {
-
 	if ((tempBuff.holdingReg != nullptr) && (tempBuff.inputReg != nullptr)) {
-		for (int i=0; i<tempBuff.regCount; ++i) {
+		for (int i=0; i < tempBuff.regCount; ++i) {
 			tempBuff.holdingReg[i] = 0;
 			tempBuff.inputReg[i] = 0;
 		}
 	}
 }
+
+}  // namespace onh

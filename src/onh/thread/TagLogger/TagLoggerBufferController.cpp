@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,24 +18,22 @@
 
 #include "TagLoggerBufferController.h"
 
-using namespace onh;
+namespace onh {
 
 TagLoggerBufferController::TagLoggerBufferController(const TagLoggerBufferController& tlbc):
-	buff(tlbc.buff), controllerInsertFinished(tlbc.controllerInsertFinished), readOnly(tlbc.readOnly)
-{
+	buff(tlbc.buff), controllerInsertFinished(tlbc.controllerInsertFinished), readOnly(tlbc.readOnly) {
 }
 
-TagLoggerBufferController::TagLoggerBufferController(const loggerBufferController &lbc, const GuardDataController<bool> &gdcf, bool readOnlyFlag):
-	buff(lbc), controllerInsertFinished(gdcf), readOnly(readOnlyFlag)
-{
+TagLoggerBufferController::TagLoggerBufferController(const loggerBufferController &lbc,
+														const GuardDataController<bool> &gdcf,
+														bool readOnlyFlag):
+	buff(lbc), controllerInsertFinished(gdcf), readOnly(readOnlyFlag) {
 }
 
-TagLoggerBufferController::~TagLoggerBufferController()
-{
+TagLoggerBufferController::~TagLoggerBufferController() {
 }
 
 void TagLoggerBufferController::putData(const std::vector<TagLoggerItem> &data) {
-
 	if (readOnly)
 		throw Exception("Tag logger buffer controller is in read only state", "TagLoggerBufferController::putData");
 
@@ -43,7 +41,7 @@ void TagLoggerBufferController::putData(const std::vector<TagLoggerItem> &data) 
 	buff.lock();
 
 	// Insert new data to the buffer
-	for (unsigned int i=0; i<data.size(); ++i) {
+	for (unsigned int i=0; i < data.size(); ++i) {
 		buff.getDataRef().push_back(data[i]);
 	}
 
@@ -52,7 +50,6 @@ void TagLoggerBufferController::putData(const std::vector<TagLoggerItem> &data) 
 }
 
 void TagLoggerBufferController::getData(std::vector<TagLoggerItem> &data) {
-
 	if (!readOnly)
 		throw Exception("Tag logger buffer controller is in write only state", "TagLoggerBufferController::getData");
 
@@ -60,7 +57,7 @@ void TagLoggerBufferController::getData(std::vector<TagLoggerItem> &data) {
 	buff.lock();
 
 	// Copy data from buffer to the input vector
-	for (unsigned int i=0; i<buff.getDataRef().size(); ++i) {
+	for (unsigned int i=0; i < buff.getDataRef().size(); ++i) {
 		data.push_back(buff.getDataRef().at(i));
 	}
 
@@ -72,14 +69,13 @@ void TagLoggerBufferController::getData(std::vector<TagLoggerItem> &data) {
 }
 
 bool TagLoggerBufferController::isEmpty() {
-
 	bool ret = false;
 
 	// Lock access to the buffer
 	buff.lock();
 
 	// Check buffer size
-	ret = (buff.getDataRef().size()==0)?(true):(false);
+	ret = (buff.getDataRef().size() == 0)?(true):(false);
 
 	// Unlock access to the buffer
 	buff.unlock();
@@ -88,7 +84,6 @@ bool TagLoggerBufferController::isEmpty() {
 }
 
 void TagLoggerBufferController::setFinished() {
-
 	if (readOnly)
 		throw Exception("Tag logger buffer controller is in read only state", "TagLoggerBufferController::setFinished");
 
@@ -96,10 +91,11 @@ void TagLoggerBufferController::setFinished() {
 }
 
 bool TagLoggerBufferController::isFinished() {
-
 	bool ret = false;
 
 	controllerInsertFinished.getData(ret);
 
 	return ret;
 }
+
+}  // namespace onh

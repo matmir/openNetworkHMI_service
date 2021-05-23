@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_THREAD_TAGLOGGER_TAGLOGGERBUFFERCONTAINER_H_
-#define SRC_ONH_THREAD_TAGLOGGER_TAGLOGGERBUFFERCONTAINER_H_
+#ifndef ONH_THREAD_TAGLOGGER_TAGLOGGERBUFFERCONTAINER_H_
+#define ONH_THREAD_TAGLOGGER_TAGLOGGERBUFFERCONTAINER_H_
 
 #include <vector>
 #include "../../utils/MutexContainer.h"
@@ -27,50 +27,48 @@
 
 namespace onh {
 
-	/// Guarded Tag logger buffer container
-	typedef GuardDataContainer<std::vector<TagLoggerItem>> loggerBufferContainer;
+/// Guarded Tag logger buffer container
+typedef GuardDataContainer<std::vector<TagLoggerItem>> loggerBufferContainer;
 
-	/**
-	 * Tag logger buffer controller class
-	 */
-	class TagLoggerBufferContainer {
+/**
+ * Tag logger buffer controller class
+ */
+class TagLoggerBufferContainer {
+	public:
+		/**
+		 * Constructor
+		 */
+		TagLoggerBufferContainer();
 
-		public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		TagLoggerBufferContainer(const TagLoggerBufferContainer&) = delete;
 
-			/**
-			 * Constructor
-			 */
-			TagLoggerBufferContainer();
+		virtual ~TagLoggerBufferContainer();
 
-			/**
-			 * Copy constructor - inactive
-			 */
-			TagLoggerBufferContainer(const TagLoggerBufferContainer&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		TagLoggerBufferContainer& operator=(const TagLoggerBufferContainer&) = delete;
 
-			virtual ~TagLoggerBufferContainer();
+		/**
+		 * Get tag logger buffer container controller object
+		 *
+		 * @param readOnly Read only flag (allowed only reading from buffer)
+		 *
+		 * @return Tag logger buffer container controller object
+		 */
+		TagLoggerBufferController getController(bool readOnly = false);
 
-			/**
-			 * Assign operator - inactive
-			 */
-			TagLoggerBufferContainer& operator=(const TagLoggerBufferContainer&) = delete;
+	private:
+		/// Data buffer
+		loggerBufferContainer buff;
 
-			/**
-			 * Get tag logger buffer container controller object
-			 *
-			 * @param readOnly Read only flag (allowed only reading from buffer)
-			 *
-			 * @return Tag logger buffer container controller object
-			 */
-			TagLoggerBufferController getController(bool readOnly = false);
+		/// Flag informs that controller finished inserting data
+		GuardDataContainer<bool> controllerInsertFinished;
+};
 
-		private:
+}  // namespace onh
 
-			/// Data buffer
-			loggerBufferContainer buff;
-
-			/// Flag informs that controller finished inserting data
-			GuardDataContainer<bool> controllerInsertFinished;
-	};
-}
-
-#endif /* SRC_ONH_THREAD_TAGLOGGER_TAGLOGGERBUFFERCONTAINER_H_ */
+#endif  // ONH_THREAD_TAGLOGGER_TAGLOGGERBUFFERCONTAINER_H_

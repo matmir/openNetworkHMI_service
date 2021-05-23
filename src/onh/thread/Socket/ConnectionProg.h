@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONNECTIONPROG_H_
-#define CONNECTIONPROG_H_
+#ifndef ONH_THREAD_SOCKET_CONNECTIONPROG_H_
+#define ONH_THREAD_SOCKET_CONNECTIONPROG_H_
 
 #include "../../driver/ProcessReader.h"
 #include "../../driver/ProcessWriter.h"
@@ -30,79 +30,76 @@
 
 namespace onh {
 
-	/**
-	 * Socket connection class
-	 */
-    class ConnectionProgram {
+/**
+ * Socket connection class
+ */
+class ConnectionProgram {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param connDescriptor Connection file descriptor
+		 * @param pr Process reader
+		 * @param pw Process writer
+		 * @param cc Cycle time controllers
+		 * @param db Database credentials
+		 * @param gdcTED Thread exit controller
+		 */
+		ConnectionProgram(int connDescriptor,
+							const ProcessReader& pr,
+							const ProcessWriter& pw,
+							const ThreadCycleControllers& cc,
+							const DBCredentials& db,
+							const GuardDataController<ThreadExitData> &gdcTED);
 
-        public:
+		/**
+		 * Copy constructor
+		 *
+		 * @param rhs Object to copy
+		 */
+		ConnectionProgram(const ConnectionProgram& rhs);
 
-            /**
-             * Constructor
-             *
-             * @param connDescriptor Connection file descriptor
-             * @param pr Process reader
-             * @param pw Process writer
-             * @param cc Cycle time controllers
-             * @param db Database credentials
-             * @param gdcTED Thread exit controller
-             */
-    		ConnectionProgram(int connDescriptor,
-    							const ProcessReader& pr,
-								const ProcessWriter& pw,
-								const ThreadCycleControllers& cc,
-								const DBCredentials& db,
-								const GuardDataController<ThreadExitData> &gdcTED);
+		/**
+		 * Destructor
+		 */
+		virtual ~ConnectionProgram();
 
-            /**
-             * Copy constructor
-             *
-             * @param rhs Object to copy
-             */
-    		ConnectionProgram(const ConnectionProgram& rhs);
+		/**
+		 * Thread program function
+		 */
+		void operator()();
 
-            /**
-             * Destructor
-             */
-            virtual ~ConnectionProgram();
+		/**
+		 * Assignment operator - inactive
+		 */
+		ConnectionProgram& operator=(const ConnectionProgram&) = delete;
 
-            /**
-             * Thread program function
-             */
-            void operator()();
+	private:
+		/// Connection file descriptor
+		int connDesc;
 
-            /**
-             * Assignment operator - inactive
-             */
-            ConnectionProgram& operator=(const ConnectionProgram&) = delete;
+		/// Process reader
+		ProcessReader *pReader;
 
-        private:
+		/// Process writer
+		ProcessWriter *pWriter;
 
-            /// Connection file descriptor
-            int connDesc;
+		/// DB credentials
+		DBCredentials dbCredentials;
 
-            /// Process reader
-            ProcessReader *pReader;
+		/// Thread Exit data controller
+		GuardDataController<ThreadExitData> thExit;
 
-            /// Process writer
-			ProcessWriter *pWriter;
+		/// Cycle controllers
+		ThreadCycleControllers cycleController;
 
-			/// DB credentials
-			DBCredentials dbCredentials;
+		/// Logger object
+		Logger* log;
 
-			/// Thread Exit data controller
-			GuardDataController<ThreadExitData> thExit;
+		/// Command parser
+		CommandParser *parser;
+};
 
-			/// Cycle controllers
-			ThreadCycleControllers cycleController;
+}  // namespace onh
 
-			/// Logger object
-			Logger* log;
-
-			/// Command parser
-			CommandParser *parser;
-    };
-
-}
-
-#endif /* CONNECTIONPROG_H_ */
+#endif  // ONH_THREAD_SOCKET_CONNECTIONPROG_H_

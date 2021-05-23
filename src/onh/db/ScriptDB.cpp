@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,175 +20,157 @@
 #include <sstream>
 #include "../utils/Exception.h"
 
-using namespace onh;
+namespace onh {
 
 ScriptDB::ScriptDB(const ScriptDB &sDB):
-    DB(sDB)
-{
+	DB(sDB) {
 }
 
 ScriptDB::ScriptDB(MYSQL *connDB):
-    DB(connDB)
-{
+	DB(connDB) {
 }
 
-ScriptDB::~ScriptDB()
-{
+ScriptDB::~ScriptDB() {
 }
 
 std::vector<ScriptItem> ScriptDB::getScripts(bool enabled) {
+	std::stringstream tagID;
 
-    std::stringstream tagID;
+	// Query
+	std::stringstream q;
+	std::string q1;
 
-    // Query
-    std::stringstream q;
-    std::string q1;
+	// Return vector
+	std::vector<ScriptItem> vScripts;
 
-    // Return vector
-    std::vector<ScriptItem> vScripts;
+	// Return value
+	Tag tg;
+	TagType tt;
+	processDataArea ta;
+	ScriptItem sc;
+	ScriptItem sc_clear;
 
-    // Return value
-    Tag tg;
-    TagType tt;
-    processDataArea ta;
-    ScriptItem sc;
-    ScriptItem sc_clear;
-
-    DBResult *result = 0;
+	DBResult *result = 0;
 	DBResult *result2 = 0;
 
-    // Prepare query
-    q << "SELECT * FROM scripts sc, tags t, driver_connections dc WHERE sc.scTagId=t.tid AND t.tConnId=dc.dcId ";
-    q << "AND sc.scEnable=" << ((enabled)?("1"):("0")) << ";";
+	// Prepare query
+	q << "SELECT * FROM scripts sc, tags t, driver_connections dc WHERE sc.scTagId=t.tid AND t.tConnId=dc.dcId ";
+	q << "AND sc.scEnable=" << ((enabled)?("1"):("0")) << ";";
 
-    try {
+	try {
+		// Query
+		result = executeQuery(q.str());
 
-        // Query
-        result = executeQuery(q.str());
+		// Read data
+		while (result->nextRow()) {
+			sc = sc_clear;
 
-        // Read data
-        while (result->nextRow()) {
-
-            sc = sc_clear;
-
-            // Tag type
+			// Tag type
 			tt = (TagType)result->getUInt("tType");
 
 			// Tag area
 			ta = (processDataArea)result->getUInt("tArea");
 
-            // Update tag object values
-            tg.setId(result->getUInt("tid"));
-            tg.setConnId(result->getUInt("tConnId"));
-            tg.setName(result->getString("tName"));
-            tg.setType(tt);
-            tg.setArea(ta);
-            tg.setByteAddress(result->getUInt("tByteAddress"));
-            tg.setBitAddress(result->getUInt("tBitAddress"));
+			// Update tag object values
+			tg.setId(result->getUInt("tid"));
+			tg.setConnId(result->getUInt("tConnId"));
+			tg.setName(result->getString("tName"));
+			tg.setType(tt);
+			tg.setArea(ta);
+			tg.setByteAddress(result->getUInt("tByteAddress"));
+			tg.setBitAddress(result->getUInt("tBitAddress"));
 
-            // Script item
-            sc.setId(result->getUInt("scid"));
-            sc.setTag(tg);
-            sc.setName(result->getString("scName"));
-            sc.setRun(((result->getInt("scRun")==1)?(true):(false)));
-            sc.setLock(((result->getInt("scLock")==1)?(true):(false)));
+			// Script item
+			sc.setId(result->getUInt("scid"));
+			sc.setTag(tg);
+			sc.setName(result->getString("scName"));
+			sc.setRun(((result->getInt("scRun") == 1)?(true):(false)));
+			sc.setLock(((result->getInt("scLock") == 1)?(true):(false)));
 
-            // Check if there is feedback Tag
-            if (!result->isNull("scFeedbackRun")) {
+			// Check if there is feedback Tag
+			if (!result->isNull("scFeedbackRun")) {
+				tagID << result->getUInt("scFeedbackRun");
+				q1 = "SELECT * FROM tags t, driver_connections dc WHERE t.tConnId=dc.dcId AND tid="+tagID.str();
 
-                tagID << result->getUInt("scFeedbackRun");
-                q1 = "SELECT * FROM tags t, driver_connections dc WHERE t.tConnId=dc.dcId AND tid="+tagID.str();
+				// Call additional query
+				result2 = executeQuery(q1);
 
-                // Call additional query
-                result2 = executeQuery(q1);
+				if (result2->rowsCount() == 1) {
+					result2->nextRow();
 
-                if (result2->rowsCount() == 1) {
-
-                    result2->nextRow();
-
-                    // Tag type
+					// Tag type
 					tt = (TagType)result2->getUInt("tType");
 
 					// Tag area
 					ta = (processDataArea)result2->getUInt("tArea");
 
-                    // Update tag object values
-                    tg.setId(result2->getUInt("tid"));
-                    tg.setConnId(result2->getUInt("tConnId"));
-                    tg.setName(result2->getString("tName"));
-                    tg.setType(tt);
-                    tg.setArea(ta);
-                    tg.setByteAddress(result2->getUInt("tByteAddress"));
-                    tg.setBitAddress(result2->getUInt("tBitAddress"));
+					// Update tag object values
+					tg.setId(result2->getUInt("tid"));
+					tg.setConnId(result2->getUInt("tConnId"));
+					tg.setName(result2->getString("tName"));
+					tg.setType(tt);
+					tg.setArea(ta);
+					tg.setByteAddress(result2->getUInt("tByteAddress"));
+					tg.setBitAddress(result2->getUInt("tBitAddress"));
 
-                    // Set feedback tag
-                    sc.setFeedbackRunTag(tg);
-                }
+					// Set feedback tag
+					sc.setFeedbackRunTag(tg);
+				}
 
-                // Release memory
-                delete result2;
-                result2 = 0;
+				// Release memory
+				delete result2;
+				result2 = 0;
+			}
 
-            }
+			sc.setEnable(((result->getInt("scEnable") == 1)?(true):(false)));
 
-            sc.setEnable(((result->getInt("scEnable")==1)?(true):(false)));
+			// Put into the vector
+			vScripts.push_back(sc);
+		}
 
-            // Put into the vector
-            vScripts.push_back(sc);
+		// Release memory
+		delete result;
+		result = 0;
+	} catch (DBException &e) {
+		if (result)
+			delete result;
+		if (result2)
+			delete result2;
 
-        }
+		throw Exception(e.what(), "ScriptDB::getScripts");
+	}
 
-        // Release memory
-        delete result;
-        result = 0;
-
-    } catch (DBException &e) {
-
-        if (result)
-            delete result;
-        if (result2)
-            delete result2;
-
-        throw Exception(e.what(), "ScriptDB::getScripts");
-    }
-
-    return vScripts;
+	return vScripts;
 }
 
 void ScriptDB::setScriptRun(const ScriptItem& script) {
+	// Query
+	std::stringstream q;
 
-    // Query
-    std::stringstream q;
+	// Prepare query
+	q << "UPDATE scripts SET scRun=1, scLock=1 WHERE scid=" << script.getId() <<";";
 
-    // Prepare query
-    q << "UPDATE scripts SET scRun=1, scLock=1 WHERE scid=" << script.getId() <<";";
-
-    try {
-
-        // Query
-        executeSaveQuery(q.str());
-
-    } catch (DBException &e) {
-
-        throw Exception(e.what(), "ScriptDB::setScriptRun");
-    }
+	try {
+		// Query
+		executeSaveQuery(q.str());
+	} catch (DBException &e) {
+		throw Exception(e.what(), "ScriptDB::setScriptRun");
+	}
 }
 
 void ScriptDB::clearScriptLock(const ScriptItem& script) {
+	// Query
+	std::stringstream q;
 
-    // Query
-    std::stringstream q;
+	// Prepare query
+	q << "UPDATE scripts SET scLock=0 WHERE scid=" << script.getId() <<";";
 
-    // Prepare query
-    q << "UPDATE scripts SET scLock=0 WHERE scid=" << script.getId() <<";";
-
-    try {
-
-        // Query
-        executeSaveQuery(q.str());
-
-    } catch (Exception &e) {
-
-        throw Exception(e.what(), "ScriptDB::clearScriptLock");
-    }
+	try {
+		// Query
+		executeSaveQuery(q.str());
+	} catch (Exception &e) {
+		throw Exception(e.what(), "ScriptDB::clearScriptLock");
+	}
 }
+
+}  // namespace onh

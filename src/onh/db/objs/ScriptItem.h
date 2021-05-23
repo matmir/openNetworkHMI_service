@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,218 +16,215 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCRIPTITEM_H
-#define SCRIPTITEM_H
+#ifndef ONH_DB_OBJS_SCRIPTITEM_H_
+#define ONH_DB_OBJS_SCRIPTITEM_H_
 
 #include "Tag.h"
 #include "ScriptException.h"
 
 namespace onh {
 
-    /**
-	 * Script item class
-	 */
-    class ScriptItem {
+/**
+ * Script item class
+ */
+class ScriptItem {
+	public:
+		ScriptItem();
 
-        public:
+		/**
+		 * Script item constructor
+		 *
+		 * @param id Script identifier
+		 * @param tag Tag object
+		 * @param name Script name
+		 * @param run Script run flag
+		 * @param lock Script lock flag
+		 * @param enable Script enable flag
+		 */
+		ScriptItem(unsigned int id,
+					const Tag& tag,
+					const std::string& name,
+					bool run,
+					bool lock,
+					bool enabled);
 
-            ScriptItem();
+		/**
+		 * Script item constructor with feedback tag
+		 *
+		 * @param id Script identifier
+		 * @param tag Tag object
+		 * @param name Script name
+		 * @param run Script run flag
+		 * @param lock Script lock flag
+		 * @param feedbackRun Tag informs controller that script is running
+		 * @param enable Script enable flag
+		 */
+		ScriptItem(unsigned int id,
+					const Tag& tag,
+					const std::string& name,
+					bool run,
+					bool lock,
+					const Tag& feedbackRun,
+					bool enabled);
 
-            /**
-             * Script item constructor
-             *
-             * @param id Script identifier
-             * @param tag Tag object
-             * @param name Script name
-             * @param run Script run flag
-             * @param lock Script lock flag
-             * @param enable Script enable flag
-             */
-            ScriptItem(unsigned int id,
-                        const Tag& tag,
-                        const std::string& name,
-                        bool run,
-                        bool lock,
-                        bool enabled);
+		/**
+		 * Script item copy constructor
+		 *
+		 * @param rhs Object to copy
+		 */
+		ScriptItem(const ScriptItem& rhs);
 
-            /**
-             * Script item constructor with feedback tag
-             *
-             * @param id Script identifier
-             * @param tag Tag object
-             * @param name Script name
-             * @param run Script run flag
-             * @param lock Script lock flag
-             * @param feedbackRun Tag informs controller that script is running
-             * @param enable Script enable flag
-             */
-            ScriptItem(unsigned int id,
-                        const Tag& tag,
-                        const std::string& name,
-                        bool run,
-                        bool lock,
-                        const Tag& feedbackRun,
-                        bool enabled);
+		/**
+		 * Script item assignment operator
+		 *
+		 * @param rhs Script item object to copy
+		 */
+		ScriptItem& operator=(const ScriptItem& rhs);
 
-            /**
-             * Script item copy constructor
-             *
-             * @param rhs Object to copy
-             */
-            ScriptItem(const ScriptItem& rhs);
+		virtual ~ScriptItem();
 
-            /**
-             * Script item assignment operator
-             *
-             * @param rhs Script item object to copy
-             */
-            ScriptItem& operator=(const ScriptItem& rhs);
+		/**
+		 * Get Script identifier
+		 *
+		 * @return Script id
+		 */
+		unsigned int getId() const;
 
-            virtual ~ScriptItem();
+		/**
+		 * Set Script identifier
+		 *
+		 * @param id Script identifier
+		 */
+		void setId(unsigned int id);
 
-            /**
-             * Get Script identifier
-             *
-             * @return Script id
-             */
-            unsigned int getId() const;
+		/**
+		 * Get Tag object
+		 *
+		 * @return Tag object
+		 */
+		const Tag& getTag() const;
 
-            /**
-             * Set Script identifier
-             *
-             * @param id Script identifier
-             */
-            void setId(unsigned int id);
+		/**
+		 * Set Tag object
+		 *
+		 * @param tag Tag object
+		 */
+		void setTag(const Tag& tag);
 
-            /**
-             * Get Tag object
-             *
-             * @return Tag object
-             */
-            const Tag& getTag() const;
+		/**
+		 *  Get Script name
+		 *
+		 * @return Script name
+		 */
+		std::string getName() const;
 
-            /**
-             * Set Tag object
-             *
-             * @param tag Tag object
-             */
-            void setTag(const Tag& tag);
+		/**
+		 * Set Script name
+		 *
+		 * @param name Script name
+		 */
+		void setName(const std::string& name);
 
-            /**
-             *  Get Script name
-             *
-             * @return Script name
-             */
-            std::string getName() const;
+		/**
+		 * Check script run flag
+		 *
+		 * @return True if script is running
+		 */
+		bool isRunning() const;
 
-            /**
-             * Set Script name
-             *
-             * @param name Script name
-             */
-            void setName(const std::string& name);
+		/**
+		 * Set script run flag
+		 *
+		 * @param run Script run flag
+		 */
+		void setRun(bool run);
 
-            /**
-             * Check script run flag
-             *
-             * @return True if script is running
-             */
-            bool isRunning() const;
+		/**
+		 * Check script lock flag
+		 *
+		 * @return True if script is locked
+		 */
+		bool isLocked() const;
 
-            /**
-             * Set script run flag
-             *
-             * @param run Script run flag
-             */
-            void setRun(bool run);
+		/**
+		 * Set script lock flag
+		 *
+		 * @param lock Script lock flag
+		 */
+		void setLock(bool lock);
 
-            /**
-             * Check script lock flag
-             *
-             * @return True if script is locked
-             */
-            bool isLocked() const;
+		/**
+		 * Set Tag informs controller that script is running
+		 *
+		 * @param feedbackTag Controller Feedback Tag
+		 */
+		void setFeedbackRunTag(const Tag& feedbackTag);
 
-            /**
-             * Set script lock flag
-             *
-             * @param lock Script lock flag
-             */
-            void setLock(bool lock);
+		/**
+		 * Get Tag informs controller that script is running
+		 *
+		 * @return Controller Feedback Tag
+		 */
+		const Tag& getFeedbackRunTag() const;
 
-            /**
-             * Set Tag informs controller that script is running
-             *
-             * @param feedbackTag Controller Feedback Tag
-             */
-            void setFeedbackRunTag(const Tag& feedbackTag);
+		/**
+		 * Get Script enable flag
+		 *
+		 * @return Script enable flag
+		 */
+		bool isEnabled() const;
 
-            /**
-             * Get Tag informs controller that script is running
-             *
-             * @return Controller Feedback Tag
-             */
-            const Tag& getFeedbackRunTag() const;
+		/**
+		 * Set Script enable flag
+		 *
+		 * @param enable Script enable flag
+		 */
+		void setEnable(bool enable);
 
-            /**
-             * Get Script enable flag
-             *
-             * @return Script enable flag
-             */
-            bool isEnabled() const;
+	private:
+		/// Script identifier
+		unsigned int scid;
 
-            /**
-             * Set Script enable flag
-             *
-             * @param enable Script enable flag
-             */
-            void setEnable(bool enable);
+		/// Tag object
+		Tag* scTag;
 
-        private:
+		/// Script name
+		std::string scName;
 
-            /// Script identifier
-            unsigned int scid;
+		/// Script run flag
+		bool scRun;
 
-            /// Tag object
-            Tag* scTag;
+		/// Script lock flag
+		bool scLock;
 
-            /// Script name
-            std::string scName;
+		/// Tag informs controller that script is running (optional)
+		Tag* scFeedbackRun;
 
-            /// Script run flag
-            bool scRun;
+		/// Script is enabled
+		bool scEnable;
 
-            /// Script lock flag
-            bool scLock;
+		/**
+		 * Check identifier
+		 *
+		 * @param id Identifier
+		 */
+		void checkId(unsigned int id) const;
 
-            /// Tag informs controller that script is running (optional)
-            Tag* scFeedbackRun;
+		/**
+		 * Check script name
+		 *
+		 * @param nm script name
+		 */
+		void checkScriptName(const std::string& nm) const;
 
-            /// Script is enabled
-            bool scEnable;
+		/**
+		 * Check if tag type is bit
+		 *
+		 * @param tg Tag
+		 */
+		void checkBitTagType(const Tag& tg) const;
+};
 
-            /**
-			 * Check identifier
-			 *
-			 * @param id Identifier
-			 */
-			void checkId(unsigned int id) const;
+}  // namespace onh
 
-			/**
-			 * Check script name
-			 *
-			 * @param nm script name
-			 */
-			void checkScriptName(const std::string& nm) const;
-
-			/**
-			 * Check if tag type is bit
-			 *
-			 * @param tg Tag
-			 */
-			void checkBitTagType(const Tag& tg) const;
-    };
-
-}
-
-#endif // SCRIPTITEM_H
+#endif  // ONH_DB_OBJS_SCRIPTITEM_H_

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,40 +16,38 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DBEXCEPTION_H
-#define DBEXCEPTION_H
+#ifndef ONH_DB_DBEXCEPTION_H_
+#define ONH_DB_DBEXCEPTION_H_
 
 #include "../utils/Exception.h"
 
 namespace onh {
 
-    /**
-     * Database exception class
-     */
-    class DBException: public Exception {
+/**
+ * Database exception class
+ */
+class DBException: public Exception {
+	public:
+		DBException();
 
-        public:
+		/**
+		 * Exception constructor with message
+		 *
+		 * @param desc Exception error
+		 */
+		explicit DBException(const std::string& desc);
 
-            DBException();
+		/**
+		 * Exception constructor with message and function name
+		 *
+		 * @param desc Exception error
+		 * @param fName Function from which exception was thrown
+		 */
+		DBException(const std::string& desc, const std::string& fName);
 
-            /**
-             * Exception constructor with message
-             *
-             * @param desc Exception error
-             */
-            DBException(const std::string& desc);
+		virtual ~DBException() noexcept;
+};
 
-            /**
-             * Exception constructor with message and function name
-             *
-             * @param desc Exception error
-             * @param fName Function from which exception was thrown
-             */
-            DBException(const std::string& desc, const std::string& fName);
+}  // namespace onh
 
-            virtual ~DBException() noexcept override;
-    };
-
-}
-
-#endif // DBEXCEPTION_H
+#endif  // ONH_DB_DBEXCEPTION_H_

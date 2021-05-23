@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_DRIVER_PROCESSREADER_H_
-#define SRC_DRIVER_PROCESSREADER_H_
+#ifndef ONH_DRIVER_PROCESSREADER_H_
+#define ONH_DRIVER_PROCESSREADER_H_
 
 #include <vector>
 #include <map>
@@ -27,119 +27,116 @@
 
 namespace onh {
 
-	/// Forward declaration
-	class DriverManager;
+/// Forward declaration
+class DriverManager;
 
-	/**
-	 * Process reader class
-	 */
-	class ProcessReader {
+/**
+ * Process reader class
+ */
+class ProcessReader {
+	public:
+		friend class DriverManager;
 
-        public:
+		/**
+		 * Copy constructor
+		 *
+		 * @param pr ProcessReader to copy
+		 */
+		ProcessReader(const ProcessReader &pr);
 
-            friend class DriverManager;
+		virtual ~ProcessReader();
 
-            /**
-             * Copy constructor
-             *
-             * @param pr ProcessReader to copy
-             */
-            ProcessReader(const ProcessReader &pr);
+		/**
+		 * Assign operator - inactive
+		 */
+		ProcessReader& operator=(const ProcessReader&) = delete;
 
-            virtual ~ProcessReader();
+		/**
+		 * Read bit from the process data
+		 *
+		 * @param tg Tag object
+		 *
+		 * @return Bit value
+		 */
+		bool getBitValue(const Tag& tg);
 
-            /**
-			 * Assign operator - inactive
-			 */
-            ProcessReader& operator=(const ProcessReader&) = delete;
+		/**
+		 * Read bits from the process data
+		 *
+		 * @param tags Tags vector
+		 *
+		 * @return Vector with bits value
+		 */
+		std::vector<bool> getBitsValue(const std::vector<Tag>& tags);
 
-            /**
-             * Read bit from the process data
-             *
-             * @param tg Tag object
-             *
-             * @return Bit value
-             */
-            bool getBitValue(const Tag& tg);
+		/**
+		 * Read byte from the process data
+		 *
+		 * @param tg Tag object
+		 *
+		 * @return Byte value
+		 */
+		BYTE getByte(const Tag& tg);
 
-            /**
-             * Read bits from the process data
-             *
-             * @param tags Tags vector
-             *
-             * @return Vector with bits value
-             */
-            std::vector<bool> getBitsValue(const std::vector<Tag>& tags);
+		/**
+		 * Read word from the process data
+		 *
+		 * @param tg Tag object
+		 *
+		 * @return Word value
+		 */
+		WORD getWord(const Tag& tg);
 
-            /**
-             * Read byte from the process data
-             *
-             * @param tg Tag object
-             *
-             * @return Byte value
-             */
-            BYTE getByte(const Tag& tg);
+		/**
+		 * Read double word from the process data
+		 *
+		 * @param tg Tag object
+		 *
+		 * @return Double word value
+		 */
+		DWORD getDWord(const Tag& tg);
 
-            /**
-             * Read word from the process data
-             *
-             * @param tg Tag object
-             *
-             * @return Word value
-             */
-            WORD getWord(const Tag& tg);
+		/**
+		 * Read int from the process data
+		 *
+		 * @param tg Tag object
+		 *
+		 * @return Int value
+		 */
+		int getInt(const Tag& tg);
 
-            /**
-             * Read double word from the process data
-             *
-             * @param tg Tag object
-             *
-             * @return Double word value
-             */
-            DWORD getDWord(const Tag& tg);
+		/**
+		 * Read float from the process data
+		 *
+		 * @param tg Tag object
+		 *
+		 * @return float value
+		 */
+		float getReal(const Tag& tg);
 
-            /**
-             * Read int from the process data
-             *
-             * @param tg Tag object
-             *
-             * @return Int value
-             */
-            int getInt(const Tag& tg);
+		/**
+		 * Update reader process data (copy from driver)
+		 */
+		void updateProcessData();
 
-            /**
-             * Read float from the process data
-             *
-             * @param tg Tag object
-             *
-             * @return float value
-             */
-            float getReal(const Tag& tg);
+	private:
+		/**
+		 * Constructor (allowed only from DriverManager)
+		 */
+		ProcessReader();
 
-            /**
-             * Update reader process data (copy from driver)
-             */
-            void updateProcessData();
+		/**
+		 * Add Driver process reader to process reader (allowed only from DriverManager)
+		 *
+		 * @param id Driver process reader identifier
+		 * @param dpr Driver process reader
+		 */
+		void addReader(unsigned int id, DriverProcessReader *dpr);
 
-        private:
+		/// Driver process data reader
+		std::map<unsigned int, DriverProcessReader*> driverReader;
+};
 
-            /**
-             * Constructor (allowed only from DriverManager)
-             */
-            ProcessReader();
+}  // namespace onh
 
-            /**
-             * Add Driver process reader to process reader (allowed only from DriverManager)
-             *
-             * @param id Driver process reader identifier
-             * @param dpr Driver process reader
-             */
-            void addReader(unsigned int id, DriverProcessReader *dpr);
-
-            /// Driver process data reader
-            std::map<unsigned int, DriverProcessReader*> driverReader;
-	};
-
-}
-
-#endif /* SRC_DRIVER_PROCESSREADER_H_ */
+#endif  // ONH_DRIVER_PROCESSREADER_H_

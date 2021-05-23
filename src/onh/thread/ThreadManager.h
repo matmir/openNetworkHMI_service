@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef THREADMANAGER_H
-#define THREADMANAGER_H
+#ifndef ONH_THREAD_THREADMANAGER_H_
+#define ONH_THREAD_THREADMANAGER_H_
 
 #include <string>
 #include <thread>
@@ -41,177 +41,174 @@
 
 namespace onh {
 
-    /**
-	 * Thread manager class
-	 */
-    class ThreadManager {
+/**
+ * Thread manager class
+ */
+class ThreadManager {
+	public:
+		/**
+		 * Constructor
+		 */
+		ThreadManager();
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ThreadManager(const ThreadManager&) = delete;
 
-    		/**
-    		 * Constructor
-    		 */
-            ThreadManager();
+		/**
+		 * Destructor
+		 */
+		virtual ~ThreadManager();
 
-            /**
-             * Copy constructor - inactive
-             */
-            ThreadManager(const ThreadManager&) = delete;
+		/**
+		 * Assignment operator - inactive
+		 */
+		ThreadManager& operator=(const ThreadManager&) = delete;
 
-            /**
-             * Destructor
-             */
-            virtual ~ThreadManager();
+		/**
+		 * Initialize Process updater thread
+		 *
+		 * @param pu Process updaters
+		 * @param updateInterval Thread update interval (milliseconds)
+		 */
+		void initProcessUpdater(const std::vector<ProcessUpdaterData>& pu, unsigned int updateInterval);
 
-            /**
-             * Assignment operator - inactive
-             */
-            ThreadManager& operator=(const ThreadManager&) = delete;
+		/**
+		 * Initialize driver buffer threads
+		 *
+		 * @param dbu Driver buffer updaters
+		 */
+		void initDriverPolling(const std::vector<DriverBufferUpdaterData>& dbu);
 
-            /**
-			 * Initialize Process updater thread
-			 *
-			 * @param pu Process updaters
-			 * @param updateInterval Thread update interval (milliseconds)
-			 */
-			void initProcessUpdater(const std::vector<ProcessUpdaterData>& pu, unsigned int updateInterval);
+		/**
+		 * Initialize Alarming thread
+		 *
+		 * @param pr Process reader
+		 * @param pw Process writer
+		 * @param adb Alarming DB
+		 * @param updateInterval Thread update interval (milliseconds)
+		 */
+		void initAlarmingThread(const ProcessReader& pr,
+								const ProcessWriter& pw,
+								const AlarmingDB& adb,
+								unsigned int updateInterval);
 
-            /**
-             * Initialize driver buffer threads
-             *
-             * @param dbu Driver buffer updaters
-             */
-            void initDriverPolling(const std::vector<DriverBufferUpdaterData>& dbu);
-
-            /**
-             * Initialize Alarming thread
-             *
-             * @param pr Process reader
-             * @param pw Process writer
-             * @param adb Alarming DB
-             * @param updateInterval Thread update interval (milliseconds)
-             */
-            void initAlarmingThread(const ProcessReader& pr,
-									const ProcessWriter& pw,
-									const AlarmingDB& adb,
+		/**
+		 * Initialize Tag logger thread
+		 *
+		 * @param pr Process reader
+		 * @param tldb Tag logger DB
+		 * @param updateInterval Thread update interval (milliseconds)
+		 */
+		void initTagLoggerThread(const ProcessReader& pr,
+									const TagLoggerDB& tldb,
 									unsigned int updateInterval);
 
-            /**
-             * Initialize Tag logger thread
-             *
-             * @param pr Process reader
-             * @param tldb Tag logger DB
-             * @param updateInterval Thread update interval (milliseconds)
-             */
-            void initTagLoggerThread(const ProcessReader& pr,
-            							const TagLoggerDB& tldb,
+		/**
+		 * Initialize Tag logger writer thread
+		 *
+		 * @param tldb Tag logger DB
+		 * @param updateInterval Thread update interval (milliseconds)
+		 */
+		void initTagLoggerWriterThread(const TagLoggerDB& tldb,
 										unsigned int updateInterval);
 
-            /**
-             * Initialize Tag logger writer thread
-             *
-             * @param tldb Tag logger DB
-             * @param updateInterval Thread update interval (milliseconds)
-             */
-            void initTagLoggerWriterThread(const TagLoggerDB& tldb,
-											unsigned int updateInterval);
+		/**
+		 * Initialize Script system thread
+		 *
+		 * @param pr Process reader
+		 * @param pw Process writer
+		 * @param sdb Script DB
+		 * @param updateInterval Thread update interval (milliseconds)
+		 * @param executeScript Full path to the main execute script
+		 * @param testEnv Test environment flag
+		 */
+		void initScriptThread(const ProcessReader& pr,
+								const ProcessWriter& pw,
+								const ScriptDB& sdb,
+								unsigned int updateInterval,
+								const std::string& executeScript,
+								bool testEnv);
 
-            /**
-             * Initialize Script system thread
-             *
-             * @param pr Process reader
-             * @param pw Process writer
-             * @param sdb Script DB
-             * @param updateInterval Thread update interval (milliseconds)
-             * @param executeScript Full path to the main execute script
-             * @param testEnv Test environment flag
-             */
-            void initScriptThread(const ProcessReader& pr,
-            						const ProcessWriter& pw,
-									const ScriptDB& sdb,
-									unsigned int updateInterval,
-									const std::string& executeScript,
-									bool testEnv);
+		/**
+		 * Initialize Socket thread
+		 *
+		 * @param pr Process reader
+		 * @param pw Process writer
+		 * @param dbc DB credentials
+		 * @param port Socket port
+		 * @param maxConn Socket maximum connected clients
+		 */
+		void initSocketThread(const ProcessReader& pr,
+								const ProcessWriter& pw,
+								const DBCredentials& dbc,
+								int port,
+								int maxConn);
 
-            /**
-             * Initialize Socket thread
-             *
-             * @param pr Process reader
-             * @param pw Process writer
-             * @param dbc DB credentials
-             * @param port Socket port
-             * @param maxConn Socket maximum connected clients
-             */
-            void initSocketThread(const ProcessReader& pr,
-            						const ProcessWriter& pw,
-									const DBCredentials& dbc,
-									int port,
-									int maxConn);
+		/**
+		 * Run threads
+		 */
+		void run();
 
-            /**
-             * Run threads
-             */
-            void run();
+		/**
+		 * Trigger exit
+		 */
+		void exitMain();
 
-            /**
-             * Trigger exit
-             */
-            void exitMain();
+		/**
+		 * Get exit information
+		 *
+		 * @return Additional information about exit
+		 */
+		std::string getExitInfo();
 
-            /**
-             * Get exit information
-             *
-             * @return Additional information about exit
-             */
-            std::string getExitInfo();
+		/**
+		 * Shutdown socket
+		 */
+		void shutdownSocket();
 
-            /**
-             * Shutdown socket
-             */
-            void shutdownSocket();
+	private:
+		/**
+		 * Thread program data structure
+		 */
+		typedef struct threadProgramData {
+			/// Cycle time container
+			GuardDataContainer<CycleTimeData> cycleContainer;
+			/// Thread program
+			ThreadProgram *thProgram;
 
-        private:
+			threadProgramData(): thProgram(nullptr) {}
+		} threadProgramData;
 
-            /**
-             * Thread program data structure
-             */
-            typedef struct threadProgramData {
-            	/// Cycle time container
-            	GuardDataContainer<CycleTimeData> cycleContainer;
-            	/// Thread program
-            	ThreadProgram *thProgram;
+		/// Thread exit
+		GuardDataContainer<ThreadExitData> tmExit;
 
-            	threadProgramData(): thProgram(nullptr) {}
-			} threadProgramData;
+		/// Socket file descriptor
+		GuardDataContainer<int> tmSockDesc;
 
-            /// Thread exit
-			GuardDataContainer<ThreadExitData> tmExit;
+		/// Program threads data
+		std::map<std::string, threadProgramData> thProgramData;
 
-			/// Socket file descriptor
-			GuardDataContainer<int> tmSockDesc;
+		/// Tag logger buffer container
+		TagLoggerBufferContainer tagLoggerBuffer;
 
-			/// Program threads data
-			std::map<std::string, threadProgramData> thProgramData;
+		/// Thread data for Socket
+		ThreadSocket *thSocket;
 
-			/// Tag logger buffer container
-			TagLoggerBufferContainer tagLoggerBuffer;
+		/// Socket thread
+		std::thread *threadSocket;
 
-            /// Thread data for Socket
-			ThreadSocket *thSocket;
+		/// Program threads
+		std::vector<std::thread*> threadProgs;
 
-			/// Socket thread
-			std::thread *threadSocket;
+		/// Process updater init flag
+		bool updatersInited;
 
-			/// Program threads
-			std::vector<std::thread*> threadProgs;
+		/// Driver buffers init flag
+		bool driverBuffersInited;
+};
 
-			/// Process updater init flag
-			bool updatersInited;
+}  // namespace onh
 
-			/// Driver buffers init flag
-			bool driverBuffersInited;
-    };
-
-}
-
-#endif // THREADMANAGER_H
+#endif  // ONH_THREAD_THREADMANAGER_H_

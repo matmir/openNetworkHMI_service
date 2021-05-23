@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TAGLOGGERPROG_H
-#define TAGLOGGERPROG_H
+#ifndef ONH_THREAD_TAGLOGGER_TAGLOGGERPROG_H_
+#define ONH_THREAD_TAGLOGGER_TAGLOGGERPROG_H_
 
 #include <map>
 #include "../../driver/ProcessReader.h"
@@ -29,83 +29,80 @@
 
 namespace onh {
 
-    /**
-	 * Tag logger program class
-	 */
-    class TagLoggerProg: public ThreadProgram {
+/**
+ * Tag logger program class
+ */
+class TagLoggerProg: public ThreadProgram {
+	public:
+		/**
+		 * Constructor
+		 *
+		 * @param pr Process reader
+		 * @param tldb Tag logger DB
+		 * @param tlbc Tag logger buffer controller
+		 * @param updateInterval Logger update interval (milliseconds)
+		 * @param gdcTED Thread exit data controller
+		 * @param gdcCTD Thread cycle time controller
+		 */
+		TagLoggerProg(const ProcessReader& pr,
+						const TagLoggerDB& tldb,
+						const TagLoggerBufferController& tlbc,
+						unsigned int updateInterval,
+						const GuardDataController<ThreadExitData> &gdcTED,
+						const GuardDataController<CycleTimeData> &gdcCTD);
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		TagLoggerProg(const TagLoggerProg&) = delete;
 
-            /**
-             * Constructor
-             *
-             * @param pr Process reader
-             * @param tldb Tag logger DB
-             * @param tlbc Tag logger buffer controller
-             * @param updateInterval Logger update interval (milliseconds)
-             * @param gdcTED Thread exit data controller
-             * @param gdcCTD Thread cycle time controller
-             */
-            TagLoggerProg(const ProcessReader& pr,
-							const TagLoggerDB& tldb,
-							const TagLoggerBufferController& tlbc,
-							unsigned int updateInterval,
-							const GuardDataController<ThreadExitData> &gdcTED,
-							const GuardDataController<CycleTimeData> &gdcCTD);
+		virtual ~TagLoggerProg();
 
-            /**
-			 * Copy constructor - inactive
-			 */
-            TagLoggerProg(const TagLoggerProg&) = delete;
+		/**
+		 * Thread program function
+		 */
+		void operator()() override;
 
-			virtual ~TagLoggerProg() override;
+		/**
+		 * Assignment operator - inactive
+		 */
+		TagLoggerProg& operator=(const TagLoggerProg&) = delete;
 
-			/**
-			 * Thread program function
-			 */
-			virtual void operator()() override;
+	private:
+		/// Handle for process reader object
+		ProcessReader* prReader;
 
-			/**
-			 * Assignment operator - inactive
-			 */
-			TagLoggerProg& operator=(const TagLoggerProg&) = delete;
+		/// Tag Logger DB access
+		TagLoggerDB *db;
 
-        private:
+		/// Tag logger buffer controller
+		TagLoggerBufferController *tagLoggerBuffer;
 
-            /// Handle for process reader object
-            ProcessReader* prReader;
+		/**
+		 * Tag logger last values
+		 */
+		std::map<unsigned int, TagLoggerItem::timeVal> loggerLastValue;
 
-            /// Tag Logger DB access
-            TagLoggerDB *db;
+		/**
+		 * Update tags
+		 */
+		void updateTags();
 
-            /// Tag logger buffer controller
-            TagLoggerBufferController *tagLoggerBuffer;
+		/**
+		 * Store logger last value
+		 *
+		 * @param tagLog Tag logger item
+		 */
+		void storeLastValue(const TagLoggerItem& tagLog);
 
-            /**
-			 * Tag logger last values
-			 */
-			std::map<unsigned int, TagLoggerItem::timeVal> loggerLastValue;
+		/**
+		 * Initialize tag logger last value
+		 *
+		 * @param tagLog Tag logger item
+		 */
+		void initLoggerLastValue(TagLoggerItem& tagLog);
+};
 
-            /**
-             * Update tags
-             */
-            void updateTags();
+}  // namespace onh
 
-            /**
-             * Store logger last value
-             *
-             * @param tagLog Tag logger item
-             */
-            void storeLastValue(const TagLoggerItem& tagLog);
-
-            /**
-             * Initialize tag logger last value
-             *
-             * @param tagLog Tag logger item
-             */
-            void initLoggerLastValue(TagLoggerItem& tagLog);
-    };
-
-}
-
-#endif // TAGLOGGERPROG_H
+#endif  // ONH_THREAD_TAGLOGGER_TAGLOGGERPROG_H_

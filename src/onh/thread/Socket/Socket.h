@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ONH_SOCKET
-#define ONH_SOCKET
+#ifndef ONH_THREAD_SOCKET_SOCKET_H_
+#define ONH_THREAD_SOCKET_SOCKET_H_
 
 /// Maximal buffer size (bytes)
 #define MAX_BUFF_SIZE 10000
@@ -28,95 +28,93 @@
 
 namespace onh {
 
-	/**
-	 * Simple socket class
-	 */
-	class Socket {
+/**
+ * Simple socket class
+ */
+class Socket {
+	public:
+		/**
+		 * Socket constructor
+		 *
+		 * @param port Socket port
+		 * @param maxConn Maximum number of connections
+		 */
+		Socket(int port, int maxConn);
 
-        public:
-            /**
-             * Socket constructor
-             *
-             * @param port Socket port
-             * @param maxConn Maximum number of connections
-             */
-            Socket(int port, int maxConn);
+		/**
+		 * Copy constructor - inactive
+		 */
+		Socket(const Socket&) = delete;
 
-            /**
-			 * Copy constructor - inactive
-			 */
-            Socket(const Socket&) = delete;
+		~Socket();
 
-            ~Socket();
+		/**
+		 * Assign operator - inactive
+		 */
+		Socket& operator=(const Socket&) = delete;
 
-            /**
-			 * Assign operator - inactive
-			 */
-            Socket& operator=(const Socket&) = delete;
+		/**
+		 * Initialize socket
+		 */
+		void init();
 
-            /**
-             * Initialize socket
-             */
-            void init();
+		/**
+		 * Wait on new data
+		 */
+		void waitOnData();
 
-            /**
-			 * Wait on new data
-			 */
-            void waitOnData();
+		/**
+		 * Wait on incoming connection
+		 *
+		 * @return Connection file descriptor
+		 */
+		int waitOnConnection();
 
-            /**
-             * Wait on incoming connection
-             *
-             * @return Connection file descriptor
-             */
-            int waitOnConnection();
+		/**
+		 * Get received data
+		 *
+		 * @return Received data
+		 */
+		std::string getData() const;
 
-            /**
-			 * Get received data
-			 *
-			 * @return Received data
-			 */
-            std::string getData() const;
+		/**
+		 * Send reply
+		 *
+		 * @param reply Reply data
+		 */
+		void sendReply(const std::string &reply);
 
-            /**
-			 * Send reply
-			 *
-			 * @param reply Reply data
-			 */
-            void sendReply(std::string &reply);
+		/**
+		 * Get socket descriptor
+		 *
+		 * @return Socket descriptor
+		 */
+		int getSocketDescriptor();
 
-            /**
-             * Get socket descriptor
-             *
-             * @return Socket descriptor
-             */
-            int getSocketDescriptor();
+	private:
+		/**
+		 * Clear socket buffer
+		 */
+		void clearBuffer();
 
-        private:
+		/// Socket port
+		int itsPort;
 
-            /**
-             * Clear socket buffer
-             */
-            void clearBuffer();
+		/// Max. connection number
+		int itsMaxConn;
 
-            /// Socket port
-            int itsPort;
+		/// Socket variables
+		int socketFD, newConn;
+		struct sockaddr_in address;
+		int addrlen;
 
-            /// Max. connection number
-            int itsMaxConn;
+		/// Buffer
+		char buffer[MAX_BUFF_SIZE];
 
-            /// Socket variables
-            int socketFD, newConn;
-            struct sockaddr_in address;
-            int addrlen;
+		/// Flag informs that socket is ready
+		bool socketReady;
+};
 
-            /// Buffer
-            char buffer[MAX_BUFF_SIZE];
+}  // namespace onh
 
-            /// Flag informs that socket is ready
-            bool socketReady;
-        };
-
-}
-
-#endif
+#endif  // ONH_THREAD_SOCKET_SOCKET_H_

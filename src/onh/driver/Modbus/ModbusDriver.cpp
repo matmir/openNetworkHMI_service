@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,19 @@
 #include "ModbusProcessWriter.h"
 #include "ModbusProcessUpdater.h"
 
-using namespace onh;
+namespace onh {
 
 ModbusDriver::ModbusDriver(const modbusM::ModbusCfg& cfg, unsigned int connId):
-	Driver("modbus_"+std::to_string(connId)+"_"), regCount(cfg.registerCount), maxByteCount(0), process(nullptr), buff(nullptr), modbus(nullptr)
-{
+	Driver("modbus_"+std::to_string(connId)+"_"),
+	regCount(cfg.registerCount),
+	maxByteCount(0),
+	process(nullptr),
+	buff(nullptr),
+	modbus(nullptr) {
 	// Check registers count
 	if (regCount < 1) {
-		triggerError("Register count need to be greater than 0", "ModbusDriver::ModbusDriver");
+		triggerError("Register count need to be greater than 0",
+						"ModbusDriver::ModbusDriver");
 	}
 
 	// Create Modbus protocol
@@ -49,65 +54,57 @@ ModbusDriver::ModbusDriver(const modbusM::ModbusCfg& cfg, unsigned int connId):
 	connect();
 }
 
-ModbusDriver::~ModbusDriver()
-{
+ModbusDriver::~ModbusDriver() {
 	getLog().write("ModbusDriver driver closed");
 
-    if (modbus) {
-    	modbus->disconnect();
-    	delete modbus;
-    }
+	if (modbus) {
+		modbus->disconnect();
+		delete modbus;
+	}
 
-    if (buff)
-        delete buff;
+	if (buff)
+		delete buff;
 
-    if (process)
-        delete process;
+	if (process)
+		delete process;
 }
 
-void ModbusDriver::triggerError(const std::string& msg, const std::string& fName) {
-
-    std::string s = fName + ": " + msg;
-    getLog().write(s);
-    throw DriverException(msg, fName);
+void ModbusDriver::triggerError(const std::string& msg,
+		const std::string& fName) {
+	std::string s = fName + ": " + msg;
+	getLog().write(s);
+	throw DriverException(msg, fName);
 }
 
 void ModbusDriver::connect() {
-
 	try {
-
 		// Connect to the controller
 		getLog().write("ModbusDriver::init: Connecting to the controller...");
 		modbus->connect();
 		getLog().write("ModbusDriver::init: Connected");
-
 	} catch (modbusM::ModbusException &e) {
-
 		triggerError(e.what(), "ModbusDriver::init:");
 	}
 }
 
 DriverBuffer* ModbusDriver::getBuffer() {
-
-    return new ModbusUpdater(
-                    modbus,
-                    driverLock.getAccess(),
+	return new ModbusUpdater(
+					modbus,
+					driverLock.getAccess(),
 					buff->getController(false)
-    );
-
+	);
 }
 
 DriverProcessReader* ModbusDriver::getReader() {
-
 	return new ModbusProcessReader(process->getController());
 }
 
 DriverProcessWriter* ModbusDriver::getWriter() {
-
 	return new ModbusProcessWriter(modbus, driverLock.getAccess(), maxByteCount);
 }
 
 DriverProcessUpdater* ModbusDriver::getUpdater() {
-
 	return new ModbusProcessUpdater(buff->getController(), process->getController(false));
 }
+
+}  // namespace onh

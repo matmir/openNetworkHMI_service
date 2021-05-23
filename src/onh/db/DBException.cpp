@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,21 @@
 
 #include "DBException.h"
 
-using namespace onh;
+namespace onh {
 
 DBException::DBException():
-    Exception()
-{
+	Exception() {
 }
 
 DBException::DBException(const std::string& desc):
-    Exception(desc)
-{
+	Exception(desc) {
 }
 
 DBException::DBException(const std::string& desc, const std::string& fName):
-    Exception(desc, fName)
-{
+	Exception(desc, fName) {
 }
 
-DBException::~DBException() noexcept
-{
+DBException::~DBException() noexcept {
 }
+
+}  // namespace onh

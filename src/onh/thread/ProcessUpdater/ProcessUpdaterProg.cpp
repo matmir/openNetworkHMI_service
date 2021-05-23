@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,55 +22,49 @@
 #include <sstream>
 #include "../../utils/Exception.h"
 
-using namespace onh;
+namespace onh {
 
 ProcessUpdaterProg::ProcessUpdaterProg(const ProcessUpdater& pru,
 										unsigned int connId,
 										unsigned int updateInterval,
 										const GuardDataController<ThreadExitData> &gdcTED,
 										const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(gdcTED, gdcCTD, updateInterval, "process", "procUpd_"+std::to_string(connId)+"_")
-{
-    // Process updater
-    prUpdater = new ProcessUpdater(pru);
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "process", "procUpd_"+std::to_string(connId)+"_") {
+	// Process updater
+	prUpdater = new ProcessUpdater(pru);
 }
 
-ProcessUpdaterProg::~ProcessUpdaterProg()
-{
-    if (prUpdater)
-        delete prUpdater;
+ProcessUpdaterProg::~ProcessUpdaterProg() {
+	if (prUpdater)
+		delete prUpdater;
 }
 
 void ProcessUpdaterProg::operator()() {
+	try {
+		getLogger().write("Start main loop");
 
-    try {
+		if (!prUpdater)
+			throw Exception("No updater object!");
 
-    	getLogger().write("Start main loop");
+		while(!isExitFlag()) {
+			// Start thread cycle time measure
+			startCycleMeasure();
 
-        if (!prUpdater)
-            throw Exception("No updater object!");
+			// Read data from controller
+			prUpdater->update();
 
-        while(!isExitFlag()) {
+			// Wait
+			threadWait();
 
-            // Start thread cycle time measure
-            startCycleMeasure();
+			// Stop thread cycle time measure
+			stopCycleMeasure();
+		}
+	} catch (Exception &e) {
+		getLogger().write(e.what());
 
-            // Read data from controller
-            prUpdater->update();
-
-            // Wait
-            threadWait();
-
-            // Stop thread cycle time measure
-            stopCycleMeasure();
-        }
-
-    } catch (Exception &e) {
-
-    	getLogger().write(e.what());
-
-        // Exit application
-        exit("Process Updater");
-
-    }
+		// Exit application
+		exit("Process Updater");
+	}
 }
+
+}  // namespace onh

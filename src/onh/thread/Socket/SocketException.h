@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,49 +16,47 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_THREAD_SOCKET_SOCKETEXCEPTION_H_
-#define SRC_ONH_THREAD_SOCKET_SOCKETEXCEPTION_H_
+#ifndef ONH_THREAD_SOCKET_SOCKETEXCEPTION_H_
+#define ONH_THREAD_SOCKET_SOCKETEXCEPTION_H_
 
 #include "../../utils/Exception.h"
 
 namespace onh {
 
-	/**
-	 * Socket exception class
-	 */
-	class SocketException: public Exception {
+/**
+ * Socket exception class
+ */
+class SocketException: public Exception {
+	public:
+		SocketException();
 
-		public:
+		/**
+		 * Exception constructor with message
+		 *
+		 * @param desc Exception error
+		 */
+		explicit SocketException(const std::string& desc);
 
-			SocketException();
+		/**
+		 * Exception constructor with message and function name
+		 *
+		 * @param desc Exception error
+		 * @param fName Function from which exception was thrown
+		 */
+		SocketException(const std::string& desc, const std::string& fName);
 
-			/**
-			 * Exception constructor with message
-			 *
-			 * @param desc Exception error
-			 */
-			SocketException(const std::string& desc);
+		/**
+		 * Exception constructor with message, errno and function name
+		 *
+		 * @param desc Exception error
+		 * @param errorNumber errno value
+		 * @param fName Function from which exception was thrown
+		 */
+		SocketException(const std::string& desc, int errorNumber, const std::string& fName);
 
-			/**
-			 * Exception constructor with message and function name
-			 *
-			 * @param desc Exception error
-			 * @param fName Function from which exception was thrown
-			 */
-			SocketException(const std::string& desc, const std::string& fName);
+		virtual ~SocketException() noexcept;
+};
 
-			/**
-			 * Exception constructor with message, errno and function name
-			 *
-			 * @param desc Exception error
-			 * @param errorNumber errno value
-			 * @param fName Function from which exception was thrown
-			 */
-			SocketException(const std::string& desc, int errorNumber, const std::string& fName);
+}  // namespace onh
 
-			virtual ~SocketException() noexcept override;
-	};
-
-}
-
-#endif /* SRC_ONH_THREAD_SOCKET_SOCKETEXCEPTION_H_ */
+#endif  // ONH_THREAD_SOCKET_SOCKETEXCEPTION_H_

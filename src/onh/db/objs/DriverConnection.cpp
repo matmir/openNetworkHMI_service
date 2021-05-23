@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,16 +20,14 @@
 #include "../../utils/Exception.h"
 #include "../DB.h"
 
-using namespace onh;
+namespace onh {
 
 DriverConnection::DriverConnection():
-	dcId(0), dcName(""), dcType(DriverType::DT_SHM), modbus(nullptr), shm(""), dcEnable(false)
-{
+	dcId(0), dcName(""), dcType(DriverType::DT_SHM), modbus(nullptr), shm(""), dcEnable(false) {
 }
 
 DriverConnection::DriverConnection(const DriverConnection& dc):
-	dcId(dc.dcId), dcName(dc.dcName), dcType(dc.dcType), modbus(nullptr), shm(dc.shm), dcEnable(dc.dcEnable)
-{
+	dcId(dc.dcId), dcName(dc.dcName), dcType(dc.dcType), modbus(nullptr), shm(dc.shm), dcEnable(dc.dcEnable) {
 	if (dc.modbus) {
 		setModbusCfg(*dc.modbus);
 	}
@@ -41,7 +39,6 @@ DriverConnection::~DriverConnection() {
 }
 
 DriverConnection& DriverConnection::operator=(const DriverConnection& dc) {
-
 	if (this == &dc)
 		return *this;
 
@@ -64,13 +61,11 @@ DriverConnection& DriverConnection::operator=(const DriverConnection& dc) {
 }
 
 void DriverConnection::checkId(unsigned int id) const {
-
 	if (id == 0)
 		throw Exception("Invalid Driver connection identifier", "DriverConnection::checkId");
 }
 
 void DriverConnection::checkName(const std::string& nm) const {
-
 	// Check empty
 	if (nm.size() == 0)
 		throw Exception("Driver connection name is empty", "DriverConnection::checkName");
@@ -81,7 +76,6 @@ void DriverConnection::checkName(const std::string& nm) const {
 }
 
 void DriverConnection::checkType(const DriverType& type) const {
-
 	bool typeOK = false;
 
 	// Check type
@@ -95,49 +89,42 @@ void DriverConnection::checkType(const DriverType& type) const {
 }
 
 unsigned int DriverConnection::getId() const {
-
 	checkId(dcId);
 
 	return dcId;
 }
 
 void DriverConnection::setId(unsigned int id) {
-
 	checkId(id);
 
 	dcId = id;
 }
 
 std::string DriverConnection::getName() const {
-
 	checkName(dcName);
 
 	return dcName;
 }
 
 void DriverConnection::setName(const std::string& nm) {
-
 	checkName(nm);
 
 	dcName = nm;
 }
 
 DriverType DriverConnection::getType() const {
-
 	checkType(dcType);
 
 	return dcType;
 }
 
 void DriverConnection::setType(const DriverType& type) {
-
 	checkType(type);
 
 	dcType = type;
 }
 
 const modbusM::ModbusCfg& DriverConnection::getModbusCfg() const {
-
 	if (dcType != DriverType::DT_Modbus)
 			throw Exception("Driver connection wrong driver type", "DriverConnection::getModbusCfg");
 
@@ -148,7 +135,6 @@ const modbusM::ModbusCfg& DriverConnection::getModbusCfg() const {
 }
 
 void DriverConnection::setModbusCfg(const modbusM::ModbusCfg& cfg) {
-
 	if (dcType != DriverType::DT_Modbus)
 			throw Exception("Driver connection wrong driver type", "DriverConnection::setModbusCfg");
 
@@ -159,7 +145,6 @@ void DriverConnection::setModbusCfg(const modbusM::ModbusCfg& cfg) {
 }
 
 void DriverConnection::checkShmCfg(const std::string& cfg) const {
-
 	if (dcType != DriverType::DT_SHM)
 		throw Exception("Driver connection wrong driver type", "DriverConnection::checkShmCfg");
 
@@ -169,25 +154,23 @@ void DriverConnection::checkShmCfg(const std::string& cfg) const {
 }
 
 const std::string& DriverConnection::getShmCfg() const {
-
 	checkShmCfg(shm);
 
 	return shm;
 }
 
 void DriverConnection::setShmCfg(const std::string& cfg) {
-
 	checkShmCfg(cfg);
 
 	shm = cfg;
 }
 
 bool DriverConnection::isEnabled() const {
-
 	return dcEnable;
 }
 
 void DriverConnection::setEnable(bool enable) {
-
 	dcEnable = enable;
 }
+
+}  // namespace onh

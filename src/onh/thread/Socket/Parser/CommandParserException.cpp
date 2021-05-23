@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,21 @@
 
 #include "CommandParserException.h"
 
-using namespace onh;
+namespace onh {
 
 CommandParserException::CommandParserException():
-    Exception(), exType(NONE)
-{
+	Exception(), exType(NONE) {
 }
 
-CommandParserException::~CommandParserException()
-{
+CommandParserException::~CommandParserException() {
 }
 
 CommandParserException::CommandParserException(ExceptionType type, const std::string& desc, const std::string& fName):
-    Exception(desc, fName), exType(type)
-{
+	Exception(desc, fName), exType(type) {
 }
 
 CommandParserException::ExceptionType CommandParserException::getType() const {
-
-    return exType;
+	return exType;
 }
+
+}  // namespace onh

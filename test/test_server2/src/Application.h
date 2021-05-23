@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_APPLICATION_H_
-#define SRC_APPLICATION_H_
+#ifndef APPLICATION_H_
+#define APPLICATION_H_
 
 #include <modbus.h>
 #include <string>
@@ -26,9 +26,7 @@
  * Modbus server application class
  */
 class Application {
-
 	public:
-
 		/**
 		 * Application constructor
 		 *
@@ -37,7 +35,7 @@ class Application {
 		 * @param regCount Modbus registers count
 		 * @param exSignal Exit signal pointer
 		 */
-		Application(const std::string &addr, const unsigned int& port, const unsigned int& regCount, bool *exSignal);
+		Application(const std::string &addr, unsigned int port, unsigned int regCount, bool *exSignal);
 
 		/**
 		 * Copy constructor - inactive
@@ -57,7 +55,6 @@ class Application {
 		void run();
 
 	private:
-
 		modbus_t *ctx;
 		modbus_mapping_t *mb_mapping;
 
@@ -93,4 +90,4 @@ class Application {
 		void clearQuery();
 };
 
-#endif /* SRC_APPLICATION_H_ */
+#endif  // APPLICATION_H_

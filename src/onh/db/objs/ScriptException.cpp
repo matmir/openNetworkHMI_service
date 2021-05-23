@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,21 @@
 
 #include "ScriptException.h"
 
-using namespace onh;
+namespace onh {
 
 ScriptException::ScriptException():
-    Exception(), exType(ExceptionType::NONE)
-{
+	Exception(), exType(ExceptionType::NONE) {
 }
 
 ScriptException::ScriptException(ExceptionType type, const std::string& desc , const std::string& fName):
-    Exception(desc, fName), exType(type)
-{
+	Exception(desc, fName), exType(type) {
 }
 
-ScriptException::~ScriptException() noexcept
-{
+ScriptException::~ScriptException() noexcept {
 }
 
 ScriptException::ExceptionType ScriptException::getType() const {
-
-    return exType;
+	return exType;
 }
+
+}  // namespace onh

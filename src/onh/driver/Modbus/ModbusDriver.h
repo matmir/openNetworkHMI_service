@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MODBUSDRIVER_H
-#define MODBUSDRIVER_H
+#ifndef ONH_DRIVER_MODBUS_MODBUSDRIVER_H_
+#define ONH_DRIVER_MODBUS_MODBUSDRIVER_H_
 
 #include "../Driver.h"
 #include "modbusmaster.h"
@@ -26,94 +26,92 @@
 
 namespace onh {
 
-    /**
-	 * Modbus driver class
-	 */
-    class ModbusDriver: public Driver {
+/**
+ * Modbus driver class
+ */
+class ModbusDriver: public Driver {
+	public:
+		/**
+		 * ModbusDriver Constructor
+		 *
+		 * @param cfg Modbus configuration structure
+		 * @param connId Driver connection identifier
+		 */
+		ModbusDriver(const modbusM::ModbusCfg& cfg, unsigned int connId);
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		ModbusDriver(const ModbusDriver&) = delete;
 
-            /**
-             * ModbusDriver Constructor
-             *
-             * @param cfg Modbus configuration structure
-             * @param connId Driver connection identifier
-             */
-            ModbusDriver(const modbusM::ModbusCfg& cfg, unsigned int connId);
+		virtual ~ModbusDriver();
 
-            /**
-			 * Copy constructor - inactive
-			 */
-            ModbusDriver(const ModbusDriver&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		ModbusDriver& operator=(const ModbusDriver&) = delete;
 
-            virtual ~ModbusDriver() override;
+		/**
+		 * Get driver buffer handle
+		 *
+		 * @return Driver buffer handle
+		 */
+		DriverBuffer* getBuffer() override;
 
-            /**
-			 * Assign operator - inactive
-			 */
-            ModbusDriver& operator=(const ModbusDriver&) = delete;
+		/**
+		 * Get driver process data reader
+		 *
+		 * @return Driver process data reader handle
+		 */
+		DriverProcessReader* getReader() override;
 
-            /**
-             * Get driver buffer handle
-             *
-             * @return Driver buffer handle
-             */
-            virtual DriverBuffer* getBuffer() override;
+		/**
+		 * Get driver process data writer
+		 *
+		 * @return Driver process data writer handle
+		 */
+		DriverProcessWriter* getWriter() override;
 
-            /**
-			 * Get driver process data reader
-			 *
-			 * @return Driver process data reader handle
-			 */
-			virtual DriverProcessReader* getReader() override;
+		/**
+		 * Get driver process data updater
+		 *
+		 * @return Driver process data updater handle
+		 */
+		DriverProcessUpdater* getUpdater() override;
 
-			/**
-			 * Get driver process data writer
-			 *
-			 * @return Driver process data writer handle
-			 */
-			virtual DriverProcessWriter* getWriter() override;
+	private:
+		/// Process registers count
+		WORD regCount;
 
-			/**
-			 * Get driver process data updater
-			 *
-			 * @return Driver process data updater handle
-			 */
-			virtual DriverProcessUpdater* getUpdater() override;
+		/// Maximum Byte address
+		unsigned int maxByteCount;
 
-        private:
-            /// Process registers count
-            WORD regCount;
+		/// Modbus process data
+		GuardDataContainer<ModbusProcessData> *process;
 
-            /// Maximum Byte address
-            unsigned int maxByteCount;
+		/// Modbus process data buffer
+		GuardDataContainer<ModbusProcessData> *buff;
 
-            /// Modbus process data
-            GuardDataContainer<ModbusProcessData> *process;
+		/// Modbus Master protocol
+		modbusM::ModbusMaster *modbus;
 
-            /// Modbus process data buffer
-            GuardDataContainer<ModbusProcessData> *buff;
+		/// Mutex for protecting driver
+		MutexContainer driverLock;
 
-            /// Modbus Master protocol
-            modbusM::ModbusMaster *modbus;
+		/**
+		 * Connect to the slave device
+		 */
+		void connect();
 
-            /// Mutex for protecting driver
-            MutexContainer driverLock;
+		/**
+		 * Trigger error (write log and throw exception)
+		 *
+		 * @param msg Exception message
+		 * @param fName Function from which exception was throwed
+		 */
+		void triggerError(const std::string& msg, const std::string& fName);
+};
 
-            /**
-			 * Connect to the slave device
-			 */
-            void connect();
+}  // namespace onh
 
-            /**
-             * Trigger error (write log and throw exception)
-             *
-             * @param msg Exception message
-             * @param fName Function from which exception was throwed
-             */
-            void triggerError(const std::string& msg, const std::string& fName);
-    };
-
-}
-
-#endif // MODBUSDRIVER_H
+#endif  // ONH_DRIVER_MODBUS_MODBUSDRIVER_H_

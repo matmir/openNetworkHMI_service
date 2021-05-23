@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_THREAD_THREADCYCLECONTROLLERS_H_
-#define SRC_ONH_THREAD_THREADCYCLECONTROLLERS_H_
+#ifndef ONH_THREAD_THREADCYCLECONTROLLERS_H_
+#define ONH_THREAD_THREADCYCLECONTROLLERS_H_
 
 #include <map>
 #include "../utils/CycleTime.h"
@@ -25,9 +25,9 @@
 
 namespace onh {
 
-	typedef std::map<std::string, GuardDataController<CycleTimeData>> ThreadCycleControllers;
-	typedef std::pair<std::string, GuardDataController<CycleTimeData>> CycleControllerPair;
+typedef std::map<std::string, GuardDataController<CycleTimeData>> ThreadCycleControllers;
+typedef std::pair<std::string, GuardDataController<CycleTimeData>> CycleControllerPair;
 
-}
+}  // namespace onh
 
-#endif /* SRC_ONH_THREAD_THREADCYCLECONTROLLERS_H_ */
+#endif  // ONH_THREAD_THREADCYCLECONTROLLERS_H_
