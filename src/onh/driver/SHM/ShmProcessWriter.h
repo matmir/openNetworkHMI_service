@@ -122,7 +122,7 @@ class ShmProcessWriter: public DriverProcessWriter {
 		 *
 		 * @return Pointer to the new driver process writer
 		 */
-		DriverProcessWriter* createNew() override;
+		DriverProcessWriterPtr createNew() override;
 
 		/**
 		 * Send exit command to the server

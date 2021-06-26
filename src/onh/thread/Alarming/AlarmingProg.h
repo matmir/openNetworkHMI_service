@@ -65,13 +65,13 @@ class AlarmingProg: public ThreadProgram {
 
 	private:
 		/// Handle for process reader object
-		ProcessReader* prReader;
+		std::unique_ptr<ProcessReader> prReader;
 
 		/// Handle for process writer object
-		ProcessWriter* prWriter;
+		std::unique_ptr<ProcessWriter> prWriter;
 
 		/// Alarmin DB access
-		AlarmingDB *db;
+		std::unique_ptr<AlarmingDB> db;
 
 		/// Check alarms
 		void checkAlarms();

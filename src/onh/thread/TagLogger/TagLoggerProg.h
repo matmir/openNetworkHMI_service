@@ -70,13 +70,13 @@ class TagLoggerProg: public ThreadProgram {
 
 	private:
 		/// Handle for process reader object
-		ProcessReader* prReader;
+		std::unique_ptr<ProcessReader> prReader;
 
 		/// Tag Logger DB access
-		TagLoggerDB *db;
+		std::unique_ptr<TagLoggerDB> db;
 
 		/// Tag logger buffer controller
-		TagLoggerBufferController *tagLoggerBuffer;
+		std::unique_ptr<TagLoggerBufferController> tagLoggerBuffer;
 
 		/**
 		 * Tag logger last values

@@ -61,28 +61,28 @@ class Driver {
 		 *
 		 * @return Driver buffer handle
 		 */
-		virtual DriverBuffer* getBuffer() = 0;
+		virtual DriverBufferPtr getBuffer() = 0;
 
 		/**
 		 * Get driver process data reader
 		 *
 		 * @return Driver process data reader handle
 		 */
-		virtual DriverProcessReader* getReader() = 0;
+		virtual DriverProcessReaderPtr getReader() = 0;
 
 		/**
 		 * Get driver process data writer
 		 *
 		 * @return Driver process data writer handle
 		 */
-		virtual DriverProcessWriter* getWriter() = 0;
+		virtual DriverProcessWriterPtr getWriter() = 0;
 
 		/**
 		 * Get driver process data updater
 		 *
 		 * @return Driver process data updater handle
 		 */
-		virtual DriverProcessUpdater* getUpdater() = 0;
+		virtual DriverProcessUpdaterPtr getUpdater() = 0;
 
 	protected:
 		/**
@@ -94,8 +94,10 @@ class Driver {
 
 	private:
 		/// Logger object
-		Logger *log;
+		std::unique_ptr<Logger> log;
 };
+
+using DriverPtr = std::shared_ptr<Driver>;
 
 }  // namespace onh
 

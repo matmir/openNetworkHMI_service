@@ -19,6 +19,7 @@
 #ifndef ONH_THREAD_THREADSOCKET_H_
 #define ONH_THREAD_THREADSOCKET_H_
 
+#include <memory>
 #include "ThreadExitData.h"
 #include "../utils/GuardDataController.h"
 #include "../utils/Logger.h"
@@ -71,7 +72,7 @@ class ThreadSocket {
 		GuardDataController<int> thSockDecsController;
 
 		/// Logger object
-		Logger* log;
+		std::unique_ptr<Logger> log;
 
 	protected:
 		/**

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,63 +19,57 @@
 #include "StringUtils.h"
 #include <sstream>
 
-using namespace onh;
+namespace onh {
 
-StringUtils::StringUtils()
-{
+StringUtils::StringUtils() {
 }
 
-StringUtils::~StringUtils()
-{
+StringUtils::~StringUtils() {
 }
 
 std::vector<std::string> StringUtils::explode(std::string str, char sep) {
+	std::vector<std::string> v;
+	std::stringstream s;
 
-    std::vector<std::string> v;
-    std::stringstream s;
+	if (str.length() == 0 || sep == 0)
+		throw Exception("No data", "StringUtils::explode");
 
-    if (str.length() == 0 || sep == 0)
-        throw Exception("No data", "StringUtils::explode");
+	for (unsigned int i=0; i < str.length(); ++i) {
+		// Separator
+		if (str[i] == sep) {
+			// Push data into the vector
+			v.push_back(s.str());
 
-    for (unsigned int i=0; i<str.length(); ++i) {
+			// Clear string stream
+			s.str("");
+			s.clear();
+		} else {
+			// Put char into the string
+			s << str[i];
 
-        // Separator
-        if (str[i] == sep) {
-            // Push data into the vector
-            v.push_back(s.str());
+			// Last char in string
+			if (i == str.length()-1) {
+				v.push_back(s.str());
+			}
+		}
+	}
 
-            // Clear string stream
-            s.str("");
-            s.clear();
-        } else {
-            // Put char into the string
-            s << str[i];
-
-            // Last char in string
-            if (i == str.length()-1) {
-                v.push_back(s.str());
-            }
-        }
-
-    }
-
-    return v;
+	return v;
 }
 
 std::string StringUtils::replaceChar(const std::string& data, char chs, char chr) {
+	std::string str = data;
 
-    std::string str = data;
+	if (data.length() == 0 || chs == 0 || chr == 0)
+		throw Exception("No data", "StringUtils::replaceChar");
 
-    if (data.length() == 0 || chs == 0 || chr == 0)
-        throw Exception("No data", "StringUtils::replaceChar");
+	for (unsigned int i=0; i < str.length(); ++i) {
+		if (str[i] == chs) {
+			str[i] = chr;
+		}
+	}
 
-    for (unsigned int i=0; i<str.length(); ++i) {
-
-        if (str[i] == chs) {
-            str[i] = chr;
-        }
-
-    }
-
-    return str;
+	return str;
 }
+
+}  // namespace onh

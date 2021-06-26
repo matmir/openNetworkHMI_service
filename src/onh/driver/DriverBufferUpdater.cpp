@@ -21,7 +21,7 @@
 
 namespace onh {
 
-DriverBufferUpdater::DriverBufferUpdater(DriverBuffer *dbh):
+DriverBufferUpdater::DriverBufferUpdater(DriverBufferPtr dbh):
 	drvBuffer(dbh) {
 }
 

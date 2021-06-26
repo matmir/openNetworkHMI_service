@@ -30,33 +30,18 @@ CommandParser::CommandParser(const ProcessReader& pr,
 								const ThreadCycleControllers& cc,
 								const GuardDataController<ThreadExitData> &gdcTED,
 								int connDescriptor):
-	thExitController(gdcTED), cycleController(cc) {
-	// Process reader
-	prReader = new ProcessReader(pr);
-
-	// Process writer
-	prWriter = new ProcessWriter(pw);
-
-	// DB access
-	db = new ParserDB(dbc);
-
+	prReader(std::make_unique<ProcessReader>(pr)),
+	prWriter(std::make_unique<ProcessWriter>(pw)),
+	thExitController(gdcTED),
+	cycleController(cc),
+	db(std::make_unique<ParserDB>(dbc)) {
 	// Create logger
 	std::stringstream s;
 	s << "parser_th_" << connDescriptor << "_";
-	log = new Logger("parser", s.str());
+	log = std::make_unique<Logger>("parser", s.str());
 }
 
 CommandParser::~CommandParser() {
-	if (prReader)
-		delete prReader;
-	if (prWriter)
-		delete prWriter;
-	if (db)
-		delete db;
-
-	if (log) {
-		delete log;
-	}
 }
 
 std::string CommandParser::getReply(const std::string& query) {

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +18,15 @@
 
 #include "DateUtils.h"
 
-using namespace onh;
+namespace onh {
 
-DateUtils::DateUtils()
-{
+DateUtils::DateUtils() {
 }
 
-DateUtils::~DateUtils()
-{
+DateUtils::~DateUtils() {
 }
 
 std::string DateUtils::getTimestampString(bool addmSec, char dateSep, char dateTimeSep, char timeSep, char milliSep) {
-
 	// Current time
 	struct timeval time_now;
 	gettimeofday(&time_now, NULL);
@@ -52,7 +49,6 @@ std::time_t DateUtils::getTimestamp(int &milliSeconds,
 											char dateTimeSep,
 											char timeSep,
 											char milliSep) {
-
 	// Current time
 	struct timeval time_now;
 	gettimeofday(&time_now, NULL);
@@ -65,7 +61,13 @@ std::time_t DateUtils::getTimestamp(int &milliSeconds,
 	localtime_r(&rawtime, &timeinfo);
 
 	// Current timestamp sting
-	currentTimestampString = getTimestampStringFromTM(&timeinfo, milliSeconds, addmSec, dateSep, dateTimeSep, timeSep, milliSep);
+	currentTimestampString = getTimestampStringFromTM(&timeinfo,
+														milliSeconds,
+														addmSec,
+														dateSep,
+														dateTimeSep,
+														timeSep,
+														milliSep);
 
 	timeinfo.tm_isdst = 0;
 
@@ -75,7 +77,6 @@ std::time_t DateUtils::getTimestamp(int &milliSeconds,
 }
 
 std::string DateUtils::getDate(char dateSep) {
-
 	// Check separators
 	if (dateSep == '\0') {
 		throw Exception("Date separator is empty", "DateUtils::getTimestamp");
@@ -116,7 +117,6 @@ std::string DateUtils::getTimestampStringFromTM(struct tm* timeInfo,
 										char dateTimeSep,
 										char timeSep,
 										char milliSep) {
-
 	// Check separators
 	if (dateSep == '\0') {
 		throw Exception("Date separator is empty", "DateUtils::getTimestamp");
@@ -169,7 +169,6 @@ std::string DateUtils::getTimestampStringFromTM(struct tm* timeInfo,
 
 	// Milliseconds
 	if (addmSec) {
-
 		s << milliSep;
 
 		if (mSec < 10) {
@@ -183,3 +182,5 @@ std::string DateUtils::getTimestampStringFromTM(struct tm* timeInfo,
 
 	return s.str();
 }
+
+}  // namespace onh

@@ -79,12 +79,11 @@ void closeModbusServer() {
 	onh::ModbusDriver *mbDriver = new onh::ModbusDriver(mbc, 666);
 
 	// driver process writer
-	onh::DriverProcessWriter *mbWriter = mbDriver->getWriter();
+	onh::DriverProcessWriterPtr mbWriter = mbDriver->getWriter();
 
 	// Send exit command
 	mbWriter->setBit(MB_BIT_EXIT);
 
-	delete mbWriter;
 	delete mbDriver;
 }
 
@@ -103,8 +102,8 @@ int main(int argc, char **argv) {
 
 		// Create SHM driver instance
 		onh::ShmDriver sDriver(SHM_SEGMENT_NAME, 666);
-		onh::DriverProcessWriter *dWriter = sDriver.getWriter();
-		onh::ShmProcessWriter *sWriter = dynamic_cast<onh::ShmProcessWriter*>(dWriter);
+		onh::DriverProcessWriterPtr dWriter = sDriver.getWriter();
+		onh::ShmProcessWriter *sWriter = dynamic_cast<onh::ShmProcessWriter*>(dWriter.release());
 
 		// Close server app
 		sWriter->sendServerExitCommand();

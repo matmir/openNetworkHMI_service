@@ -78,10 +78,10 @@ class CommandParser {
 
 	private:
 		/// Process data reader
-		ProcessReader *prReader;
+		std::unique_ptr<ProcessReader> prReader;
 
 		/// Process data writer
-		ProcessWriter *prWriter;
+		std::unique_ptr<ProcessWriter> prWriter;
 
 		/// Thread exit data controller
 		GuardDataController<ThreadExitData> thExitController;
@@ -90,10 +90,10 @@ class CommandParser {
 		ThreadCycleControllers cycleController;
 
 		/// DB access
-		ParserDB *db;
+		std::unique_ptr<ParserDB> db;
 
 		/// Logger object
-		Logger* log;
+		std::unique_ptr<Logger> log;
 
 		/**
 		 * Get reply from multi command request

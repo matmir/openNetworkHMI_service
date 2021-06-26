@@ -57,7 +57,7 @@ class ModbusProcessUpdater: public DriverProcessUpdater {
 		 *
 		 * @return Pointer to the new driver process updater
 		 */
-		DriverProcessUpdater* createNew() override;
+		DriverProcessUpdaterPtr createNew() override;
 
 	private:
 		/**

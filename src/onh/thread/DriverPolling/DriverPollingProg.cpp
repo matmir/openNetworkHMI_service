@@ -30,14 +30,11 @@ DriverPollingProg::DriverPollingProg(const DriverBufferUpdater& dbu,
 										unsigned int updateInterval,
 										const GuardDataController<ThreadExitData> &gdcTED,
 										const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(gdcTED, gdcCTD, updateInterval, "driver", "polling_"+std::to_string(connId)+"_") {
-	// Driver updater
-	drvUpdater = new DriverBufferUpdater(dbu);
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "driver", "polling_"+std::to_string(connId)+"_"),
+	drvUpdater(std::make_unique<DriverBufferUpdater>(dbu)) {
 }
 
 DriverPollingProg::~DriverPollingProg() {
-	if (drvUpdater)
-		delete drvUpdater;
 }
 
 

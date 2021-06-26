@@ -95,11 +95,11 @@ class DriverManager {
 			/// Buffer update interval
 			unsigned int updateInterval;
 			/// Driver buffer
-			DriverBuffer *buff;
+			DriverBufferPtr buff;
 		} DriverBufferData;
 
 		/// Driver handle
-		std::map<unsigned int, Driver*> driver;
+		std::map<unsigned int, DriverPtr> driver;
 
 		/// Driver buffer handle
 		std::vector<DriverBufferData> driverBuffer;

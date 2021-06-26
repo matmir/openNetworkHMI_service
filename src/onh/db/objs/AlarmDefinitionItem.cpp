@@ -30,9 +30,9 @@ AlarmDefinitionItem::AlarmDefinitionItem():
 	adAutoAck(false),
 	adActive(false),
 	adPending(false),
+	adFeedbackNotAck(nullptr),
+	adHWAck(nullptr),
 	adEnable(false) {
-	adFeedbackNotAck = 0;
-	adHWAck = 0;
 }
 
 AlarmDefinitionItem::AlarmDefinitionItem(unsigned int id,
@@ -44,7 +44,9 @@ AlarmDefinitionItem::AlarmDefinitionItem(unsigned int id,
 										 bool aAck,
 										 bool active,
 										 bool pending,
-										 bool enabled) {
+										 bool enabled):
+	adFeedbackNotAck(nullptr),
+	adHWAck(nullptr) {
 	setId(id);
 	setTag(tag);
 	setPriority(priority);
@@ -55,8 +57,6 @@ AlarmDefinitionItem::AlarmDefinitionItem(unsigned int id,
 	setActive(active);
 	setPending(pending);
 	setEnable(enabled);
-	adFeedbackNotAck = 0;
-	adHWAck = 0;
 }
 
 AlarmDefinitionItem::AlarmDefinitionItem(unsigned int id,
@@ -70,7 +70,9 @@ AlarmDefinitionItem::AlarmDefinitionItem(unsigned int id,
 										 bool pending,
 										 const Tag& feedbackNotAck,
 										 const Tag& hwAck,
-										 bool enabled) {
+										 bool enabled):
+	adFeedbackNotAck(std::make_unique<Tag>(feedbackNotAck)),
+	adHWAck(std::make_unique<Tag>(hwAck)) {
 	setId(id);
 	setTag(tag);
 	setPriority(priority);
@@ -81,8 +83,6 @@ AlarmDefinitionItem::AlarmDefinitionItem(unsigned int id,
 	setActive(active);
 	setPending(pending);
 	setEnable(enabled);
-	adFeedbackNotAck = new Tag(feedbackNotAck);
-	adHWAck = new Tag(hwAck);
 }
 
 AlarmDefinitionItem::AlarmDefinitionItem(const AlarmDefinitionItem& rhs):
@@ -95,16 +95,15 @@ AlarmDefinitionItem::AlarmDefinitionItem(const AlarmDefinitionItem& rhs):
 	adAutoAck(rhs.adAutoAck),
 	adActive(rhs.adActive),
 	adPending(rhs.adPending),
+	adFeedbackNotAck(nullptr),
+	adHWAck(nullptr),
 	adEnable(rhs.adEnable) {
+	// Check pointers
 	if (rhs.adFeedbackNotAck)
-		adFeedbackNotAck = new Tag(*rhs.adFeedbackNotAck);
-	else
-		adFeedbackNotAck = 0;
+		adFeedbackNotAck = std::make_unique<Tag>(*rhs.adFeedbackNotAck);
 
 	if (rhs.adHWAck)
-		adHWAck = new Tag(*rhs.adHWAck);
-	else
-		adHWAck = 0;
+		adHWAck = std::make_unique<Tag>(*rhs.adHWAck);
 }
 
 AlarmDefinitionItem& AlarmDefinitionItem::operator=(const AlarmDefinitionItem& rhs) {
@@ -121,36 +120,21 @@ AlarmDefinitionItem& AlarmDefinitionItem::operator=(const AlarmDefinitionItem& r
 		adPending = rhs.adPending;
 		adEnable = rhs.adEnable;
 
-		if (adFeedbackNotAck)
-			delete adFeedbackNotAck;
-
-		if (adHWAck)
-			delete adHWAck;
+		adFeedbackNotAck.reset();
+		adHWAck.reset();
 
 		// Feedback No ACK Tag
-		if (rhs.adFeedbackNotAck) {
-			adFeedbackNotAck = new Tag(*rhs.adFeedbackNotAck);
-		} else {
-			adFeedbackNotAck = 0;
-		}
-
+		if (rhs.adFeedbackNotAck)
+			adFeedbackNotAck = std::make_unique<Tag>(*rhs.adFeedbackNotAck);
 		// HW ACK Tag
-		if (rhs.adHWAck) {
-			adHWAck = new Tag(*rhs.adHWAck);
-		} else {
-			adHWAck = 0;
-		}
+		if (rhs.adHWAck)
+			adHWAck = std::make_unique<Tag>(*rhs.adHWAck);
 	}
 
 	return *this;
 }
 
 AlarmDefinitionItem::~AlarmDefinitionItem() {
-	if (adFeedbackNotAck)
-		delete adFeedbackNotAck;
-
-	if (adHWAck)
-		delete adHWAck;
 }
 
 void AlarmDefinitionItem::checkId(unsigned int id) const {
@@ -280,13 +264,8 @@ void AlarmDefinitionItem::checkBitTagType(const Tag& tg) const {
 
 void AlarmDefinitionItem::setFeedbackNotAckTag(const Tag& feedbackNotAckTag) {
 	checkBitTagType(feedbackNotAckTag);
-
-	if (adFeedbackNotAck) {
-		delete adFeedbackNotAck;
-		adFeedbackNotAck = 0;
-	}
-
-	adFeedbackNotAck = new Tag(feedbackNotAckTag);
+	// New pointer
+	adFeedbackNotAck.reset(new Tag(feedbackNotAckTag));
 }
 
 const Tag& AlarmDefinitionItem::getFeedbackNotAckTag() const {
@@ -302,13 +281,8 @@ const Tag& AlarmDefinitionItem::getFeedbackNotAckTag() const {
 
 void AlarmDefinitionItem::setHWAckTag(const Tag& ackTag) {
 	checkBitTagType(ackTag);
-
-	if (adHWAck) {
-		delete adHWAck;
-		adHWAck = 0;
-	}
-
-	adHWAck = new Tag(ackTag);
+	// New pointer
+	adHWAck.reset(new Tag(ackTag));
 }
 
 const Tag& AlarmDefinitionItem::getHWAckTag() const {

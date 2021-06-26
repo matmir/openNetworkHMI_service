@@ -62,14 +62,14 @@ class ModbusUpdater: public DriverBuffer {
 		 * @param drvLock Driver Mutex locking structure
 		 * @param mbuff Driver buffer data controller (write mode)
 		 */
-		ModbusUpdater(modbusM::ModbusMaster* drv,
+		ModbusUpdater(modbusM::ModbusMasterPtr drv,
 							const MutexAccess &drvLock,
 							const GuardDataController<ModbusProcessData> &mbuff);
 
 		void clearTempReg();
 
 		/// Driver instance
-		modbusM::ModbusMaster* driver;
+		modbusM::ModbusMasterPtr driver;
 		MutexAccess driverLock;
 
 		/// Driver buffer data controller (write mode)

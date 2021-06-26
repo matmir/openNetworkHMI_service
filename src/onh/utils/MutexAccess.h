@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,76 +16,73 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_UTILS_MUTEXACCESS_H
-#define SRC_UTILS_MUTEXACCESS_H
+#ifndef ONH_UTILS_MUTEXACCESS_H_
+#define ONH_UTILS_MUTEXACCESS_H_
 
 #include <mutex>
 #include "Exception.h"
 
 namespace onh {
 
-    /// Forward declaration
-	class MutexContainer;
+/// Forward declaration
+class MutexContainer;
 
-    /**
-	 * Mutex access class.
-	 */
-    class MutexAccess {
+/**
+ * Mutex access class.
+ */
+class MutexAccess {
+	friend class MutexContainer;
 
-        friend class MutexContainer;
+	public:
+		MutexAccess();
 
-        public:
+		/**
+		 * Copy constructor
+		 *
+		 * @param ma MutexAccess object
+		 */
+		MutexAccess(const MutexAccess& ma);
 
-            MutexAccess();
+		virtual ~MutexAccess();
 
-            /**
-             * Copy constructor
-             *
-             * @param ma MutexAccess object
-             */
-            MutexAccess(const MutexAccess& ma);
+		/**
+		 * Lock mutex
+		 */
+		void lock();
 
-            virtual ~MutexAccess();
+		/**
+		 * Try to lock mutex
+		 *
+		 * @return True if locked
+		 */
+		bool tryLock();
 
-            /**
-             * Lock mutex
-             */
-            void lock();
+		/**
+		 * Unlock mutex
+		 */
+		void unlock();
 
-            /**
-			 * Try to lock mutex
-			 *
-			 * @return True if locked
-			 */
-			bool tryLock();
+		/**
+		 * Assign operator
+		 *
+		 * @param ma MutexAccess object
+		 *
+		 * @return MutexAccess
+		 */
+		MutexAccess& operator=(const MutexAccess& ma);
 
-            /**
-             * Unlock mutex
-             */
-            void unlock();
+	private:
+		/**
+		 * Constructor (allowed only from MutexContainer)
+		 *
+		 * @param mcLock Mutex handle
+		 */
+		explicit MutexAccess(std::mutex* mcLock);
 
-            /**
-             * Assign operator
-             *
-             * @param ma MutexAccess object
-             *
-             * @return MutexAccess
-             */
-            MutexAccess& operator=(const MutexAccess& ma);
+		/// Handle for mutex
+		std::mutex* itsLock;
+};
 
-        private:
+}  // namespace onh
 
-            /**
-             * Constructor (allowed only from MutexContainer)
-             *
-             * @param mcLock Mutex handle
-             */
-            MutexAccess(std::mutex* mcLock);
-
-            /// Handle for mutex
-            std::mutex* itsLock;
-    };
-
-}
-
-#endif // SRC_UTILS_MUTEXACCESS_H
+#endif  // ONH_UTILS_MUTEXACCESS_H_

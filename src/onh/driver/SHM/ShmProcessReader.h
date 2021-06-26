@@ -120,7 +120,7 @@ class ShmProcessReader: public DriverProcessReader {
 		 *
 		 * @return Pointer to the new driver process reader
 		 */
-		DriverProcessReader* createNew();
+		DriverProcessReaderPtr createNew() override;
 
 	private:
 		/**

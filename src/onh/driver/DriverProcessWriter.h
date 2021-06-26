@@ -20,6 +20,7 @@
 #define ONH_DRIVER_DRIVERPROCESSWRITER_H_
 
 #include <vector>
+#include <memory>
 #include "DriverRegisterTypes.h"
 #include "ProcessDataTypes.h"
 
@@ -107,8 +108,10 @@ class DriverProcessWriter {
 		 *
 		 * @return Pointer to the new driver process writer
 		 */
-		virtual DriverProcessWriter* createNew() = 0;
+		virtual std::unique_ptr<DriverProcessWriter> createNew() = 0;
 };
+
+using DriverProcessWriterPtr = std::unique_ptr<DriverProcessWriter>;
 
 }  // namespace onh
 

@@ -26,18 +26,14 @@ ThreadProgram::ThreadProgram(const GuardDataController<ThreadExitData> &gdcTED,
 								unsigned int updateInterval,
 								const std::string& dirName,
 								const std::string& fPrefix):
-	thDelay(updateInterval), thExitController(gdcTED), thCycleTimeController(gdcCTD) {
-	// Create logger
-	log = new Logger(dirName, fPrefix);
+	thDelay(updateInterval), thExitController(gdcTED), thCycleTimeController(gdcCTD),
+	log(std::make_unique<Logger>(dirName, fPrefix)) {
+	// Create info
 	log->write("Initialize thread logger");
 }
 
 ThreadProgram::~ThreadProgram() {
-	if (log) {
-		log->write("Closing thread logger");
-
-		delete log;
-	}
+	log->write("Closing thread logger");
 }
 
 void ThreadProgram::startCycleMeasure() {
@@ -68,9 +64,6 @@ void ThreadProgram::exit(const std::string& info) {
 }
 
 Logger& ThreadProgram::getLogger() {
-	if (!log)
-		throw Exception("Logger object does not exist", "ThreadProgram::getLogger");
-
 	return *log;
 }
 

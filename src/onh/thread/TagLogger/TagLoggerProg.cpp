@@ -32,27 +32,13 @@ TagLoggerProg::TagLoggerProg(const ProcessReader& pr,
 								unsigned int updateInterval,
 								const GuardDataController<ThreadExitData> &gdcTED,
 								const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(gdcTED, gdcCTD, updateInterval, "taglogger", "tagLog_") {
-	// Process reader
-	prReader = new ProcessReader(pr);
-
-	// Create DB access
-	db = new TagLoggerDB(tldb);
-
-	// Create tag logger buffer controller
-	tagLoggerBuffer = new TagLoggerBufferController(tlbc);
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "taglogger", "tagLog_"),
+	prReader(std::make_unique<ProcessReader>(pr)),
+	db(std::make_unique<TagLoggerDB>(tldb)),
+	tagLoggerBuffer(std::make_unique<TagLoggerBufferController>(tlbc)) {
 }
 
 TagLoggerProg::~TagLoggerProg() {
-	if (prReader)
-		delete prReader;
-
-	if (db)
-		delete db;
-
-	if (tagLoggerBuffer)
-		delete tagLoggerBuffer;
-
 	getLogger().write("Tag logger close");
 }
 

@@ -74,15 +74,15 @@ class SocketProgram: public ThreadSocket {
 
 	private:
 		/// Socket thread data
-		ProcessReader *pReader;
-		ProcessWriter *pWriter;
+		std::unique_ptr<ProcessReader> pReader;
+		std::unique_ptr<ProcessWriter> pWriter;
 		DBCredentials dbCredentials;
 		ThreadCycleControllers cycleController;
 		int sPort;
 		int sMaxConn;
 
 		/// Socket object
-		Socket *sock;
+		std::unique_ptr<Socket> sock;
 
 		/// Connection threads pool
 		std::vector<std::thread*> tConn;

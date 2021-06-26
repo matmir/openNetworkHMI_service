@@ -19,6 +19,7 @@
 #ifndef ONH_DB_OBJS_ALARMDEFINITIONITEM_H_
 #define ONH_DB_OBJS_ALARMDEFINITIONITEM_H_
 
+#include <memory>
 #include "Tag.h"
 #include "AlarmException.h"
 #include "../../driver/DriverRegisterTypes.h"
@@ -415,10 +416,10 @@ class AlarmDefinitionItem {
 		bool adPending;
 
 		/// Tag informs controller that alarm is not acknowledgment (optional)
-		Tag* adFeedbackNotAck;
+		std::unique_ptr<Tag> adFeedbackNotAck;
 
 		/// Tag HW alarm acknowledgment (optional)
-		Tag* adHWAck;
+		std::unique_ptr<Tag> adHWAck;
 
 		/// Alarm definition is enabled
 		bool adEnable;

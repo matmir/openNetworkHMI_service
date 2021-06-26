@@ -39,14 +39,14 @@ ModbusDriver::ModbusDriver(const modbusM::ModbusCfg& cfg, unsigned int connId):
 	}
 
 	// Create Modbus protocol
-	modbus = new modbusM::ModbusMaster(cfg);
+	modbus = std::make_shared<modbusM::ModbusMaster>(cfg);
 	getLog().write("ModbusDriver initialized");
 
 	// Initialize registers
 	ModbusProcessData clearProcess(regCount);
 	maxByteCount = clearProcess.getMaxByte();
-	process = new GuardDataContainer<ModbusProcessData>(clearProcess);
-	buff = new GuardDataContainer<ModbusProcessData>(clearProcess);
+	process = std::make_unique<GuardDataContainer<ModbusProcessData>>(clearProcess);
+	buff = std::make_unique<GuardDataContainer<ModbusProcessData>>(clearProcess);
 
 	getLog().write("ModbusDriver::init: Process registers prepared");
 
@@ -55,18 +55,11 @@ ModbusDriver::ModbusDriver(const modbusM::ModbusCfg& cfg, unsigned int connId):
 }
 
 ModbusDriver::~ModbusDriver() {
-	getLog().write("ModbusDriver driver closed");
-
 	if (modbus) {
 		modbus->disconnect();
-		delete modbus;
 	}
 
-	if (buff)
-		delete buff;
-
-	if (process)
-		delete process;
+	getLog().write("ModbusDriver driver closed");
 }
 
 void ModbusDriver::triggerError(const std::string& msg,
@@ -87,24 +80,20 @@ void ModbusDriver::connect() {
 	}
 }
 
-DriverBuffer* ModbusDriver::getBuffer() {
-	return new ModbusUpdater(
-					modbus,
-					driverLock.getAccess(),
-					buff->getController(false)
-	);
+DriverBufferPtr ModbusDriver::getBuffer() {
+	return DriverBufferPtr(new ModbusUpdater(modbus, driverLock.getAccess(), buff->getController(false)));
 }
 
-DriverProcessReader* ModbusDriver::getReader() {
-	return new ModbusProcessReader(process->getController());
+DriverProcessReaderPtr ModbusDriver::getReader() {
+	return DriverProcessReaderPtr(new ModbusProcessReader(process->getController()));
 }
 
-DriverProcessWriter* ModbusDriver::getWriter() {
-	return new ModbusProcessWriter(modbus, driverLock.getAccess(), maxByteCount);
+DriverProcessWriterPtr ModbusDriver::getWriter() {
+	return DriverProcessWriterPtr(new ModbusProcessWriter(modbus, driverLock.getAccess(), maxByteCount));
 }
 
-DriverProcessUpdater* ModbusDriver::getUpdater() {
-	return new ModbusProcessUpdater(buff->getController(), process->getController(false));
+DriverProcessUpdaterPtr ModbusDriver::getUpdater() {
+	return DriverProcessUpdaterPtr(new ModbusProcessUpdater(buff->getController(), process->getController(false)));
 }
 
 }  // namespace onh

@@ -67,20 +67,20 @@ void ShmDriver::triggerError(const std::string& msg, const std::string& fName) {
 	throw DriverException(msg, fName);
 }
 
-DriverBuffer* ShmDriver::getBuffer() {
+DriverBufferPtr ShmDriver::getBuffer() {
 	return nullptr;
 }
 
-DriverProcessReader* ShmDriver::getReader() {
-	return new ShmProcessReader(process.getController());
+DriverProcessReaderPtr ShmDriver::getReader() {
+	return DriverProcessReaderPtr(new ShmProcessReader(process.getController()));
 }
 
-DriverProcessWriter* ShmDriver::getWriter() {
-	return new ShmProcessWriter(shmName, shm, driverLock.getAccess());
+DriverProcessWriterPtr ShmDriver::getWriter() {
+	return DriverProcessWriterPtr(new ShmProcessWriter(shmName, shm, driverLock.getAccess()));
 }
 
-DriverProcessUpdater* ShmDriver::getUpdater() {
-	return new ShmProcessUpdater(shmName, shm, process.getController(false), driverLock.getAccess());
+DriverProcessUpdaterPtr ShmDriver::getUpdater() {
+	return DriverProcessUpdaterPtr(new ShmProcessUpdater(shmName, shm, process.getController(false), driverLock.getAccess()));
 }
 
 }  // namespace onh

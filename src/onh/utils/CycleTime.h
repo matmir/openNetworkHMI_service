@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ONH_UTILS_CYCLETIME_H
-#define ONH_UTILS_CYCLETIME_H
+#ifndef ONH_UTILS_CYCLETIME_H_
+#define ONH_UTILS_CYCLETIME_H_
 
 #include <chrono>
 #include <string>
@@ -25,78 +25,75 @@
 
 namespace onh {
 
-    /**
-     * Cycle time data structure
-     */
-    typedef struct CycleTimeData {
-        /// Minimum cycle time (ms) of the program
-        double min;
-        /// Maximum cycle time (ms) of the program
-        double max;
-        /// Current cycle time (ms) of the program
-        double current;
+/**
+ * Cycle time data structure
+ */
+typedef struct CycleTimeData {
+	/// Minimum cycle time (ms) of the program
+	double min;
+	/// Maximum cycle time (ms) of the program
+	double max;
+	/// Current cycle time (ms) of the program
+	double current;
 
-        CycleTimeData(): min(0), max(0), current(0) {}
-    } CycleTimeData;
+	CycleTimeData(): min(0), max(0), current(0) {}
+} CycleTimeData;
 
-    /**
-     * Cycle time class
-     */
-    class CycleTime {
+/**
+ * Cycle time class
+ */
+class CycleTime {
+	public:
+		/**
+		 * Constructor
+		 */
+		CycleTime();
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		CycleTime(const CycleTime&) = delete;
 
-    		/**
-    		 * Constructor
-    		 */
-            CycleTime();
+		virtual ~CycleTime();
 
-            /**
-             * Copy constructor - inactive
-             */
-            CycleTime(const CycleTime&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		CycleTime& operator=(const CycleTime&) = delete;
 
-            virtual ~CycleTime();
+		/**
+		 * Start measuring cycle time
+		 */
+		void start();
 
-            /**
-			 * Assign operator - inactive
-			 */
-            CycleTime& operator=(const CycleTime&) = delete;
+		/**
+		 * Stop measuring cycle time
+		 */
+		void stop();
 
-            /**
-             * Start measuring cycle time
-             */
-            void start();
+		/**
+		 * Get measured cycle time
+		 *
+		 * @return Measured cycle time
+		 */
+		CycleTimeData getCycle() const;
 
-            /**
-             * Stop measuring cycle time
-             */
-            void stop();
+	private:
+		/// Cycle time
+		CycleTimeData cycle;
 
-            /**
-             * Get measured cycle time
-             *
-             * @return Measured cycle time
-             */
-            CycleTimeData getCycle() const;
+		/// First cycle flag
+		bool firstCycle;
 
-        private:
+		/// Start flag
+		bool started;
 
-            /// Cycle time
-            CycleTimeData cycle;
+		/// Start time of the cycle
+		std::chrono::time_point<std::chrono::steady_clock> cycleStart;
+		/// Stop time of the cycle
+		std::chrono::time_point<std::chrono::steady_clock> cycleStop;
+};
 
-            /// First cycle flag
-            bool firstCycle;
+}  // namespace onh
 
-            /// Start flag
-            bool started;
-
-            /// Start time of the cycle
-            std::chrono::time_point<std::chrono::steady_clock> cycleStart;
-            /// Stop time of the cycle
-            std::chrono::time_point<std::chrono::steady_clock> cycleStop;
-    };
-
-}
-
-#endif // ONH_UTILS_CYCLETIME_H
+#endif  // ONH_UTILS_CYCLETIME_H_

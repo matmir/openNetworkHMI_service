@@ -64,8 +64,8 @@ void ModbusProcessReader::updateProcessData() {
 	driverProcess.getData(process);
 }
 
-DriverProcessReader* ModbusProcessReader::createNew() {
-	return new ModbusProcessReader(driverProcess);
+DriverProcessReaderPtr ModbusProcessReader::createNew() {
+	return DriverProcessReaderPtr(new ModbusProcessReader(driverProcess));
 }
 
 }  // namespace onh

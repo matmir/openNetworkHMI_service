@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,30 +18,26 @@
 
 #include "CycleTime.h"
 
-using namespace onh;
+namespace onh {
 
 CycleTime::CycleTime():
-	cycle(), firstCycle(true), started(false)
-{
+	cycle(), firstCycle(true), started(false) {
 }
 
-CycleTime::~CycleTime()
-{
+CycleTime::~CycleTime() {
 }
 
 void CycleTime::start() {
-
 	if (started) {
 		throw Exception("Cycle calculation already started", "CycleTime::start");
 	}
 
-    // Get start time
+	// Get start time
 	cycleStart = std::chrono::steady_clock::now();
 	started = true;
 }
 
 void CycleTime::stop() {
-
 	if (!started) {
 		throw Exception("Cycle calculation not started", "CycleTime::stop");
 	}
@@ -53,27 +49,28 @@ void CycleTime::stop() {
 	// Calculate difference
 	std::chrono::duration<double, std::milli> elapsed = cycleStop-cycleStart;
 
-    // Current cycle time (milliseconds)
-    cycle.current = elapsed.count();
+	// Current cycle time (milliseconds)
+	cycle.current = elapsed.count();
 
-    // Update max
-    if (cycle.current > cycle.max) {
-        cycle.max = cycle.current;
-    }
+	// Update max
+	if (cycle.current > cycle.max) {
+		cycle.max = cycle.current;
+	}
 
-    // First cycle time -> set min
-    if (firstCycle) {
-        cycle.min = cycle.current;
-        firstCycle = false;
-    }
+	// First cycle time -> set min
+	if (firstCycle) {
+		cycle.min = cycle.current;
+		firstCycle = false;
+	}
 
-    // Update min
-    if (cycle.current < cycle.min) {
-        cycle.min = cycle.current;
-    }
+	// Update min
+	if (cycle.current < cycle.min) {
+		cycle.min = cycle.current;
+	}
 }
 
 CycleTimeData CycleTime::getCycle() const {
-
-    return cycle;
+	return cycle;
 }
+
+}  // namespace onh

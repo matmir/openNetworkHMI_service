@@ -32,31 +32,17 @@ SocketProgram::SocketProgram(const ProcessReader& pr,
 								const GuardDataController<ThreadExitData> &gdcTED,
 								const GuardDataController<int> &gdcSockDesc):
 	ThreadSocket(gdcTED, gdcSockDesc, "socket", "serv_"),
+	pReader(std::make_unique<ProcessReader>(pr)),
+	pWriter(std::make_unique<ProcessWriter>(pw)),
 	dbCredentials(dbc),
 	cycleController(cc),
 	sPort(port),
-	sMaxConn(maxConn) {
-	// Process reader
-	pReader = new ProcessReader(pr);
-
-	// Process writer
-	pWriter = new ProcessWriter(pw);
-
-	// Socket
-	sock = new Socket(port, maxConn);
+	sMaxConn(maxConn),
+	sock(std::make_unique<Socket>(port, maxConn)) {
 }
 
 SocketProgram::~SocketProgram() {
-	if (pReader)
-		delete pReader;
-
-	if (pWriter)
-		delete pWriter;
-
-	if (sock) {
-		getLogger().write("Close socket");
-		delete sock;
-	}
+	getLogger().write("Close socket");
 }
 
 void SocketProgram::operator()() {

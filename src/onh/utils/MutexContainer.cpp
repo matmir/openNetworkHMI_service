@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,44 +20,38 @@
 #include <system_error>
 #include <sstream>
 
-using namespace onh;
+namespace onh {
 
 MutexContainer::MutexContainer() {
-
 }
 
 MutexContainer::~MutexContainer() {
-
 }
 
 void MutexContainer::lock() {
+	// Lock access to the data
+	try {
+		itsLock.lock();
+	} catch (const std::system_error& e) {
+		std::stringstream s;
+		s << "Lock mutex error code: " << e.code() << ", msg: " << e.what();
 
-    // Lock access to the data
-    try {
-
-    	itsLock.lock();
-
-    } catch (const std::system_error& e) {
-    	std::stringstream s;
-    	s << "Lock mutex error code: " << e.code() << ", msg: " << e.what();
-
-    	throw Exception(s.str(), "MutexContainer::lock");
-    }
+		throw Exception(s.str(), "MutexContainer::lock");
+	}
 }
 
 bool MutexContainer::tryLock() {
-
-    // Try lock access to the data
+	// Try lock access to the data
 	return itsLock.try_lock();
 }
 
 void MutexContainer::unlock() {
-
-    // Unlock access to the data
+	// Unlock access to the data
 	itsLock.unlock();
 }
 
 MutexAccess MutexContainer::getAccess() {
-
-    return MutexAccess(&itsLock);
+	return MutexAccess(&itsLock);
 }
+
+}  // namespace onh

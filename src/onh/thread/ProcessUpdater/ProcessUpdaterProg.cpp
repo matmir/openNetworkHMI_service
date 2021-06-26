@@ -29,14 +29,11 @@ ProcessUpdaterProg::ProcessUpdaterProg(const ProcessUpdater& pru,
 										unsigned int updateInterval,
 										const GuardDataController<ThreadExitData> &gdcTED,
 										const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(gdcTED, gdcCTD, updateInterval, "process", "procUpd_"+std::to_string(connId)+"_") {
-	// Process updater
-	prUpdater = new ProcessUpdater(pru);
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "process", "procUpd_"+std::to_string(connId)+"_"),
+	prUpdater(std::make_unique<ProcessUpdater>(pru)) {
 }
 
 ProcessUpdaterProg::~ProcessUpdaterProg() {
-	if (prUpdater)
-		delete prUpdater;
 }
 
 void ProcessUpdaterProg::operator()() {

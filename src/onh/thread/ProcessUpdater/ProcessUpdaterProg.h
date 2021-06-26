@@ -64,7 +64,7 @@ class ProcessUpdaterProg: public ThreadProgram {
 
 	private:
 		/// Handle for process updater object
-		ProcessUpdater* prUpdater;
+		std::unique_ptr<ProcessUpdater> prUpdater;
 };
 
 }  // namespace onh

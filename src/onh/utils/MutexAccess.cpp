@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,74 +20,66 @@
 #include <system_error>
 #include <sstream>
 
-using namespace onh;
+namespace onh {
 
 MutexAccess::MutexAccess():
-    itsLock(nullptr)
-{
+	itsLock(nullptr) {
 }
 
 MutexAccess::MutexAccess(const MutexAccess& ma):
-    itsLock(ma.itsLock)
-{
+	itsLock(ma.itsLock) {
 }
 
 MutexAccess::MutexAccess(std::mutex* mcLock):
-    itsLock(mcLock)
-{
+	itsLock(mcLock) {
 }
 
-MutexAccess::~MutexAccess()
-{
+MutexAccess::~MutexAccess() {
 }
 
 void MutexAccess::lock() {
+	if (!itsLock) {
+		throw Exception("Lock mechanism not initialized", "MutexAccess::lock");
+	}
 
-    if (!itsLock) {
-        throw Exception("Lock mechanism not initialized", "MutexAccess::lock");
-    }
+	// Lock access to the data
+	try {
+		itsLock->lock();
+	} catch (const std::system_error& e) {
+		std::stringstream s;
+		s << "Lock mutex error code: " << e.code() << ", error: " << e.what();
 
-    // Lock access to the data
-    try {
-
-        itsLock->lock();
-
-    } catch (const std::system_error& e) {
-        std::stringstream s;
-        s << "Lock mutex error code: " << e.code() << ", error: " << e.what();
-
-        throw Exception(s.str(), "MutexAccess::lock");
-    }
+		throw Exception(s.str(), "MutexAccess::lock");
+	}
 }
 
 bool MutexAccess::tryLock() {
+	if (!itsLock) {
+		throw Exception("Lock mechanism not initialized", "MutexAccess::tryLock");
+	}
 
-    if (!itsLock) {
-        throw Exception("Lock mechanism not initialized", "MutexAccess::tryLock");
-    }
-
-    // Try lock access to the data
+	// Try lock access to the data
 	return itsLock->try_lock();
 }
 
 void MutexAccess::unlock() {
+	if (!itsLock) {
+		throw Exception("Lock mechanism not initialized", "MutexAccess::unlock");
+	}
 
-    if (!itsLock) {
-        throw Exception("Lock mechanism not initialized", "MutexAccess::unlock");
-    }
-
-    // Unlock access to the data
+	// Unlock access to the data
 	itsLock->unlock();
 }
 
 MutexAccess& MutexAccess::operator=(const MutexAccess& ma) {
+	// Check self assignment
+	if(&ma == this)
+		return *this;
 
-    // Check self assignment
-    if(&ma == this)
-        return *this;
+	// Copy pointers
+	itsLock = ma.itsLock;
 
-    // Copy pointers
-    itsLock = ma.itsLock;
-
-    return *this;
+	return *this;
 }
+
+}  // namespace onh

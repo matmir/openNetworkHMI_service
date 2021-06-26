@@ -25,21 +25,12 @@ TagLoggerWriterProg::TagLoggerWriterProg(const TagLoggerDB& tldb,
 											unsigned int updateInterval,
 											const GuardDataController<ThreadExitData> &gdcTED,
 											const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(gdcTED, gdcCTD, updateInterval, "taglogger", "tagLogWriter_") {
-	// Create DB access
-	db = new TagLoggerDB(tldb);
-
-	// Create tag logger buffer controller
-	tagLoggerBuffer = new TagLoggerBufferController(tlbc);
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "taglogger", "tagLogWriter_"),
+	db(std::make_unique<TagLoggerDB>(tldb)),
+	tagLoggerBuffer(std::make_unique<TagLoggerBufferController>(tlbc)) {
 }
 
 TagLoggerWriterProg::~TagLoggerWriterProg() {
-	if (db)
-		delete db;
-
-	if (tagLoggerBuffer)
-		delete tagLoggerBuffer;
-
 	getLogger().write("Tag logger writer close");
 }
 

@@ -21,7 +21,7 @@
 
 namespace onh {
 
-ModbusUpdater::ModbusUpdater(modbusM::ModbusMaster* drv,
+ModbusUpdater::ModbusUpdater(modbusM::ModbusMasterPtr drv,
 								const MutexAccess &drvLock,
 								const GuardDataController<ModbusProcessData> &mbuff):
 	driver(drv), driverLock(drvLock), buff(mbuff), tempBuff{nullptr, nullptr, 0, 0} {

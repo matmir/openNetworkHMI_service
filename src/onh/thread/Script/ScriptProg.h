@@ -72,13 +72,13 @@ class ScriptProg: public ThreadProgram {
 
 	private:
 		/// Handle for process reader object
-		ProcessReader* prReader;
+		std::unique_ptr<ProcessReader> prReader;
 
 		/// Handle for process writer object
-		ProcessWriter* prWriter;
+		std::unique_ptr<ProcessWriter> prWriter;
 
 		/// Script DB access
-		ScriptDB *db;
+		std::unique_ptr<ScriptDB> db;
 
 		/// Full path to the main execute script
 		std::string executeScript;

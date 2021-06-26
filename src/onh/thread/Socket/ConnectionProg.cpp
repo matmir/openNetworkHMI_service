@@ -30,61 +30,39 @@ ConnectionProgram::ConnectionProgram(int connDescriptor,
 										const ThreadCycleControllers& cc,
 										const DBCredentials& db,
 										const GuardDataController<ThreadExitData> &gdcTED):
-	connDesc(connDescriptor), dbCredentials(db), thExit(gdcTED), cycleController(cc) {
-	// Process reader
-	pReader = new ProcessReader(pr);
-
-	// Process writer
-	pWriter = new ProcessWriter(pw);
-
+	connDesc(connDescriptor),
+	pReader(std::make_unique<ProcessReader>(pr)),
+	pWriter(std::make_unique<ProcessWriter>(pw)),
+	dbCredentials(db),
+	thExit(gdcTED),
+	cycleController(cc),
+	parser(std::make_unique<CommandParser>(pr, pw, db, cc, thExit, connDescriptor)) {
 	// Create logger
 	std::stringstream s;
 	s << "connection_th_" << connDescriptor << "_";
-	log = new Logger("parser", s.str());
-
-	// Create parser
-	parser = new CommandParser(pr,
-								pw,
-								db,
-								cc,
-								thExit,
-								connDescriptor);
+	log = std::make_unique<Logger>("parser", s.str());
 }
 
 ConnectionProgram::ConnectionProgram(const ConnectionProgram& rhs):
-	connDesc(rhs.connDesc), dbCredentials(rhs.dbCredentials), thExit(rhs.thExit), cycleController(rhs.cycleController) {
-	// Process reader
-	pReader = new ProcessReader(*rhs.pReader);
-
-	// Process writer
-	pWriter = new ProcessWriter(*rhs.pWriter);
-
+	connDesc(rhs.connDesc),
+	pReader(std::make_unique<ProcessReader>(*rhs.pReader)),
+	pWriter(std::make_unique<ProcessWriter>(*rhs.pWriter)),
+	dbCredentials(rhs.dbCredentials),
+	thExit(rhs.thExit),
+	cycleController(rhs.cycleController),
+	parser(std::make_unique<CommandParser>(*rhs.pReader,
+											*rhs.pWriter,
+											dbCredentials,
+											cycleController,
+											thExit,
+											connDesc))  {
 	// Create logger
 	std::stringstream s;
 	s << "connection_th_" << connDesc << "_";
-	log = new Logger("parser", s.str());
-
-	// Create parser
-	parser = new CommandParser(*pReader,
-								*pWriter,
-								dbCredentials,
-								cycleController,
-								thExit,
-								connDesc);
+	log = std::make_unique<Logger>("parser", s.str());
 }
 
 ConnectionProgram::~ConnectionProgram() {
-	if (pReader)
-		delete pReader;
-
-	if (pWriter)
-		delete pWriter;
-
-	if (parser)
-		delete parser;
-
-	if (log)
-		delete log;
 }
 
 void ConnectionProgram::operator()() {

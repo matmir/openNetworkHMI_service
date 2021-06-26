@@ -79,10 +79,10 @@ class ConnectionProgram {
 		int connDesc;
 
 		/// Process reader
-		ProcessReader *pReader;
+		std::unique_ptr<ProcessReader> pReader;
 
 		/// Process writer
-		ProcessWriter *pWriter;
+		std::unique_ptr<ProcessWriter> pWriter;
 
 		/// DB credentials
 		DBCredentials dbCredentials;
@@ -94,10 +94,10 @@ class ConnectionProgram {
 		ThreadCycleControllers cycleController;
 
 		/// Logger object
-		Logger* log;
+		std::unique_ptr<Logger> log;
 
 		/// Command parser
-		CommandParser *parser;
+		std::unique_ptr<CommandParser> parser;
 };
 
 }  // namespace onh

@@ -131,10 +131,10 @@ class ProcessReader {
 		 * @param id Driver process reader identifier
 		 * @param dpr Driver process reader
 		 */
-		void addReader(unsigned int id, DriverProcessReader *dpr);
+		void addReader(unsigned int id, DriverProcessReaderPtr dpr);
 
 		/// Driver process data reader
-		std::map<unsigned int, DriverProcessReader*> driverReader;
+		std::map<unsigned int, DriverProcessReaderPtr> driverReader;
 };
 
 }  // namespace onh

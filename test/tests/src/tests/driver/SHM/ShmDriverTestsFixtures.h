@@ -41,15 +41,6 @@ class shmDriverTests: public ::testing::Test {
 
 		static void TearDownTestSuite() {
 
-			if (shmReader)
-				delete shmReader;
-
-			if (shmWriter)
-				delete shmWriter;
-
-			if (shmUpdater)
-				delete shmUpdater;
-
 			if (shmDriver)
 				delete shmDriver;
 		}
@@ -118,16 +109,16 @@ class shmDriverTests: public ::testing::Test {
 		static onh::ShmDriver *shmDriver;
 
 		// driver process reader
-		static onh::DriverProcessReader *shmReader;
+		static onh::DriverProcessReaderPtr shmReader;
 		// driver process writer
-		static onh::DriverProcessWriter *shmWriter;
+		static onh::DriverProcessWriterPtr shmWriter;
 		// driver process updater
-		static onh::DriverProcessUpdater *shmUpdater;
+		static onh::DriverProcessUpdaterPtr shmUpdater;
 };
 
 onh::ShmDriver* shmDriverTests::shmDriver = nullptr;
-onh::DriverProcessReader* shmDriverTests::shmReader = nullptr;
-onh::DriverProcessWriter* shmDriverTests::shmWriter = nullptr;
-onh::DriverProcessUpdater* shmDriverTests::shmUpdater = nullptr;
+onh::DriverProcessReaderPtr shmDriverTests::shmReader = nullptr;
+onh::DriverProcessWriterPtr shmDriverTests::shmWriter = nullptr;
+onh::DriverProcessUpdaterPtr shmDriverTests::shmUpdater = nullptr;
 
 #endif /* TESTS_DRIVER_SHM_SHMDRIVERTESTSFIXTURES_H_ */

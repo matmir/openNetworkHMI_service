@@ -25,18 +25,15 @@ ThreadSocket::ThreadSocket(const GuardDataController<ThreadExitData> &gdcTED,
 							const GuardDataController<int> &gdcSockDesc,
 							const std::string& dirName,
 							const std::string& fPrefix):
-	thExitController(gdcTED), thSockDecsController(gdcSockDesc) {
-	// Create logger
-	log = new Logger(dirName, fPrefix);
+	thExitController(gdcTED),
+	thSockDecsController(gdcSockDesc),
+	log(std::make_unique<Logger>(dirName, fPrefix)) {
+	// Log info
 	log->write("Initialize thread logger");
 }
 
 ThreadSocket::~ThreadSocket() {
-	if (log) {
-		log->write("Closing thread logger");
-
-		delete log;
-	}
+	log->write("Closing thread logger");
 }
 
 const GuardDataController<ThreadExitData>& ThreadSocket::getExitController() {
@@ -64,9 +61,6 @@ void ThreadSocket::setSocketFD(int sockFD) {
 }
 
 Logger& ThreadSocket::getLogger() {
-	if (!log)
-		throw Exception("Logger object does not exist", "ThreadSocket::getLogger");
-
 	return *log;
 }
 

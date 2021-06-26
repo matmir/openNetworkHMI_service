@@ -81,11 +81,11 @@ class ParserDB: public DB {
 		/**
 		 * Get Tag object from SQL resultset
 		 *
-		 * @param res Pointer to the resultset
+		 * @param res Reference to the resultset
 		 *
 		 * @return  Tag objects
 		 */
-		Tag getTagFromResultset(DBResult *res);
+		Tag getTagFromResultset(const DBResult &res);
 
 		/**
 		 * Prepare SQL IN array statement
@@ -105,7 +105,7 @@ class ParserDB: public DB {
 		void checkTagNamesExist(const std::vector<std::string> &tagNames, const std::vector<Tag> &vTags);
 
 		/// AlarmingDB object
-		AlarmingDB *pAlarmDB;
+		std::unique_ptr<AlarmingDB> pAlarmDB;
 };
 
 }  // namespace onh

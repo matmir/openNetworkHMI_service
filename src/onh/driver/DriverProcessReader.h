@@ -19,6 +19,7 @@
 #ifndef ONH_DRIVER_DRIVERPROCESSREADER_H_
 #define ONH_DRIVER_DRIVERPROCESSREADER_H_
 
+#include <memory>
 #include <vector>
 #include "DriverRegisterTypes.h"
 #include "ProcessDataTypes.h"
@@ -106,8 +107,10 @@ class DriverProcessReader {
 		 *
 		 * @return Pointer to the new driver process reader
 		 */
-		virtual DriverProcessReader* createNew() = 0;
+		virtual std::unique_ptr<DriverProcessReader> createNew() = 0;
 };
+
+using DriverProcessReaderPtr = std::unique_ptr<DriverProcessReader>;
 
 }  // namespace onh
 

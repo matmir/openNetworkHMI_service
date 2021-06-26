@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ONH_UTILS_MUTEXCONTAINER_H
-#define ONH_UTILS_MUTEXCONTAINER_H
+#ifndef ONH_UTILS_MUTEXCONTAINER_H_
+#define ONH_UTILS_MUTEXCONTAINER_H_
 
 #include <mutex>
 #include "Exception.h"
@@ -25,57 +25,54 @@
 
 namespace onh {
 
-    /**
-	 * Mutex container class.
-	 */
-    class MutexContainer {
+/**
+ * Mutex container class.
+ */
+class MutexContainer {
+	public:
+		MutexContainer();
 
-        public:
+		/**
+		 * Copy constructor - inactive
+		 */
+		MutexContainer(const MutexContainer&) = delete;
 
-            MutexContainer();
+		virtual ~MutexContainer();
 
-            /**
-			 * Copy constructor - inactive
-			 */
-			MutexContainer(const MutexContainer&) = delete;
+		/**
+		 * Assign operator - inactive
+		 */
+		MutexContainer& operator=(const MutexContainer&) = delete;
 
-            virtual ~MutexContainer();
+		/**
+		 * Lock mutex
+		 */
+		void lock();
 
-            /**
-			 * Assign operator - inactive
-			 */
-            MutexContainer& operator=(const MutexContainer&) = delete;
+		/**
+		 * Try to lock mutex
+		 *
+		 * @return True if locked
+		 */
+		bool tryLock();
 
-            /**
-             * Lock mutex
-             */
-            void lock();
+		/**
+		 * Unlock mutex
+		 */
+		void unlock();
 
-            /**
-			 * Try to lock mutex
-			 *
-			 * @return True if locked
-			 */
-			bool tryLock();
+		/**
+		 * Get MutexAccess object
+		 *
+		 * @return MutexAccess object
+		 */
+		MutexAccess getAccess();
 
-            /**
-             * Unlock mutex
-             */
-            void unlock();
+	private:
+		/// Mutex
+		std::mutex itsLock;
+};
 
-            /**
-             * Get MutexAccess object
-             *
-             * @return MutexAccess object
-             */
-            MutexAccess getAccess();
+}  // namespace onh
 
-        private:
-
-            /// Mutex
-            std::mutex itsLock;
-    };
-
-}
-
-#endif // ONH_UTILS_MUTEXCONTAINER_H
+#endif  // ONH_UTILS_MUTEXCONTAINER_H_

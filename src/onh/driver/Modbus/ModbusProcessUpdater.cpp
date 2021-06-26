@@ -33,8 +33,8 @@ void ModbusProcessUpdater::updateProcessData() {
 	process.setData(buff);
 }
 
-DriverProcessUpdater* ModbusProcessUpdater::createNew() {
-	return new ModbusProcessUpdater(buff, process);
+DriverProcessUpdaterPtr ModbusProcessUpdater::createNew() {
+	return DriverProcessUpdaterPtr(new ModbusProcessUpdater(buff, process));
 }
 
 }  // namespace onh

@@ -44,18 +44,15 @@ ParserDB::ParserDB(const DBCredentials & dbData):
 	}
 
 	// Create alarming DB
-	pAlarmDB = new AlarmingDB(conn);
+	pAlarmDB = std::make_unique<AlarmingDB>(conn);
 }
 
 ParserDB::ParserDB(const ParserDB &tDB):
 	DB(tDB) {
-	pAlarmDB = new AlarmingDB(*(tDB.pAlarmDB));
+	pAlarmDB = std::make_unique<AlarmingDB>(*(tDB.pAlarmDB));
 }
 
 ParserDB::~ParserDB() {
-	if (pAlarmDB)
-		delete pAlarmDB;
-
 	if (conn)
 		mysql_close(conn);
 }
@@ -84,34 +81,24 @@ const Tag ParserDB::getTag(const std::string& tagName) {
 	// Return value
 	Tag tg;
 
-	DBResult *result = 0;
-
 	try {
 		// Prepare query
 		q << "SELECT * FROM tags t, driver_connections dc WHERE t.tConnId=dc.dcId AND t.tName=";
 		q << "'" << tagName << "';";
 
 		// Query
-		result = executeQuery(q.str());
+		auto result = executeQuery(q.str());
 
 		if (result->rowsCount() == 1) {
 			// Read data
 			result->nextRow();
 
 			// Get Tag
-			tg = getTagFromResultset(result);
-
-			// Release memory
-			delete result;
-			result = 0;
-
+			tg = getTagFromResultset(*result);
 		} else {
 			noData = true;
 		}
 	} catch (DBException &e) {
-		if (result)
-			delete result;
-
 		throw Exception(e.what(), "ParserDB::getTag");
 	}
 
@@ -188,34 +175,25 @@ std::vector<Tag> ParserDB::getTags(std::vector<std::string> tagNames) {
 	// Return value
 	Tag tg;
 
-	DBResult *result = 0;
-
 	try {
 		// Prepare query
 		q << "SELECT * FROM tags t, driver_connections dc WHERE t.tConnId=dc.dcId AND tName IN (";
 		q << sTags.str() << ") ORDER BY FIELD(t.tName, " << sTags.str() << ");";
 
 		// Query
-		result = executeQuery(q.str());
+		auto result = executeQuery(q.str());
 
 		// Read data
 		while (result->nextRow()) {
 			noData = false;
 
 			// Get Tag
-			tg = getTagFromResultset(result);
+			tg = getTagFromResultset(*result);
 
 			// Put into the vector
 			vTag.push_back(tg);
 		}
-
-		// Release memory
-		delete result;
-		result = 0;
 	} catch (DBException &e) {
-		if (result)
-			delete result;
-
 		throw Exception(e.what(), "ParserDB::getTag");
 	}
 
@@ -229,26 +207,26 @@ std::vector<Tag> ParserDB::getTags(std::vector<std::string> tagNames) {
 	return vTag;
 }
 
-Tag ParserDB::getTagFromResultset(DBResult *res) {
+Tag ParserDB::getTagFromResultset(const DBResult &res) {
 	// Return value
 	Tag tg;
 	TagType tt;
 	processDataArea ta;
 
 	// Tag type
-	tt = (TagType)res->getUInt("tType");
+	tt = (TagType)res.getUInt("tType");
 
 	// Tag area
-	ta = (processDataArea)res->getUInt("tArea");
+	ta = (processDataArea)res.getUInt("tArea");
 
 	// Update tag object values
-	tg.setId(res->getUInt("tid"));
-	tg.setConnId(res->getUInt("tConnId"));
-	tg.setName(res->getString("tName"));
+	tg.setId(res.getUInt("tid"));
+	tg.setConnId(res.getUInt("tConnId"));
+	tg.setName(res.getString("tName"));
 	tg.setType(tt);
 	tg.setArea(ta);
-	tg.setByteAddress(res->getUInt("tByteAddress"));
-	tg.setBitAddress(res->getUInt("tBitAddress"));
+	tg.setByteAddress(res.getUInt("tByteAddress"));
+	tg.setBitAddress(res.getUInt("tBitAddress"));
 
 	return tg;
 }

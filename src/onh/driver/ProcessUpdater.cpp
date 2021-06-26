@@ -25,13 +25,11 @@ ProcessUpdater::ProcessUpdater(const ProcessUpdater &pu) {
 	driverUpdater = pu.driverUpdater->createNew();
 }
 
-ProcessUpdater::ProcessUpdater(DriverProcessUpdater *dpu):
-	driverUpdater(dpu) {
+ProcessUpdater::ProcessUpdater(DriverProcessUpdaterPtr dpu):
+	driverUpdater(std::move(dpu)) {
 }
 
 ProcessUpdater::~ProcessUpdater() {
-	if (driverUpdater)
-		delete driverUpdater;
 }
 
 void ProcessUpdater::update() {

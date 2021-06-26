@@ -19,6 +19,7 @@
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 
+#include <memory>
 #include "onh/driver/DriverManager.h"
 #include "onh/driver/SHM/ShmDriver.h"
 #include "onh/driver/Modbus/ModbusDriver.h"
@@ -83,19 +84,19 @@ class Application {
 		void runThreads();
 
 		/// Main program logger
-		Logger *log;
+		std::unique_ptr<Logger> log;
 
 		/// Driver manager
-		DriverManager *drvManager;
+		std::unique_ptr<DriverManager> drvManager;
 
 		/// Thread manager
-		ThreadManager *thManager;
+		std::unique_ptr<ThreadManager> thManager;
 
 		/// Database manager
-		DBManager *dbManager;
+		std::unique_ptr<DBManager> dbManager;
 
 		/// Config DB access
-		Config *cfg;
+		std::unique_ptr<Config> cfg;
 
 		/// Test environment flag
 		bool testEnv;

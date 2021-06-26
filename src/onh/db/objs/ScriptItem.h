@@ -19,6 +19,7 @@
 #ifndef ONH_DB_OBJS_SCRIPTITEM_H_
 #define ONH_DB_OBJS_SCRIPTITEM_H_
 
+#include <memory>
 #include "Tag.h"
 #include "ScriptException.h"
 
@@ -186,7 +187,7 @@ class ScriptItem {
 		unsigned int scid;
 
 		/// Tag object
-		Tag* scTag;
+		std::unique_ptr<Tag> scTag;
 
 		/// Script name
 		std::string scName;
@@ -198,7 +199,7 @@ class ScriptItem {
 		bool scLock;
 
 		/// Tag informs controller that script is running (optional)
-		Tag* scFeedbackRun;
+		std::unique_ptr<Tag> scFeedbackRun;
 
 		/// Script is enabled
 		bool scEnable;

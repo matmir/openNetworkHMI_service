@@ -56,28 +56,28 @@ class ShmDriver: public Driver {
 		 *
 		 * @return Driver buffer handle
 		 */
-		DriverBuffer* getBuffer() override;
+		DriverBufferPtr getBuffer() override;
 
 		/**
 		 * Get driver process data reader
 		 *
 		 * @return Driver process data reader handle
 		 */
-		DriverProcessReader* getReader() override;
+		DriverProcessReaderPtr getReader() override;
 
 		/**
 		 * Get driver process data writer
 		 *
 		 * @return Driver process data writer handle
 		 */
-		DriverProcessWriter* getWriter() override;
+		DriverProcessWriterPtr getWriter() override;
 
 		/**
 		 * Get driver process data updater
 		 *
 		 * @return Driver process data updater handle
 		 */
-		DriverProcessUpdater* getUpdater() override;
+		DriverProcessUpdaterPtr getUpdater() override;
 
 	private:
 		/// Shared memory id

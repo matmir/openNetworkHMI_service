@@ -36,8 +36,12 @@ class ParserDB;
  */
 class AlarmingDB: public DB {
 	public:
-		friend class DBManager;
-		friend class ParserDB;
+		/**
+		 * Constructor with connection param
+		 *
+		 * @param connection Connection handle
+		 */
+		explicit AlarmingDB(MYSQL *connDB);
 
 		/**
 		 * Copy constructor
@@ -83,14 +87,6 @@ class AlarmingDB: public DB {
 		 * @param apadid Alarm definition identifier (alarm to acknowledge)
 		 */
 		void ackAlarm(unsigned int apadid = 0);
-
-	private:
-		/**
-		 * Constructor with connection param (allowed only from DBManager)
-		 *
-		 * @param connection Connection handle
-		 */
-		explicit AlarmingDB(MYSQL *connDB);
 };
 
 }  // namespace onh

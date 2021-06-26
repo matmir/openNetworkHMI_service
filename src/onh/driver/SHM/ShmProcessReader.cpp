@@ -63,8 +63,8 @@ void ShmProcessReader::updateProcessData() {
 	driverProcess.getData(process);
 }
 
-DriverProcessReader* ShmProcessReader::createNew() {
-	return new ShmProcessReader(driverProcess);
+DriverProcessReaderPtr ShmProcessReader::createNew() {
+	return DriverProcessReaderPtr(new ShmProcessReader(driverProcess));
 }
 
 }  // namespace onh

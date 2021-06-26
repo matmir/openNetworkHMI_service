@@ -22,11 +22,11 @@ namespace onh {
 
 ScriptItem::ScriptItem():
 	scid(0),
-	scTag(0),
+	scTag(nullptr),
 	scName(""),
 	scRun(false),
 	scLock(false),
-	scFeedbackRun(0),
+	scFeedbackRun(nullptr),
 	scEnable(false) {
 }
 
@@ -36,10 +36,10 @@ ScriptItem::ScriptItem(unsigned int id,
 						bool run,
 						bool lock,
 						bool enabled):
-	scTag(0),
+	scTag(nullptr),
 	scRun(run),
 	scLock(lock),
-	scFeedbackRun(0),
+	scFeedbackRun(nullptr),
 	scEnable(enabled) {
 	setId(id);
 	setTag(tag);
@@ -53,10 +53,10 @@ ScriptItem::ScriptItem(unsigned int id,
 						bool lock,
 						const Tag& feedbackRun,
 						bool enabled):
-	scTag(0),
+	scTag(nullptr),
 	scRun(run),
 	scLock(lock),
-	scFeedbackRun(0),
+	scFeedbackRun(nullptr),
 	scEnable(enabled) {
 	setId(id);
 	setTag(tag);
@@ -66,27 +66,20 @@ ScriptItem::ScriptItem(unsigned int id,
 
 ScriptItem::ScriptItem(const ScriptItem& rhs):
 	scid(rhs.scid),
+	scTag(nullptr),
 	scName(rhs.scName),
 	scRun(rhs.scRun),
 	scLock(rhs.scLock),
+	scFeedbackRun(nullptr),
 	scEnable(rhs.scEnable) {
 	if (rhs.scTag)
-		scTag = new Tag(*rhs.scTag);
-	else
-		scTag = 0;
+		scTag = std::make_unique<Tag>(*rhs.scTag);
 
 	if (rhs.scFeedbackRun)
-		scFeedbackRun = new Tag(*rhs.scFeedbackRun);
-	else
-		scFeedbackRun = 0;
+		scFeedbackRun = std::make_unique<Tag>(*rhs.scFeedbackRun);
 }
 
 ScriptItem::~ScriptItem() {
-	if (scTag)
-		delete scTag;
-
-	if (scFeedbackRun)
-		delete scFeedbackRun;
 }
 
 ScriptItem& ScriptItem::operator=(const ScriptItem& rhs) {
@@ -98,20 +91,14 @@ ScriptItem& ScriptItem::operator=(const ScriptItem& rhs) {
 		scLock = rhs.scLock;
 		scEnable = rhs.scEnable;
 
-		if (scTag) {
-			delete scTag;
-			scTag = 0;
-		}
+		scTag.reset();
 		if (rhs.scTag)
-			scTag = new Tag(*rhs.scTag);
+			scTag = std::make_unique<Tag>(*rhs.scTag);
 
 		// Feedback run Tag
-		if (scFeedbackRun) {
-			delete scFeedbackRun;
-			scFeedbackRun = 0;
-		}
+		scFeedbackRun.reset();
 		if (rhs.scFeedbackRun) {
-			scFeedbackRun = new Tag(*rhs.scFeedbackRun);
+			scFeedbackRun = std::make_unique<Tag>(*rhs.scFeedbackRun);
 		}
 	}
 
@@ -151,12 +138,7 @@ const Tag& ScriptItem::getTag() const {
 void ScriptItem::setTag(const Tag& tag) {
 	checkBitTagType(tag);
 
-	if (scTag) {
-		delete scTag;
-		scTag = 0;
-	}
-
-	scTag = new Tag(tag);
+	scTag.reset(new Tag(tag));
 }
 
 void ScriptItem::checkScriptName(const std::string& nm) const {
@@ -204,12 +186,7 @@ void ScriptItem::checkBitTagType(const Tag& tg) const {
 void ScriptItem::setFeedbackRunTag(const Tag& feedbackTag) {
 	checkBitTagType(feedbackTag);
 
-	if (scFeedbackRun) {
-		delete scFeedbackRun;
-		scFeedbackRun = 0;
-	}
-
-	scFeedbackRun = new Tag(feedbackTag);
+	scFeedbackRun.reset(new Tag(feedbackTag));
 }
 
 const Tag& ScriptItem::getFeedbackRunTag() const {

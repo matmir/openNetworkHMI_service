@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_UTILS_LOGGER_H
-#define SRC_UTILS_LOGGER_H
+#ifndef ONH_UTILS_LOGGER_H_
+#define ONH_UTILS_LOGGER_H_
 
 #include <string>
 #include <fstream>
@@ -25,84 +25,82 @@
 
 namespace onh {
 
-    /**
-     * Logger class
-     */
-    class Logger {
+/**
+ * Logger class
+ */
+class Logger {
+	public:
+		/**
+		 * Default constructor
+		 *
+		 * @param dirName Name of the directory where to write log files
+		 * @param fPrefix Log file name prefix
+		 */
+		explicit Logger(const std::string& dirName, const std::string& fPrefix = "");
 
-        public:
-            /**
-             * Default constructor
-             *
-             * @param dirName Name of the directory where to write log files
-             * @param fPrefix Log file name prefix
-             */
-            Logger(const std::string& dirName, const std::string& fPrefix = "");
+		/**
+		 * Copy constructor - inactive
+		 */
+		Logger(const Logger&) = delete;
 
-            /**
-			 * Copy constructor - inactive
-			 */
-            Logger(const Logger&) = delete;
+		virtual ~Logger();
 
-            virtual ~Logger();
+		/**
+		 * Assign operator - inactive
+		 */
+		Logger& operator=(const Logger&) = delete;
 
-            /**
-			 * Assign operator - inactive
-			 */
-            Logger& operator=(const Logger&) = delete;
+		/**
+		 * Write to the log file
+		 *
+		 * @param log String with information to write
+		 */
+		void write(const std::string& log);
 
-            /**
-             * Write to the log file
-             *
-             * @param log String with information to write
-             */
-            void write(const std::string& log);
+		/**
+		 * Clear logs (delete all files and open blank one)
+		 */
+		void clear();
 
-            /**
-             * Clear logs (delete all files and open blank one)
-             */
-            void clear();
+		/**
+		 * Get log file path
+		 *
+		 * @return Log file path
+		 */
+		std::string getLoggerPath() const;
 
-            /**
-			 * Get log file path
-			 *
-			 * @return Log file path
-			 */
-            std::string getLoggerPath() const;
+	private:
+		/// Logger directory name
+		std::string directoryName;
 
-        private:
+		/// Log file name prefix
+		std::string filePrefix;
 
-            /// Logger directory name
-            std::string directoryName;
+		/// Flag informs that directory is ready to write
+		bool dirReady;
 
-            /// Log file name prefix
-            std::string filePrefix;
+		/// Logger file handle
+		std::ofstream logFile;
 
-            /// Flag informs that directory is ready to write
-            bool dirReady;
+		/// Log file name
+		std::string logFileName;
 
-            /// Logger file handle
-            std::ofstream logFile;
+		/// Path to the log file
+		std::string filePath;
 
-            /// Log file name
-            std::string logFileName;
+		/**
+		 * Generate file name based on current date
+		 *
+		 * @return String with file name
+		 */
+		std::string generateFileName();
 
-            /// Path to the log file
-			std::string filePath;
+		/**
+		 * Check log file names (create new log file when date changes)
+		 */
+		void checkFiles();
+};
 
-            /**
-             * Generate file name based on current date
-             *
-             * @return String with file name
-             */
-            std::string generateFileName();
+}  // namespace onh
 
-            /**
-             * Check log file names (create new log file when date changes)
-             */
-            void checkFiles();
-    };
-
-}
-
-#endif // SRC_UTILS_LOGGER_H
+#endif  // ONH_UTILS_LOGGER_H_

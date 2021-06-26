@@ -29,25 +29,13 @@ AlarmingProg::AlarmingProg(const ProcessReader& pr,
 							unsigned int updateInterval,
 							const GuardDataController<ThreadExitData> &gdcTED,
 							const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(gdcTED, gdcCTD, updateInterval, "alarming", "alarmLog_") {
-	// Process Reader
-	prReader = new ProcessReader(pr);
-
-	// Process Writer
-	prWriter = new ProcessWriter(pw);
-
-	// Create Alarming DB
-	db = new AlarmingDB(adb);
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "alarming", "alarmLog_"),
+	prReader(std::make_unique<ProcessReader>(pr)),
+	prWriter(std::make_unique<ProcessWriter>(pw)),
+	db(std::make_unique<AlarmingDB>(adb)) {
 }
 
 AlarmingProg::~AlarmingProg() {
-	if (prReader)
-		delete prReader;
-	if (prWriter)
-		delete prWriter;
-	if (db)
-		delete db;
-
 	getLogger().write("Alarming close");
 }
 
@@ -56,10 +44,10 @@ void AlarmingProg::operator()() {
 		getLogger().write("Start main loop");
 
 		if (!prReader)
-			throw Exception("No reader object");
+            throw Exception("No reader object");
 
-		if (!prWriter)
-			throw Exception("No writer object");
+        if (!prWriter)
+            throw Exception("No writer object");
 
 		while(!isExitFlag()) {
 			// Start thread cycle time measure

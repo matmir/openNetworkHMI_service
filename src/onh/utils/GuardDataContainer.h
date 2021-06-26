@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2021 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,119 +16,107 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_ONH_UTILS_GUARDDATACONTAINER_H_
-#define SRC_ONH_UTILS_GUARDDATACONTAINER_H_
+#ifndef ONH_UTILS_GUARDDATACONTAINER_H_
+#define ONH_UTILS_GUARDDATACONTAINER_H_
 
+#include <memory>
 #include "MutexContainer.h"
 #include "Exception.h"
 #include "GuardDataController.h"
 
 namespace onh {
 
-	/**
-	 * Guarded data container class
-	 */
-	template <class T>
-	class GuardDataContainer {
+/**
+ * Guarded data container class
+ */
+template <class T>
+class GuardDataContainer {
+	public:
+		/**
+		 * Default constructor
+		 */
+		GuardDataContainer();
 
-		public:
+		/**
+		 * Constructor with data
+		 *
+		 * @param newData Data to store in container
+		 */
+		explicit GuardDataContainer(const T& newData);
 
-			/**
-			 * Default constructor
-			 */
-			GuardDataContainer();
+		/**
+		 * Copy constructor
+		 *
+		 * @param gdc Data container object to copy
+		 */
+		GuardDataContainer(const GuardDataContainer& gdc);
 
-			/**
-			 * Constructor with data
-			 *
-			 * @param newData Data to store in container
-			 */
-			GuardDataContainer(const T& newData);
+		virtual ~GuardDataContainer();
 
-			/**
-			 * Copy constructor
-			 *
-			 * @param gdc Data container object to copy
-			 */
-			GuardDataContainer(const GuardDataContainer& gdc);
+		/**
+		 * Assign operator - inactive
+		 */
+		GuardDataContainer& operator=(const GuardDataContainer&) = delete;
 
-			virtual ~GuardDataContainer();
+		/**
+		 * Get guarded data controller object
+		 *
+		 * @return Guarded data controller object
+		 */
+		GuardDataController<T> getController(bool readOnly = true);
 
-			/**
-			 * Assign operator - inactive
-			 */
-			GuardDataContainer& operator=(const GuardDataContainer&) = delete;
+		/**
+		 * Get internal controller object
+		 *
+		 * @return Internal controller object
+		 */
+		GuardDataController<T>& controll();
 
-			/**
-			 * Get guarded data controller object
-			 *
-			 * @return Guarded data controller object
-			 */
-			GuardDataController<T> getController(bool readOnly = true);
+	private:
+		/// Guarded data
+		std::shared_ptr<T> data;
 
-			/**
-			 * Get internal controller object
-			 *
-			 * @return Internal controller object
-			 */
-			GuardDataController<T>& controll();
+		/// Mutex for protecting data
+		MutexContainer dataLock;
 
-		private:
+		/// Internal controller object
+		std::unique_ptr<GuardDataController<T>> itsController;
+};
 
-			/// Guarded data
-			T *data;
-
-			/// Mutex for protecting data
-			MutexContainer dataLock;
-
-			/// Internal controller object
-			GuardDataController<T> *itsController;
-	};
-
-	template <class T>
-	GuardDataContainer<T>::GuardDataContainer():
-		data(nullptr), itsController(nullptr)
-	{
-		data = new T;
-	}
-
-	template <class T>
-	GuardDataContainer<T>::GuardDataContainer(const T& newData):
-		data(nullptr), itsController(nullptr)
-	{
-		data = new T(newData);
-	}
-
-	template <class T>
-	GuardDataContainer<T>::GuardDataContainer(const GuardDataContainer& gdc):
-		data(nullptr), itsController(nullptr)
-	{
-		data = new T(*gdc.data);
-	}
-
-	template <class T>
-	GuardDataContainer<T>::~GuardDataContainer() {
-		if (itsController)
-			delete itsController;
-		if (data)
-			delete data;
-	}
-
-	template <class T>
-	GuardDataController<T> GuardDataContainer<T>::getController(bool readOnly) {
-
-		return GuardDataController<T>(data, dataLock.getAccess(), readOnly);
-	}
-
-	template <class T>
-	GuardDataController<T>& GuardDataContainer<T>::controll() {
-
-		if (itsController == nullptr)
-			itsController = new GuardDataController<T>(data, dataLock.getAccess(), false);
-
-		return *itsController;
-	}
-
+template <class T>
+GuardDataContainer<T>::GuardDataContainer():
+	data(std::make_shared<T>()), itsController(nullptr) {
 }
 
-#endif /* SRC_ONH_UTILS_GUARDDATACONTAINER_H_ */
+template <class T>
+GuardDataContainer<T>::GuardDataContainer(const T& newData):
+	data(std::make_shared<T>(T(newData))), itsController(nullptr) {
+}
+
+template <class T>
+GuardDataContainer<T>::GuardDataContainer(const GuardDataContainer& gdc):
+	data(std::make_shared<T>(T(*gdc.data))), itsController(nullptr) {
+}
+
+template <class T>
+GuardDataContainer<T>::~GuardDataContainer() {
+}
+
+template <class T>
+GuardDataController<T> GuardDataContainer<T>::getController(bool readOnly) {
+	return GuardDataController<T>(data, dataLock.getAccess(), readOnly);
+}
+
+template <class T>
+GuardDataController<T>& GuardDataContainer<T>::controll() {
+	if (itsController == nullptr)
+		itsController = std::unique_ptr<GuardDataController<T>>(new GuardDataController<T>(data,
+																							dataLock.getAccess(),
+																							false));
+
+	return *itsController;
+}
+
+}  // namespace onh
+
+#endif  // ONH_UTILS_GUARDDATACONTAINER_H_

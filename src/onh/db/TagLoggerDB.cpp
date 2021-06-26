@@ -45,15 +45,13 @@ std::vector<TagLoggerItem> TagLoggerDB::getLoggers(bool enabled) {
 	processDataArea ta;
 	TagLoggerItem tl;
 
-	DBResult *result = 0;
-
 	try {
 		// Prepare query
 		q << "SELECT * FROM log_tags lt, tags t, driver_connections dc WHERE lt.lttid=t.tid AND t.tConnId=dc.dcId ";
 		q << "AND lt.ltEnable=" << ((enabled)?("1"):("0")) << ";";
 
 		// Query
-		result = executeQuery(q.str());
+		auto result = executeQuery(q.str());
 
 		// Read data
 		while (result->nextRow()) {
@@ -90,14 +88,7 @@ std::vector<TagLoggerItem> TagLoggerDB::getLoggers(bool enabled) {
 			// Put into the vector
 			vTagLoggers.push_back(tl);
 		}
-
-		// Release memory
-		delete result;
-		result = 0;
 	} catch (DBException &e) {
-		if (result)
-			delete result;
-
 		throw Exception(e.what(), "TagLoggerDB::getLoggers");
 	}
 

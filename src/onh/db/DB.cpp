@@ -53,7 +53,7 @@ bool DB::checkStringValue(std::string val) {
 	return ret;
 }
 
-DBResult* DB::executeQuery(const std::string &q) {
+DBResultPtr DB::executeQuery(const std::string &q) {
 	if (!conn)
 		throw DBException("Connection not initialized", "DB::executeQuery");
 
@@ -64,7 +64,7 @@ DBResult* DB::executeQuery(const std::string &q) {
 		throw DBException(s.str(), "DB::executeQuery");
 	}
 
-	return new DBResult(conn);
+	return DBResultPtr(new DBResult(conn));
 }
 
 void DB::executeSaveQuery(const std::string &q) {

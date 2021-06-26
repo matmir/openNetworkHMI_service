@@ -56,28 +56,28 @@ class ModbusDriver: public Driver {
 		 *
 		 * @return Driver buffer handle
 		 */
-		DriverBuffer* getBuffer() override;
+		DriverBufferPtr getBuffer() override;
 
 		/**
 		 * Get driver process data reader
 		 *
 		 * @return Driver process data reader handle
 		 */
-		DriverProcessReader* getReader() override;
+		DriverProcessReaderPtr getReader() override;
 
 		/**
 		 * Get driver process data writer
 		 *
 		 * @return Driver process data writer handle
 		 */
-		DriverProcessWriter* getWriter() override;
+		DriverProcessWriterPtr getWriter() override;
 
 		/**
 		 * Get driver process data updater
 		 *
 		 * @return Driver process data updater handle
 		 */
-		DriverProcessUpdater* getUpdater() override;
+		DriverProcessUpdaterPtr getUpdater() override;
 
 	private:
 		/// Process registers count
@@ -87,13 +87,13 @@ class ModbusDriver: public Driver {
 		unsigned int maxByteCount;
 
 		/// Modbus process data
-		GuardDataContainer<ModbusProcessData> *process;
+		std::unique_ptr<GuardDataContainer<ModbusProcessData>> process;
 
 		/// Modbus process data buffer
-		GuardDataContainer<ModbusProcessData> *buff;
+		std::unique_ptr<GuardDataContainer<ModbusProcessData>> buff;
 
 		/// Modbus Master protocol
-		modbusM::ModbusMaster *modbus;
+		modbusM::ModbusMasterPtr modbus;
 
 		/// Mutex for protecting driver
 		MutexContainer driverLock;

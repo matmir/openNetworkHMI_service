@@ -36,19 +36,6 @@ ThreadManager::ThreadManager():
 }
 
 ThreadManager::~ThreadManager() {
-	for (auto& th : thProgramData) {
-		delete th.second.thProgram;
-	}
-
-	if (thSocket)
-		delete thSocket;
-
-	if (threadSocket)
-		delete threadSocket;
-
-	for (auto& thProg : threadProgs) {
-		delete thProg;
-	}
 }
 
 void ThreadManager::initProcessUpdater(const std::vector<ProcessUpdaterData>& pu, unsigned int updateInterval) {
@@ -62,13 +49,12 @@ void ThreadManager::initProcessUpdater(const std::vector<ProcessUpdaterData>& pu
 		// Prepare updater name
 		nm = "Updater_"+std::to_string(pu[i].connId);
 
-		thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
-
-		thProgramData.at(nm).thProgram = new ProcessUpdaterProg(pu[i].procUpdater,
+		auto inserted = thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData())).first;
+		inserted->second.thProgram = std::make_unique<ProcessUpdaterProg>(pu[i].procUpdater,
 															pu[i].connId,
 															updateInterval,
 															tmExit.getController(false),
-															thProgramData.at(nm).cycleContainer.getController(false));
+															inserted->second.cycleContainer.getController(false));
 	}
 
 	updatersInited = true;
@@ -85,13 +71,12 @@ void ThreadManager::initDriverPolling(const std::vector<DriverBufferUpdaterData>
 		// Prepare buffer name
 		nm = "DriverBuffer_"+std::to_string(dbu[i].connId);
 
-		thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
-
-		thProgramData.at(nm).thProgram = new DriverPollingProg(dbu[i].buffUpdater,
+		auto inserted = thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData())).first;
+		inserted->second.thProgram = std::make_unique<DriverPollingProg>(dbu[i].buffUpdater,
 														dbu[i].connId,
 														dbu[i].updateInterval,
 														tmExit.getController(false),
-														thProgramData.at(nm).cycleContainer.getController(false));
+														inserted->second.cycleContainer.getController(false));
 	}
 
 	driverBuffersInited = true;
@@ -106,14 +91,13 @@ void ThreadManager::initAlarmingThread(const ProcessReader& pr,
 	if (thProgramData.count(nm) != 0)
 		throw Exception("Alarming thread already initialized", "ThreadManager::initAlarmingThread");
 
-	thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
-
-	thProgramData.at(nm).thProgram = new AlarmingProg(pr,
+	auto inserted = thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData())).first;
+	inserted->second.thProgram = std::make_unique<AlarmingProg>(pr,
 											pw,
 											adb,
 											updateInterval,
 											tmExit.getController(false),
-											thProgramData.at(nm).cycleContainer.getController(false));
+											inserted->second.cycleContainer.getController(false));
 }
 
 void ThreadManager::initTagLoggerThread(const ProcessReader& pr,
@@ -124,14 +108,13 @@ void ThreadManager::initTagLoggerThread(const ProcessReader& pr,
 	if (thProgramData.count(nm) != 0)
 		throw Exception("Tag logger thread already initialized", "ThreadManager::initTagLoggerThread");
 
-	thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
-
-	thProgramData.at(nm).thProgram = new TagLoggerProg(pr,
+	auto inserted = thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData())).first;
+	inserted->second.thProgram = std::make_unique<TagLoggerProg>(pr,
 											tldb,
 											tagLoggerBuffer.getController(),
 											updateInterval,
 											tmExit.getController(false),
-											thProgramData.at(nm).cycleContainer.getController(false));
+											inserted->second.cycleContainer.getController(false));
 }
 
 void ThreadManager::initTagLoggerWriterThread(const TagLoggerDB& tldb,
@@ -141,13 +124,12 @@ void ThreadManager::initTagLoggerWriterThread(const TagLoggerDB& tldb,
 	if (thProgramData.count(nm) != 0)
 		throw Exception("Tag logger writer thread already initialized", "ThreadManager::initTagLoggerWriterThread");
 
-	thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
-
-	thProgramData.at(nm).thProgram = new TagLoggerWriterProg(tldb,
+	auto inserted = thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData())).first;
+	inserted->second.thProgram = std::make_unique<TagLoggerWriterProg>(tldb,
 																tagLoggerBuffer.getController(true),
 																updateInterval,
 																tmExit.getController(false),
-																thProgramData.at(nm).cycleContainer.getController(false));
+																inserted->second.cycleContainer.getController(false));
 }
 
 void ThreadManager::initScriptThread(const ProcessReader& pr,
@@ -161,16 +143,15 @@ void ThreadManager::initScriptThread(const ProcessReader& pr,
 	if (thProgramData.count(nm) != 0)
 		throw Exception("Script thread already initialized", "ThreadManager::initScriptThread");
 
-	thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData()));
-
-	thProgramData.at(nm).thProgram = new ScriptProg(pr,
+	auto inserted = thProgramData.insert(std::pair<std::string, threadProgramData>(nm, threadProgramData())).first;
+	inserted->second.thProgram = std::make_unique<ScriptProg>(pr,
 													pw,
 													sdb,
 													updateInterval,
 													executeScript,
 													testEnv,
 													tmExit.getController(false),
-													thProgramData.at(nm).cycleContainer.getController(false));
+													inserted->second.cycleContainer.getController(false));
 }
 
 void ThreadManager::initSocketThread(const ProcessReader& pr,
@@ -187,7 +168,7 @@ void ThreadManager::initSocketThread(const ProcessReader& pr,
 		cc.insert(CycleControllerPair(thProg.first, thProg.second.cycleContainer.getController()));
 	}
 
-	thSocket = new SocketProgram(pr,
+	thSocket = std::make_unique<SocketProgram>(pr,
 									pw,
 									dbc,
 									port,
@@ -222,15 +203,15 @@ void ThreadManager::run() {
 
 	// Start threads
 	for (auto& thData : thProgramData) {
-		threadProgs.push_back(new std::thread(std::ref(*thData.second.thProgram)));
+		threadProgs.push_back(std::thread(std::ref(*thData.second.thProgram)));
 	}
 
 	// Run socket thread
-	threadSocket = new std::thread(std::ref(*thSocket));
+	threadSocket = std::make_unique<std::thread>(std::ref(*thSocket));
 
 	// Join threads
 	for (auto& thProg : threadProgs) {
-		thProg->join();
+		thProg.join();
 	}
 
 	// Close socket

@@ -52,9 +52,6 @@ std::vector<AlarmDefinitionItem> AlarmingDB::getAlarms(bool enabled) {
 	bool feedbackTag = false;
 	bool HWAckTag = false;
 
-	DBResult *result = 0;
-	DBResult *result2 = 0;
-
 	// Prepare query
 	q << "SELECT * FROM alarms_definition ad, tags t, driver_connections dc ";
 	q << "WHERE ad.adtid=t.tid AND t.tConnId=dc.dcId ";
@@ -62,7 +59,7 @@ std::vector<AlarmDefinitionItem> AlarmingDB::getAlarms(bool enabled) {
 
 	try {
 		// Query
-		result = executeQuery(q.str());
+		auto result = executeQuery(q.str());
 
 		// Read data
 		while (result->nextRow()) {
@@ -127,7 +124,7 @@ std::vector<AlarmDefinitionItem> AlarmingDB::getAlarms(bool enabled) {
 				q1 += "WHERE t.tConnId=dc.dcId AND t.tid IN ( "+tagIDs.str();
 
 				// Call additional query
-				result2 = executeQuery(q1);
+				auto result2 = executeQuery(q1);
 
 				if (result2->rowsCount() == 2) {
 					result2->nextRow();
@@ -199,10 +196,6 @@ std::vector<AlarmDefinitionItem> AlarmingDB::getAlarms(bool enabled) {
 					else
 						HWAck = tg;
 				}
-
-				// Release memory
-				delete result2;
-				result2 = 0;
 			}
 
 			if (feedbackTag)
@@ -219,15 +212,7 @@ std::vector<AlarmDefinitionItem> AlarmingDB::getAlarms(bool enabled) {
 			feedbackTag = false;
 			HWAckTag = false;
 		}
-
-		// Release memory
-		delete result;
 	} catch (DBException &e) {
-		if (result)
-			delete result;
-		if (result2)
-			delete result2;
-
 		throw Exception(e.what(), "AlarmingDB::getAlarms");
 	}
 

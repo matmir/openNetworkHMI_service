@@ -21,6 +21,7 @@
 
 #include <mysql.h>
 #include <string>
+#include <memory>
 #include "DBException.h"
 
 namespace onh {
@@ -53,7 +54,7 @@ class DBResult {
 		 * @param fName Table field name
 		 * @return DB data as string
 		 */
-		std::string getString(const std::string &fName);
+		std::string getString(const std::string &fName) const;
 
 		/**
 		 * Get integer value from result
@@ -62,7 +63,7 @@ class DBResult {
 		 *
 		 * @return DB data as integer
 		 */
-		int getInt(const std::string &fName);
+		int getInt(const std::string &fName) const;
 
 		/**
 		 * Get unsigned integer value from result
@@ -71,7 +72,7 @@ class DBResult {
 		 *
 		 * @return DB data as unsigned integer
 		 */
-		unsigned int getUInt(const std::string &fName);
+		unsigned int getUInt(const std::string &fName) const;
 
 		/**
 		 * Get unsigned long integer value from result
@@ -80,7 +81,7 @@ class DBResult {
 		 *
 		 * @return DB data as unsigned long integer
 		 */
-		unsigned long int getUInt64(const std::string &fName);
+		unsigned long int getUInt64(const std::string &fName) const;
 
 		/**
 		 * Get real value from result
@@ -89,7 +90,7 @@ class DBResult {
 		 *
 		 * @return DB data as real
 		 */
-		float getReal(const std::string &fName);
+		float getReal(const std::string &fName) const;
 
 		/**
 		 * Check if field value in row is null
@@ -98,7 +99,7 @@ class DBResult {
 		 *
 		 * @return True if data is NULL
 		 */
-		bool isNull(const std::string &fName);
+		bool isNull(const std::string &fName) const;
 
 		/**
 		 * Get next row data
@@ -112,7 +113,7 @@ class DBResult {
 		 *
 		 * @return Rows count
 		 */
-		unsigned long int rowsCount();
+		unsigned long int rowsCount() const;
 
 	private:
 		/**
@@ -129,7 +130,7 @@ class DBResult {
 		 *
 		 * @return Field position
 		 */
-		unsigned int getFieldPos(const std::string &fName);
+		unsigned int getFieldPos(const std::string &fName) const;
 
 		/// MySQL connection handle
 		MYSQL *conn;
@@ -143,6 +144,8 @@ class DBResult {
 		/// Result fields count
 		unsigned int fieldsCount;
 };
+
+using DBResultPtr = std::unique_ptr<DBResult>;
 
 }  // namespace onh
 

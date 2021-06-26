@@ -64,7 +64,7 @@ class DriverPollingProg: public ThreadProgram {
 
 	private:
 		/// Driver buffer updater
-		DriverBufferUpdater *drvUpdater;
+		std::unique_ptr<DriverBufferUpdater> drvUpdater;
 };
 
 }  // namespace onh

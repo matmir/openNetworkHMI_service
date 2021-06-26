@@ -122,7 +122,7 @@ class ModbusProcessWriter: public DriverProcessWriter {
 		 *
 		 * @return Pointer to the new driver process writer
 		 */
-		DriverProcessWriter* createNew() override;
+		DriverProcessWriterPtr createNew() override;
 
 	private:
 		/**
@@ -132,10 +132,10 @@ class ModbusProcessWriter: public DriverProcessWriter {
 		 * @param lock Mutex for protecting driver
 		 * @param maxBytes Maximum Byte address
 		 */
-		ModbusProcessWriter(modbusM::ModbusMaster *mbus, const MutexAccess& lock, unsigned int maxBytes);
+		ModbusProcessWriter(modbusM::ModbusMasterPtr mbus, const MutexAccess& lock, unsigned int maxBytes);
 
 		/// Modbus Master protocol handle
-		modbusM::ModbusMaster *modbus;
+		modbusM::ModbusMasterPtr modbus;
 
 		/// Mutex for protecting driver
 		MutexAccess driverLock;

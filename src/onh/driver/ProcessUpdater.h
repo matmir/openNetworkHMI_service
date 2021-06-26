@@ -58,10 +58,10 @@ class ProcessUpdater {
 		 *
 		 * @param dpu Pointer to the driver process data updater
 		 */
-		explicit ProcessUpdater(DriverProcessUpdater *dpu);
+		explicit ProcessUpdater(DriverProcessUpdaterPtr dpu);
 
 		/// Driver process data updater
-		DriverProcessUpdater *driverUpdater;
+		DriverProcessUpdaterPtr driverUpdater;
 };
 
 }  // namespace onh

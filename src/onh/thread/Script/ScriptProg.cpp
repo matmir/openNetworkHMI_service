@@ -35,16 +35,13 @@ ScriptProg::ScriptProg(const ProcessReader& pr,
 						bool tstEnv,
 						const GuardDataController<ThreadExitData> &gdcTED,
 						const GuardDataController<CycleTimeData> &gdcCTD):
-	ThreadProgram(gdcTED, gdcCTD, updateInterval, "script", "scriptLog_"), executeScript(execScript), testEnv(tstEnv) {
-	// Process reader
-	prReader = new ProcessReader(pr);
-
-	// Process writer
-	prWriter = new ProcessWriter(pw);
-
-	// Script DB access
-	db = new ScriptDB(sdb);
-
+	ThreadProgram(gdcTED, gdcCTD, updateInterval, "script", "scriptLog_"),
+	prReader(std::make_unique<ProcessReader>(pr)),
+	prWriter(std::make_unique<ProcessWriter>(pw)),
+	db(std::make_unique<ScriptDB>(sdb)),
+	executeScript(execScript),
+	testEnv(tstEnv) {
+	// Dir flag
 	dirReady = false;
 
 	// Create script redirected output directory log
@@ -58,13 +55,6 @@ ScriptProg::ScriptProg(const ProcessReader& pr,
 }
 
 ScriptProg::~ScriptProg() {
-	if (prReader)
-		delete prReader;
-	if (prWriter)
-		delete prWriter;
-	if (db)
-		delete db;
-
 	getLogger().write("Script system close");
 }
 

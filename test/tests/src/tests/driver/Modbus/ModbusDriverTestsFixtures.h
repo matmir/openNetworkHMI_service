@@ -50,19 +50,6 @@ class modbusDriverTests: public ::testing::Test {
 		}
 
 		static void TearDownTestSuite() {
-
-			if (mbReader)
-				delete mbReader;
-
-			if (mbWriter)
-				delete mbWriter;
-
-			if (mbUpdater)
-				delete mbUpdater;
-
-			if (mbUpd)
-				delete mbUpd;
-
 			if (mbDriver)
 				delete mbDriver;
 		}
@@ -135,22 +122,22 @@ class modbusDriverTests: public ::testing::Test {
 		static onh::ModbusDriver *mbDriver;
 
 		// Modbus buffer updater
-		static onh::DriverBuffer *mbUpd;
+		static onh::DriverBufferPtr mbUpd;
 
 		// driver process reader
-		static onh::DriverProcessReader *mbReader;
+		static onh::DriverProcessReaderPtr mbReader;
 		// driver process writer
-		static onh::DriverProcessWriter *mbWriter;
+		static onh::DriverProcessWriterPtr mbWriter;
 		// driver process updater
-		static onh::DriverProcessUpdater *mbUpdater;
+		static onh::DriverProcessUpdaterPtr mbUpdater;
 
 		static const unsigned int maxBytes = MODBUS_REGS*2;
 };
 
 onh::ModbusDriver* modbusDriverTests::mbDriver = nullptr;
-onh::DriverBuffer* modbusDriverTests::mbUpd = nullptr;
-onh::DriverProcessReader* modbusDriverTests::mbReader = nullptr;
-onh::DriverProcessWriter* modbusDriverTests::mbWriter = nullptr;
-onh::DriverProcessUpdater* modbusDriverTests::mbUpdater = nullptr;
+onh::DriverBufferPtr modbusDriverTests::mbUpd = nullptr;
+onh::DriverProcessReaderPtr modbusDriverTests::mbReader = nullptr;
+onh::DriverProcessWriterPtr modbusDriverTests::mbWriter = nullptr;
+onh::DriverProcessUpdaterPtr modbusDriverTests::mbUpdater = nullptr;
 
 #endif /* TESTS_DRIVER_MODBUS_MODBUSDRIVERTESTSFIXTURES_H_ */

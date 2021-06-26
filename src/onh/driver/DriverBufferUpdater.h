@@ -58,10 +58,10 @@ class DriverBufferUpdater {
 		 *
 		 * @param dbh Driver buffer handle
 		 */
-		explicit DriverBufferUpdater(DriverBuffer *dbh);
+		explicit DriverBufferUpdater(DriverBufferPtr dbh);
 
 		/// Driver buffer handle
-		DriverBuffer *drvBuffer;
+		DriverBufferPtr drvBuffer;
 };
 
 }  // namespace onh

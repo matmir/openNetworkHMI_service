@@ -26,34 +26,16 @@
 namespace onh {
 
 Application::Application(bool test):
+	log(std::make_unique<Logger>("mainProg", "main_")),
 	drvManager(nullptr),
 	thManager(nullptr),
 	dbManager(nullptr),
 	cfg(nullptr),
 	testEnv(test) {
-	// Create logger
-	log = new Logger("mainProg", "main_");
 }
 
 Application::~Application() {
-	if (drvManager) {
-		delete drvManager;
-	}
-	if (thManager) {
-		delete thManager;
-	}
-	if (cfg) {
-		delete cfg;
-	}
-	if (dbManager) {
-		delete dbManager;
-	}
-
 	log->write("Bye");
-
-	if (log) {
-		delete log;
-	}
 }
 
 int Application::start() {
@@ -118,17 +100,25 @@ void Application::initDB() {
 	}
 
 	// DB access prepare
-	dbManager = new DBManager(dbConf[0], dbConf[1], dbConf[2], dbConf[3]);
+	dbManager = std::make_unique<DBManager>(dbConf[0], dbConf[1], dbConf[2], dbConf[3]);
 
-	cfg = new Config(dbManager->getConfigDB());
+	cfg = std::make_unique<Config>(dbManager->getConfigDB());
 
 	// Clear restart flag
 	cfg->setValue("serverRestart", 0);
 }
 
 void Application::initDriver() {
+	if (!dbManager)
+		throw Exception("Database manager not initialized",
+						"Application::initDriver");
+
+	if (!cfg)
+		throw Exception("Configuration not initialized",
+						"Application::initDriver");
+
 	// Init driver manager
-	drvManager = new DriverManager(cfg->getDriverConnections());
+	drvManager = std::make_unique<DriverManager>(cfg->getDriverConnections());
 }
 
 void Application::initThreadManager() {
@@ -146,7 +136,7 @@ void Application::initThreadManager() {
 						"Application::initThreadManager");
 
 	// Initialize thread manager
-	thManager = new ThreadManager();
+	thManager = std::make_unique<ThreadManager>();
 
 	// Init process updater threads
 	thManager->initProcessUpdater(drvManager->getProcessUpdaters(),

@@ -67,7 +67,7 @@ class DB {
 		 *
 		 * @return Handle for DBResult object
 		 */
-		DBResult* executeQuery(const std::string &q);
+		DBResultPtr executeQuery(const std::string &q);
 
 		/**
 		 * Execute save query to the DB

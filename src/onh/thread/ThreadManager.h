@@ -23,6 +23,7 @@
 #include <thread>
 #include <vector>
 #include <map>
+#include <memory>
 #include "ThreadProgram.h"
 #include "ThreadSocket.h"
 #include "../utils/GuardDataContainer.h"
@@ -172,14 +173,14 @@ class ThreadManager {
 		/**
 		 * Thread program data structure
 		 */
-		typedef struct threadProgramData {
+		struct threadProgramData {
 			/// Cycle time container
 			GuardDataContainer<CycleTimeData> cycleContainer;
 			/// Thread program
-			ThreadProgram *thProgram;
+			std::unique_ptr<ThreadProgram> thProgram;
 
 			threadProgramData(): thProgram(nullptr) {}
-		} threadProgramData;
+		};
 
 		/// Thread exit
 		GuardDataContainer<ThreadExitData> tmExit;
@@ -194,13 +195,13 @@ class ThreadManager {
 		TagLoggerBufferContainer tagLoggerBuffer;
 
 		/// Thread data for Socket
-		ThreadSocket *thSocket;
+		std::unique_ptr<ThreadSocket> thSocket;
 
 		/// Socket thread
-		std::thread *threadSocket;
+		std::unique_ptr<std::thread> threadSocket;
 
 		/// Program threads
-		std::vector<std::thread*> threadProgs;
+		std::vector<std::thread> threadProgs;
 
 		/// Process updater init flag
 		bool updatersInited;

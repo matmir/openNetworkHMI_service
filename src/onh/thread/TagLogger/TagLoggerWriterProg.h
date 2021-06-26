@@ -67,10 +67,10 @@ class TagLoggerWriterProg: public ThreadProgram {
 
 	private:
 		/// Tag Logger DB access
-		TagLoggerDB *db;
+		std::unique_ptr<TagLoggerDB> db;
 
 		/// Tag logger buffer controller
-		TagLoggerBufferController *tagLoggerBuffer;
+		std::unique_ptr<TagLoggerBufferController> tagLoggerBuffer;
 
 		/**
 		 * Get information that tag logger writer should stop working

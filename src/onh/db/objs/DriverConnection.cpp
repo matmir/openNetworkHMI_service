@@ -28,14 +28,12 @@ DriverConnection::DriverConnection():
 
 DriverConnection::DriverConnection(const DriverConnection& dc):
 	dcId(dc.dcId), dcName(dc.dcName), dcType(dc.dcType), modbus(nullptr), shm(dc.shm), dcEnable(dc.dcEnable) {
-	if (dc.modbus) {
+	if (dc.modbus != nullptr) {
 		setModbusCfg(*dc.modbus);
 	}
 }
 
 DriverConnection::~DriverConnection() {
-	if (modbus)
-		delete modbus;
 }
 
 DriverConnection& DriverConnection::operator=(const DriverConnection& dc) {
@@ -48,10 +46,7 @@ DriverConnection& DriverConnection::operator=(const DriverConnection& dc) {
 	shm = dc.shm;
 	dcEnable = dc.dcEnable;
 
-	if (modbus) {
-		delete modbus;
-		modbus = nullptr;
-	}
+	modbus.reset();
 
 	if (dc.modbus) {
 		setModbusCfg(*dc.modbus);
@@ -139,7 +134,7 @@ void DriverConnection::setModbusCfg(const modbusM::ModbusCfg& cfg) {
 			throw Exception("Driver connection wrong driver type", "DriverConnection::setModbusCfg");
 
 	if (modbus == nullptr)
-		modbus = new modbusM::ModbusCfg();
+		modbus = std::make_unique<modbusM::ModbusCfg>();
 
 	*modbus = cfg;
 }

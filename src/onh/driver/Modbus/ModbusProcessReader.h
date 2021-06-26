@@ -120,7 +120,7 @@ class ModbusProcessReader: public DriverProcessReader {
 		 *
 		 * @return Pointer to the new driver process reader
 		 */
-		DriverProcessReader* createNew() override;
+		DriverProcessReaderPtr createNew() override;
 
 	private:
 		/**

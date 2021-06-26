@@ -19,6 +19,8 @@
 #ifndef ONH_DRIVER_DRIVERPROCESSUPDATER_H_
 #define ONH_DRIVER_DRIVERPROCESSUPDATER_H_
 
+#include <memory>
+
 namespace onh {
 
 /**
@@ -40,8 +42,10 @@ class DriverProcessUpdater {
 		 *
 		 * @return Pointer to the new driver process updater
 		 */
-		virtual DriverProcessUpdater* createNew() = 0;
+		virtual std::unique_ptr<DriverProcessUpdater> createNew() = 0;
 };
+
+using DriverProcessUpdaterPtr = std::unique_ptr<DriverProcessUpdater>;
 
 }  // namespace onh
 

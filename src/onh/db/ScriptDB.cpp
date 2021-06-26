@@ -50,16 +50,13 @@ std::vector<ScriptItem> ScriptDB::getScripts(bool enabled) {
 	ScriptItem sc;
 	ScriptItem sc_clear;
 
-	DBResult *result = 0;
-	DBResult *result2 = 0;
-
 	// Prepare query
 	q << "SELECT * FROM scripts sc, tags t, driver_connections dc WHERE sc.scTagId=t.tid AND t.tConnId=dc.dcId ";
 	q << "AND sc.scEnable=" << ((enabled)?("1"):("0")) << ";";
 
 	try {
 		// Query
-		result = executeQuery(q.str());
+		auto result = executeQuery(q.str());
 
 		// Read data
 		while (result->nextRow()) {
@@ -93,7 +90,7 @@ std::vector<ScriptItem> ScriptDB::getScripts(bool enabled) {
 				q1 = "SELECT * FROM tags t, driver_connections dc WHERE t.tConnId=dc.dcId AND tid="+tagID.str();
 
 				// Call additional query
-				result2 = executeQuery(q1);
+				auto result2 = executeQuery(q1);
 
 				if (result2->rowsCount() == 1) {
 					result2->nextRow();
@@ -116,10 +113,6 @@ std::vector<ScriptItem> ScriptDB::getScripts(bool enabled) {
 					// Set feedback tag
 					sc.setFeedbackRunTag(tg);
 				}
-
-				// Release memory
-				delete result2;
-				result2 = 0;
 			}
 
 			sc.setEnable(((result->getInt("scEnable") == 1)?(true):(false)));
@@ -127,16 +120,7 @@ std::vector<ScriptItem> ScriptDB::getScripts(bool enabled) {
 			// Put into the vector
 			vScripts.push_back(sc);
 		}
-
-		// Release memory
-		delete result;
-		result = 0;
 	} catch (DBException &e) {
-		if (result)
-			delete result;
-		if (result2)
-			delete result2;
-
 		throw Exception(e.what(), "ScriptDB::getScripts");
 	}
 

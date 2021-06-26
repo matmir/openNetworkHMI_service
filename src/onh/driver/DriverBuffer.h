@@ -19,6 +19,8 @@
 #ifndef ONH_DRIVER_DRIVERBUFFER_H_
 #define ONH_DRIVER_DRIVERBUFFER_H_
 
+#include <memory>
+
 namespace onh {
 
 /**
@@ -34,6 +36,8 @@ class DriverBuffer {
 		 */
 		virtual void updateBuffer() = 0;
 };
+
+using DriverBufferPtr = std::shared_ptr<DriverBuffer>;
 
 }  // namespace onh
 

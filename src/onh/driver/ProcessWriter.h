@@ -132,10 +132,10 @@ class ProcessWriter {
 		 * @param id Driver process writer identifier
 		 * @param dpw Driver process writer
 		 */
-		void addWriter(unsigned int id, DriverProcessWriter *dpw);
+		void addWriter(unsigned int id, DriverProcessWriterPtr dpw);
 
 		/// Driver process data writer
-		std::map<unsigned int, DriverProcessWriter*> driverWriter;
+		std::map<unsigned int, DriverProcessWriterPtr> driverWriter;
 };
 
 }  // namespace onh

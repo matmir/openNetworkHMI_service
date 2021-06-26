@@ -19,6 +19,7 @@
 #ifndef ONH_THREAD_THREADPROGRAM_H_
 #define ONH_THREAD_THREADPROGRAM_H_
 
+#include <memory>
 #include "ThreadExitData.h"
 #include "../utils/GuardDataController.h"
 #include "../utils/Logger.h"
@@ -81,7 +82,7 @@ class ThreadProgram {
 		GuardDataController<CycleTimeData> thCycleTimeController;
 
 		/// Logger object
-		Logger* log;
+		std::unique_ptr<Logger> log;
 
 	protected:
 		/**

@@ -66,8 +66,8 @@ void ShmProcessUpdater::updateProcessData() {
 	}
 }
 
-DriverProcessUpdater* ShmProcessUpdater::createNew() {
-	return new ShmProcessUpdater(shmName, shm, process, driverLock);
+DriverProcessUpdaterPtr ShmProcessUpdater::createNew() {
+	return DriverProcessUpdaterPtr(new ShmProcessUpdater(shmName, shm, process, driverLock));
 }
 
 }  // namespace onh

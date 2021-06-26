@@ -26,7 +26,7 @@ ProcessReader::ProcessReader(const ProcessReader &pr) {
 	driverReader.clear();
 
 	for (auto& it : pr.driverReader) {
-		driverReader.insert(std::pair<unsigned int, DriverProcessReader*>(it.first, it.second->createNew()));
+		driverReader.insert(std::pair<unsigned int, DriverProcessReaderPtr>(it.first, it.second->createNew()));
 	}
 }
 
@@ -35,12 +35,9 @@ ProcessReader::ProcessReader() {
 }
 
 ProcessReader::~ProcessReader() {
-	for (auto& reader : driverReader) {
-		delete reader.second;
-	}
 }
 
-void ProcessReader::addReader(unsigned int id, DriverProcessReader *dpr) {
+void ProcessReader::addReader(unsigned int id, DriverProcessReaderPtr dpr) {
 	// Check identifier
 	if (id == 0) {
 		throw Exception("Wrong driver process reader identifier",
@@ -54,7 +51,7 @@ void ProcessReader::addReader(unsigned int id, DriverProcessReader *dpr) {
 	}
 
 	// Add reader
-	driverReader.insert(std::pair<unsigned int, DriverProcessReader*>(id, dpr));
+	driverReader.insert(std::pair<unsigned int, DriverProcessReaderPtr>(id, std::move(dpr)));
 }
 
 bool ProcessReader::getBitValue(const Tag& tg) {

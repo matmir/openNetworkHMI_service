@@ -498,8 +498,8 @@ void ShmProcessWriter::writeReal(processDataAddress addr, float val) {
 	}
 }
 
-DriverProcessWriter* ShmProcessWriter::createNew() {
-	return new ShmProcessWriter(shmName, shm, driverLock);
+DriverProcessWriterPtr ShmProcessWriter::createNew() {
+	return DriverProcessWriterPtr(new ShmProcessWriter(shmName, shm, driverLock));
 }
 
 void ShmProcessWriter::sendServerExitCommand() {

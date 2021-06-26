@@ -60,7 +60,7 @@ DBResult::~DBResult() {
 	mysql_free_result(result);
 }
 
-unsigned int DBResult::getFieldPos(const std::string &fName) {
+unsigned int DBResult::getFieldPos(const std::string &fName) const {
 	unsigned int pos = 0;
 	bool ok = false;
 
@@ -94,7 +94,7 @@ bool DBResult::nextRow() {
 	return (row == NULL)?(false):(true);
 }
 
-std::string DBResult::getString(const std::string &fName) {
+std::string DBResult::getString(const std::string &fName) const {
 	if (!row) {
 		throw DBException("No data in row structure", "DBResult::getString");
 	}
@@ -102,7 +102,7 @@ std::string DBResult::getString(const std::string &fName) {
 	return row[getFieldPos(fName)];
 }
 
-int DBResult::getInt(const std::string &fName) {
+int DBResult::getInt(const std::string &fName) const {
 	if (!row) {
 		throw DBException("No data in row structure", "DBResult::getInt");
 	}
@@ -114,7 +114,7 @@ int DBResult::getInt(const std::string &fName) {
 	return val;
 }
 
-unsigned int DBResult::getUInt(const std::string &fName) {
+unsigned int DBResult::getUInt(const std::string &fName) const {
 	if (!row) {
 		throw DBException("No data in row structure", "DBResult::getUInt");
 	}
@@ -126,7 +126,7 @@ unsigned int DBResult::getUInt(const std::string &fName) {
 	return val;
 }
 
-unsigned long int DBResult::getUInt64(const std::string &fName) {
+unsigned long int DBResult::getUInt64(const std::string &fName) const {
 	if (!row) {
 		throw DBException("No data in row structure", "DBResult::getUInt64");
 	}
@@ -138,7 +138,7 @@ unsigned long int DBResult::getUInt64(const std::string &fName) {
 	return val;
 }
 
-float DBResult::getReal(const std::string &fName) {
+float DBResult::getReal(const std::string &fName) const {
 	if (!row) {
 		throw DBException("No data in row structure", "DBResult::getReal");
 	}
@@ -150,11 +150,11 @@ float DBResult::getReal(const std::string &fName) {
 	return val;
 }
 
-bool DBResult::isNull(const std::string &fName) {
+bool DBResult::isNull(const std::string &fName) const {
 	return (row[getFieldPos(fName)] == NULL)?(true):(false);
 }
 
-unsigned long int DBResult::rowsCount() {
+unsigned long int DBResult::rowsCount() const {
 	return mysql_num_rows(result);
 }
 

@@ -37,15 +37,13 @@ DriverManager::DriverManager(const std::vector<DriverConnection>& dcv) {
 		// SHM driver
 		if (driverConn.getType() == DriverType::DT_SHM) {
 			// Create SHM driver
-			driver.insert(std::pair<unsigned int, Driver*>(driverConn.getId(),
-							new ShmDriver(driverConn.getShmCfg(),
-							driverConn.getId())));
+			driver.insert(std::pair<unsigned int, DriverPtr>(driverConn.getId(),
+							DriverPtr(new ShmDriver(driverConn.getShmCfg(), driverConn.getId()))));
 
 		} else if (driverConn.getType() == DriverType::DT_Modbus) {
 			// Create Modbus driver
-			Driver* drv = new ModbusDriver(driverConn.getModbusCfg(),
-											driverConn.getId());
-			driver.insert(std::pair<unsigned int, Driver*>(driverConn.getId(), drv));
+			DriverPtr drv(new ModbusDriver(driverConn.getModbusCfg(), driverConn.getId()));
+			driver.insert(std::pair<unsigned int, DriverPtr>(driverConn.getId(), drv));
 
 			// Create Modbus driver buffer
 			DriverBufferData dbd;
@@ -58,13 +56,6 @@ DriverManager::DriverManager(const std::vector<DriverConnection>& dcv) {
 }
 
 DriverManager::~DriverManager() {
-	for (auto& drv : driver) {
-		delete drv.second;
-	}
-
-	for (unsigned int i=0; i < driverBuffer.size(); ++i) {
-		delete driverBuffer[i].buff;
-	}
 }
 
 std::vector<ProcessUpdaterData> DriverManager::getProcessUpdaters() {

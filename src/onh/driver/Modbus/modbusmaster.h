@@ -22,6 +22,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <modbus.h>
+#include <memory>
 
 #include "modbusmasterCfg.h"
 #include "modbusexception.h"
@@ -107,6 +108,8 @@ class ModbusMaster {
 		/// Modbus configuration structure
 		ModbusCfg config;
 };
+
+using ModbusMasterPtr = std::shared_ptr<modbusM::ModbusMaster>;
 
 }  // namespace modbusM
 

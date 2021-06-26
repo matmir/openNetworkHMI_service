@@ -20,6 +20,7 @@
 #define ONH_DB_OBJS_DRIVERCONNECTION_H_
 
 #include <string>
+#include <memory>
 #include "../../driver/Modbus/modbusmasterCfg.h"
 
 namespace onh {
@@ -158,7 +159,7 @@ class DriverConnection {
 		DriverType dcType;
 
 		/// Modbus configuration
-		modbusM::ModbusCfg *modbus;
+		std::unique_ptr<modbusM::ModbusCfg> modbus;
 
 		/// SHM configuration (segment name)
 		std::string shm;

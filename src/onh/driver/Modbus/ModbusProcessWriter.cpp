@@ -24,7 +24,7 @@
 
 namespace onh {
 
-ModbusProcessWriter::ModbusProcessWriter(modbusM::ModbusMaster *mbus, const MutexAccess& lock, unsigned int maxBytes):
+ModbusProcessWriter::ModbusProcessWriter(modbusM::ModbusMasterPtr mbus, const MutexAccess& lock, unsigned int maxBytes):
 	modbus(mbus), driverLock(lock), maxByteCount(maxBytes) {
 }
 
@@ -485,8 +485,8 @@ void ModbusProcessWriter::writeReal(processDataAddress addr, float val) {
 	}
 }
 
-DriverProcessWriter* ModbusProcessWriter::createNew() {
-	return new ModbusProcessWriter(modbus, driverLock, maxByteCount);
+DriverProcessWriterPtr ModbusProcessWriter::createNew() {
+	return DriverProcessWriterPtr(new ModbusProcessWriter(modbus, driverLock, maxByteCount));
 }
 
 }   // namespace onh

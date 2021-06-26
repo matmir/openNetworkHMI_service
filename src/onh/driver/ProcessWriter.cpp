@@ -27,7 +27,7 @@ ProcessWriter::ProcessWriter(const ProcessWriter &pw) {
 	driverWriter.clear();
 
 	for (auto& it : pw.driverWriter) {
-		driverWriter.insert(std::pair<unsigned int, DriverProcessWriter*>(it.first, it.second->createNew()));
+		driverWriter.insert(std::pair<unsigned int, DriverProcessWriterPtr>(it.first, it.second->createNew()));
 	}
 }
 
@@ -36,12 +36,9 @@ ProcessWriter::ProcessWriter() {
 }
 
 ProcessWriter::~ProcessWriter() {
-	for (auto& writer : driverWriter) {
-		delete writer.second;
-	}
 }
 
-void ProcessWriter::addWriter(unsigned int id, DriverProcessWriter *dpw) {
+void ProcessWriter::addWriter(unsigned int id, DriverProcessWriterPtr dpw) {
 	// Check identifier
 	if (id == 0) {
 		throw Exception("Wrong driver process writer identifier",
@@ -55,7 +52,7 @@ void ProcessWriter::addWriter(unsigned int id, DriverProcessWriter *dpw) {
 	}
 
 	// Add reader
-	driverWriter.insert(std::pair<unsigned int, DriverProcessWriter*>(id, dpw));
+	driverWriter.insert(std::pair<unsigned int, DriverProcessWriterPtr>(id, std::move(dpw)));
 }
 
 void ProcessWriter::setBit(const Tag& tg) {
