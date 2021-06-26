@@ -26,14 +26,10 @@ ThreadProgram::ThreadProgram(const GuardDataController<ThreadExitData> &gdcTED,
 								unsigned int updateInterval,
 								const std::string& dirName,
 								const std::string& fPrefix):
-	thDelay(updateInterval), thExitController(gdcTED), thCycleTimeController(gdcCTD),
-	log(std::make_unique<Logger>(dirName, fPrefix)) {
-	// Create info
-	log->write("Initialize thread logger");
+	BaseThreadProgram(gdcTED, dirName, fPrefix), thDelay(updateInterval), thCycleTimeController(gdcCTD) {
 }
 
 ThreadProgram::~ThreadProgram() {
-	log->write("Closing thread logger");
 }
 
 void ThreadProgram::startCycleMeasure() {
@@ -45,26 +41,6 @@ void ThreadProgram::stopCycleMeasure() {
 
 	// Pass counted value to the cycle time controller
 	thCycleTimeController.setData(thCycle.getCycle());
-}
-
-bool ThreadProgram::isExitFlag() {
-	ThreadExitData ex;
-	thExitController.getData(ex);
-
-	return ex.exit;
-}
-
-void ThreadProgram::exit(const std::string& info) {
-	ThreadExitData ex;
-	ex.exit = true;
-	ex.additionalInfo = info;
-
-	// Trigger application exit
-	thExitController.setData(ex);
-}
-
-Logger& ThreadProgram::getLogger() {
-	return *log;
 }
 
 void ThreadProgram::threadWait() {

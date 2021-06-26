@@ -19,8 +19,7 @@
 #ifndef ONH_THREAD_THREADSOCKET_H_
 #define ONH_THREAD_THREADSOCKET_H_
 
-#include <memory>
-#include "ThreadExitData.h"
+#include "BaseThreadProgram.h"
 #include "../utils/GuardDataController.h"
 #include "../utils/Logger.h"
 
@@ -29,7 +28,7 @@ namespace onh {
 /**
  * Thread socket base class
  */
-class ThreadSocket {
+class ThreadSocket: public BaseThreadProgram {
 	public:
 		/**
 		 * Constructor
@@ -55,60 +54,21 @@ class ThreadSocket {
 		virtual ~ThreadSocket();
 
 		/**
-		 * Thread program function
-		 */
-		virtual void operator()() = 0;
-
-		/**
 		 * Assignment operator - inactive
 		 */
 		ThreadSocket& operator=(const ThreadSocket&) = delete;
 
 	private:
-		/// Thread exit data controller
-		GuardDataController<ThreadExitData> thExitController;
-
 		/// Socket file descriptor controller
 		GuardDataController<int> thSockDecsController;
 
-		/// Logger object
-		std::unique_ptr<Logger> log;
-
 	protected:
-		/**
-		 * Get Exit controller
-		 *
-		 * @return Exit data controller
-		 */
-		const GuardDataController<ThreadExitData>& getExitController();
-
-		/**
-		 * Check if thread need to be closed
-		 *
-		 * @return True if thread need to be closed
-		 */
-		bool isExitFlag();
-
-		/**
-		 * Trigger exit from thread
-		 *
-		 * @param info Additional info about exit
-		 */
-		void exit(const std::string& info);
-
 		/**
 		 * Set Socket file descriptor
 		 *
 		 * @param sockFD Socket file descriptor
 		 */
 		void setSocketFD(int sockFD);
-
-		/**
-		 * Get logger instance
-		 *
-		 * @return Logger instance
-		 */
-		Logger& getLogger();
 };
 
 }  // namespace onh

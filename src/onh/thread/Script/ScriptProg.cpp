@@ -52,10 +52,12 @@ ScriptProg::ScriptProg(const ProcessReader& pr,
 	} else {
 		dirReady = true;
 	}
+
+	getLogger().write("Script system initialized");
 }
 
 ScriptProg::~ScriptProg() {
-	getLogger().write("Script system close");
+	getLogger().write("Script system closed");
 }
 
 void ScriptProg::operator()() {

@@ -36,10 +36,11 @@ TagLoggerProg::TagLoggerProg(const ProcessReader& pr,
 	prReader(std::make_unique<ProcessReader>(pr)),
 	db(std::make_unique<TagLoggerDB>(tldb)),
 	tagLoggerBuffer(std::make_unique<TagLoggerBufferController>(tlbc)) {
+	getLogger().write("Tag logger program initialized");
 }
 
 TagLoggerProg::~TagLoggerProg() {
-	getLogger().write("Tag logger close");
+	getLogger().write("Tag logger program closed");
 }
 
 void TagLoggerProg::operator()() {

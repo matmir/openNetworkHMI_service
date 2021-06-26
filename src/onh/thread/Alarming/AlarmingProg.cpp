@@ -33,10 +33,11 @@ AlarmingProg::AlarmingProg(const ProcessReader& pr,
 	prReader(std::make_unique<ProcessReader>(pr)),
 	prWriter(std::make_unique<ProcessWriter>(pw)),
 	db(std::make_unique<AlarmingDB>(adb)) {
+	getLogger().write("Alarming program initialized");
 }
 
 AlarmingProg::~AlarmingProg() {
-	getLogger().write("Alarming close");
+	getLogger().write("Alarming program closed");
 }
 
 void AlarmingProg::operator()() {

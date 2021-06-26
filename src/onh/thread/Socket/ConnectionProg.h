@@ -22,7 +22,7 @@
 #include "../../driver/ProcessReader.h"
 #include "../../driver/ProcessWriter.h"
 #include "../../thread/ThreadCycleControllers.h"
-#include "../ThreadExitData.h"
+#include "../BaseThreadProgram.h"
 #include "../../utils/GuardDataController.h"
 #include "../../db/DBCredentials.h"
 #include "../../utils/Logger.h"
@@ -33,7 +33,7 @@ namespace onh {
 /**
  * Socket connection class
  */
-class ConnectionProgram {
+class ConnectionProgram: public BaseThreadProgram {
 	public:
 		/**
 		 * Constructor
@@ -67,7 +67,7 @@ class ConnectionProgram {
 		/**
 		 * Thread program function
 		 */
-		void operator()();
+		void operator()() override;
 
 		/**
 		 * Assignment operator - inactive
@@ -87,14 +87,8 @@ class ConnectionProgram {
 		/// DB credentials
 		DBCredentials dbCredentials;
 
-		/// Thread Exit data controller
-		GuardDataController<ThreadExitData> thExit;
-
 		/// Cycle controllers
 		ThreadCycleControllers cycleController;
-
-		/// Logger object
-		std::unique_ptr<Logger> log;
 
 		/// Command parser
 		std::unique_ptr<CommandParser> parser;

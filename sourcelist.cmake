@@ -158,4 +158,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 	"src/onh/thread/TagLogger/TagLoggerBufferContainer.cpp"
 	"src/onh/thread/TagLogger/TagLoggerBufferController.h"
 	"src/onh/thread/ThreadProgram.h"
+	"src/onh/thread/BaseThreadProgram.h"
+	"src/onh/thread/BaseThreadProgram.cpp"
 )

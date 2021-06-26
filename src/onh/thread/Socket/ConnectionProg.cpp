@@ -30,36 +30,28 @@ ConnectionProgram::ConnectionProgram(int connDescriptor,
 										const ThreadCycleControllers& cc,
 										const DBCredentials& db,
 										const GuardDataController<ThreadExitData> &gdcTED):
+	BaseThreadProgram(gdcTED, "parser", std::string("connection_th_" + std::to_string(connDescriptor) + "_"), false),
 	connDesc(connDescriptor),
 	pReader(std::make_unique<ProcessReader>(pr)),
 	pWriter(std::make_unique<ProcessWriter>(pw)),
 	dbCredentials(db),
-	thExit(gdcTED),
 	cycleController(cc),
-	parser(std::make_unique<CommandParser>(pr, pw, db, cc, thExit, connDescriptor)) {
-	// Create logger
-	std::stringstream s;
-	s << "connection_th_" << connDescriptor << "_";
-	log = std::make_unique<Logger>("parser", s.str());
+	parser(std::make_unique<CommandParser>(pr, pw, db, cc, getExitController(), connDescriptor)) {
 }
 
 ConnectionProgram::ConnectionProgram(const ConnectionProgram& rhs):
+	BaseThreadProgram(rhs.getExitController(), "parser", "connection_th_" + std::to_string(rhs.connDesc) + "_", false),
 	connDesc(rhs.connDesc),
 	pReader(std::make_unique<ProcessReader>(*rhs.pReader)),
 	pWriter(std::make_unique<ProcessWriter>(*rhs.pWriter)),
 	dbCredentials(rhs.dbCredentials),
-	thExit(rhs.thExit),
 	cycleController(rhs.cycleController),
 	parser(std::make_unique<CommandParser>(*rhs.pReader,
 											*rhs.pWriter,
 											dbCredentials,
 											cycleController,
-											thExit,
+											getExitController(),
 											connDesc))  {
-	// Create logger
-	std::stringstream s;
-	s << "connection_th_" << connDesc << "_";
-	log = std::make_unique<Logger>("parser", s.str());
 }
 
 ConnectionProgram::~ConnectionProgram() {
@@ -83,7 +75,7 @@ void ConnectionProgram::operator()() {
 			throw SocketException("Error while socket send data", errno, "ConnectionProgram::operator()");
 		}
 	} catch (Exception &e) {
-		log->write(e.what());
+		getLogger().write(e.what());
 	}
 
 	// Close connection descriptor

@@ -16,10 +16,11 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ONH_THREAD_THREADPROGRAM_H_
-#define ONH_THREAD_THREADPROGRAM_H_
+#ifndef ONH_THREAD_BASETHREADPROGRAM_H_
+#define ONH_THREAD_BASETHREADPROGRAM_H_
 
-#include "BaseThreadProgram.h"
+#include <memory>
+#include "ThreadExitData.h"
 #include "../utils/GuardDataController.h"
 #include "../utils/Logger.h"
 #include "../utils/CycleTime.h"
@@ -28,77 +29,83 @@
 namespace onh {
 
 /**
- * Thread program base class
+ * Base Thread program class
  */
-class ThreadProgram: public BaseThreadProgram {
+class BaseThreadProgram {
 	public:
 		/**
 		 * Constructor
 		 *
 		 * @param gdcTED Thread exit data controller
-		 * @param thCCC Thread cycle time controller
-		 * @param updateInterval Thread wait time (ms)
 		 * @param dirName Name of the directory where to write log files
 		 * @param fPrefix Log file name prefix
+		 * @param printLogMsg Flag prtints log init and destruct messages
 		 */
-		ThreadProgram(const GuardDataController<ThreadExitData> &gdcTED,
-				const GuardDataController<CycleTimeData> &gdcCTD,
-				unsigned int updateInterval,
+		BaseThreadProgram(const GuardDataController<ThreadExitData> &gdcTED,
 				const std::string& dirName,
-				const std::string& fPrefix = "");
+				const std::string& fPrefix = "",
+				bool printLogMsg = true);
 
 		/**
 		 * Copy constructor - inactive
 		 */
-		ThreadProgram(const ThreadProgram&) = delete;
+		BaseThreadProgram(const BaseThreadProgram&) = delete;
 
 		/**
 		 * Destructor
 		 */
-		virtual ~ThreadProgram();
+		virtual ~BaseThreadProgram();
+
+		/**
+		 * Thread program function
+		 */
+		virtual void operator()() = 0;
 
 		/**
 		 * Assignment operator - inactive
 		 */
-		ThreadProgram& operator=(const ThreadProgram&) = delete;
+		BaseThreadProgram& operator=(const BaseThreadProgram&) = delete;
 
 	private:
-		/// Thread program cycle time
-		CycleTime thCycle;
+		/// Flag prints log init and destruct messages
+		bool printMsg;
 
-		/// Timer delay object
-		Delay thDelay;
+		/// Thread exit data controller
+		GuardDataController<ThreadExitData> thExitController;
 
-		/// Thread cycle time data controller
-		GuardDataController<CycleTimeData> thCycleTimeController;
+		/// Logger object
+		std::unique_ptr<Logger> log;
 
 	protected:
 		/**
-		 * Start measure cycle time of the thread
+		 * Get Exit controller
+		 *
+		 * @return Exit data controller
 		 */
-		void startCycleMeasure();
+		const GuardDataController<ThreadExitData>& getExitController() const;
 
 		/**
-		 * Stop measure cycle time of the thread
+		 * Check if thread need to be closed
+		 *
+		 * @return True if thread need to be closed
 		 */
-		void stopCycleMeasure();
+		bool isExitFlag();
 
 		/**
-		 * Thread wait
+		 * Trigger exit from thread
+		 *
+		 * @param info Additional info about exit
 		 */
-		void threadWait();
+		void exit(const std::string& info);
 
 		/**
-		 * Thread wait (no blocking)
+		 * Get logger instance
+		 *
+		 * @return Logger instance
 		 */
-		void threadWaitStart();
-
-		/**
-		 * Thread wait after start called (blocking)
-		 */
-		void threadWaitAfterStart();
+		Logger& getLogger();
 };
 
 }  // namespace onh
 
-#endif  // ONH_THREAD_THREADPROGRAM_H_
+#endif  // ONH_THREAD_BASETHREADPROGRAM_H_

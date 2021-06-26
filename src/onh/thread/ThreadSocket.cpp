@@ -25,43 +25,15 @@ ThreadSocket::ThreadSocket(const GuardDataController<ThreadExitData> &gdcTED,
 							const GuardDataController<int> &gdcSockDesc,
 							const std::string& dirName,
 							const std::string& fPrefix):
-	thExitController(gdcTED),
-	thSockDecsController(gdcSockDesc),
-	log(std::make_unique<Logger>(dirName, fPrefix)) {
-	// Log info
-	log->write("Initialize thread logger");
+	BaseThreadProgram(gdcTED, dirName, fPrefix),
+	thSockDecsController(gdcSockDesc) {
 }
 
 ThreadSocket::~ThreadSocket() {
-	log->write("Closing thread logger");
-}
-
-const GuardDataController<ThreadExitData>& ThreadSocket::getExitController() {
-	return thExitController;
-}
-
-bool ThreadSocket::isExitFlag() {
-	ThreadExitData ex;
-	thExitController.getData(ex);
-
-	return ex.exit;
-}
-
-void ThreadSocket::exit(const std::string& info) {
-	ThreadExitData ex;
-	ex.exit = true;
-	ex.additionalInfo = info;
-
-	// Trigger application exit
-	thExitController.setData(ex);
 }
 
 void ThreadSocket::setSocketFD(int sockFD) {
 	thSockDecsController.setData(sockFD);
-}
-
-Logger& ThreadSocket::getLogger() {
-	return *log;
 }
 
 }  // namespace onh

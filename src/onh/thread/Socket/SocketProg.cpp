@@ -39,10 +39,11 @@ SocketProgram::SocketProgram(const ProcessReader& pr,
 	sPort(port),
 	sMaxConn(maxConn),
 	sock(std::make_unique<Socket>(port, maxConn)) {
+	getLogger().write("Socket program initialized");
 }
 
 SocketProgram::~SocketProgram() {
-	getLogger().write("Close socket");
+	getLogger().write("Socket program closed");
 }
 
 void SocketProgram::operator()() {
