@@ -33,16 +33,16 @@ AlarmingProg::AlarmingProg(const ProcessReader& pr,
 	prReader(std::make_unique<ProcessReader>(pr)),
 	prWriter(std::make_unique<ProcessWriter>(pw)),
 	db(std::make_unique<AlarmingDB>(adb)) {
-	getLogger().write("Alarming program initialized");
+	getLogger() << LOG_INFO("Alarming program initialized");
 }
 
 AlarmingProg::~AlarmingProg() {
-	getLogger().write("Alarming program closed");
+	getLogger() << LOG_INFO("Alarming program closed");
 }
 
 void AlarmingProg::operator()() {
 	try {
-		getLogger().write("Start main loop");
+		getLogger() << LOG_INFO("Start main loop");
 
 		if (!prReader)
             throw Exception("No reader object");
@@ -67,9 +67,7 @@ void AlarmingProg::operator()() {
 			stopCycleMeasure();
 		}
 	} catch (Exception &e) {
-		std::stringstream s;
-		s << "AlarmingProg::run: " << e.what();
-		getLogger().write(s.str());
+		getLogger() << LOG_ERROR(e.what());
 
 		// Exit application
 		exit("Alarming system");

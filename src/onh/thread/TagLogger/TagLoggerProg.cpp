@@ -36,16 +36,16 @@ TagLoggerProg::TagLoggerProg(const ProcessReader& pr,
 	prReader(std::make_unique<ProcessReader>(pr)),
 	db(std::make_unique<TagLoggerDB>(tldb)),
 	tagLoggerBuffer(std::make_unique<TagLoggerBufferController>(tlbc)) {
-	getLogger().write("Tag logger program initialized");
+	getLogger() << LOG_INFO("Tag logger program initialized");
 }
 
 TagLoggerProg::~TagLoggerProg() {
-	getLogger().write("Tag logger program closed");
+	getLogger() << LOG_INFO("Tag logger program closed");
 }
 
 void TagLoggerProg::operator()() {
 	try {
-		getLogger().write("Start main loop");
+		getLogger() << LOG_INFO("Start main loop");
 
 		if (!prReader)
 			throw Exception("No reader object");
@@ -79,7 +79,7 @@ void TagLoggerProg::operator()() {
 		// Inform writing thread that we are finished putting data to the buffer
 		tagLoggerBuffer->setFinished();
 	} catch (Exception &e) {
-		getLogger().write(e.what());
+		getLogger() << LOG_ERROR(e.what());
 
 		// Exit application
 		exit("Tag logger");

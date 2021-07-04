@@ -75,7 +75,7 @@ void ConnectionProgram::operator()() {
 			throw SocketException("Error while socket send data", errno, "ConnectionProgram::operator()");
 		}
 	} catch (Exception &e) {
-		getLogger().write(e.what());
+		getLogger() << LOG_ERROR(e.what());
 	}
 
 	// Close connection descriptor

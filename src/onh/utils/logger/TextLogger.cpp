@@ -16,15 +16,15 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Logger.h"
+#include "TextLogger.h"
 #include <sys/stat.h>
 #include <errno.h>
 #include <sstream>
-#include "DateUtils.h"
+#include "../DateUtils.h"
 
 namespace onh {
 
-Logger::Logger(const std::string& dirName, const std::string& fPrefix):
+TextLogger::TextLogger(const std::string& dirName, const std::string& fPrefix):
 	directoryName(dirName), filePrefix(fPrefix), dirReady(false), logFileName(""), filePath("") {
 	bool createDir = false;
 	std::string tmpDir = "logs/" + dirName;
@@ -50,13 +50,13 @@ Logger::Logger(const std::string& dirName, const std::string& fPrefix):
 	}
 }
 
-Logger::~Logger() {
+TextLogger::~TextLogger() {
 	if (logFile.is_open()) {
 		logFile.close();
 	}
 }
 
-std::string Logger::generateFileName() {
+std::string TextLogger::generateFileName() {
 	std::stringstream s;
 
 	// File prefix
@@ -69,7 +69,7 @@ std::string Logger::generateFileName() {
 	return s.str();
 }
 
-void Logger::checkFiles() {
+void TextLogger::checkFiles() {
 	// Temporary file name
 	std::string tmpFileName = generateFileName();
 
@@ -97,14 +97,14 @@ void Logger::checkFiles() {
 
 	if (!logFile.is_open()) {
 		std::string s = "Logger error: Log "+filePath+" not opened";
-		throw Exception(s, "Logger::checkFiles");
+		throw Exception(s, "TextLogger::checkFiles");
 	}
 }
 
-void Logger::write(const std::string& log) {
+void TextLogger::write(const std::string& log) {
 	if (!dirReady) {
 		std::string s = "Logger error: Log "+directoryName+" directory not ready";
-		throw Exception(s, "Logger::write");
+		throw Exception(s, "TextLogger::write");
 	}
 
 	// Entry timestamp
@@ -118,7 +118,11 @@ void Logger::write(const std::string& log) {
 	logFile.close();
 }
 
-void Logger::clear() {
+void TextLogger::operator<<(const std::string& log) {
+	write(log);
+}
+
+void TextLogger::clear() {
 	// Check if file is already opened
 	if (logFile.is_open()) {
 		logFile.close();
@@ -136,7 +140,7 @@ void Logger::clear() {
 	checkFiles();
 }
 
-std::string Logger::getLoggerPath() const {
+std::string TextLogger::getLoggerPath() const {
 	return filePath;
 }
 

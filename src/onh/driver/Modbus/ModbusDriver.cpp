@@ -40,7 +40,7 @@ ModbusDriver::ModbusDriver(const modbusM::ModbusCfg& cfg, unsigned int connId):
 
 	// Create Modbus protocol
 	modbus = std::make_shared<modbusM::ModbusMaster>(cfg);
-	getLog().write("ModbusDriver initialized");
+	getLog() << LOG_INFO("ModbusDriver initialized");
 
 	// Initialize registers
 	ModbusProcessData clearProcess(regCount);
@@ -48,7 +48,7 @@ ModbusDriver::ModbusDriver(const modbusM::ModbusCfg& cfg, unsigned int connId):
 	process = std::make_unique<GuardDataContainer<ModbusProcessData>>(clearProcess);
 	buff = std::make_unique<GuardDataContainer<ModbusProcessData>>(clearProcess);
 
-	getLog().write("ModbusDriver::init: Process registers prepared");
+	getLog() << LOG_INFO("Process registers prepared");
 
 	// Connect to the controller
 	connect();
@@ -59,24 +59,23 @@ ModbusDriver::~ModbusDriver() {
 		modbus->disconnect();
 	}
 
-	getLog().write("ModbusDriver driver closed");
+	getLog() << LOG_INFO("ModbusDriver driver closed");
 }
 
 void ModbusDriver::triggerError(const std::string& msg,
 		const std::string& fName) {
-	std::string s = fName + ": " + msg;
-	getLog().write(s);
+	getLog() << LOG_ERROR(fName << ": " << msg);
 	throw DriverException(msg, fName);
 }
 
 void ModbusDriver::connect() {
 	try {
 		// Connect to the controller
-		getLog().write("ModbusDriver::init: Connecting to the controller...");
+		getLog() << LOG_INFO("Connecting to the controller...");
 		modbus->connect();
-		getLog().write("ModbusDriver::init: Connected");
+		getLog() << LOG_INFO("Connected");
 	} catch (modbusM::ModbusException &e) {
-		triggerError(e.what(), "ModbusDriver::init:");
+		triggerError(e.what(), "ModbusDriver::connect:");
 	}
 }
 

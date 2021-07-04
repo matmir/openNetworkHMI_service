@@ -48,7 +48,7 @@ ShmDriver::ShmDriver(const std::string& segmentName, unsigned int connId):
 		triggerError("SHM ("+shmName+") is not initialized", "ShmDriver::ShmDriver");
 	}
 
-	getLog().write("SHM ("+shmName+") driver initialized");
+	getLog() << LOG_INFO("SHM ("+shmName+") driver initialized");
 }
 
 ShmDriver::~ShmDriver() {
@@ -58,12 +58,11 @@ ShmDriver::~ShmDriver() {
 	// Close shared memory object
 	close(sfd);
 
-	getLog().write("Shm driver closed");
+	getLog() << LOG_INFO("Shm driver closed");
 }
 
 void ShmDriver::triggerError(const std::string& msg, const std::string& fName) {
-	std::string s = fName + ": " + msg;
-	getLog().write(s);
+	getLog() << LOG_ERROR(fName << ": " << msg);
 	throw DriverException(msg, fName);
 }
 

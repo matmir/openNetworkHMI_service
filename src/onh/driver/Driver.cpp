@@ -26,14 +26,14 @@ Driver::Driver(const std::string& logPrefix):
 		throw DriverException("Driver::Driver: Logger prefix is empty");
 
 	// Create logger object
-	log = std::make_unique<Logger>("driver", logPrefix);
-	log->write("Initialize driver logger with prefix: "+logPrefix);
+	log = std::make_unique<TextLogger>("driver", logPrefix);
+	log->write(LOG_INFO("Initialize driver logger with prefix: " << logPrefix));
 }
 
 Driver::~Driver() {
 }
 
-Logger& Driver::getLog() {
+ILogger& Driver::getLog() {
 	return *log;
 }
 

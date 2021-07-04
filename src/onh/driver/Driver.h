@@ -20,7 +20,7 @@
 #define ONH_DRIVER_DRIVER_H_
 
 #include <vector>
-#include "../utils/Logger.h"
+#include "../utils/logger/TextLogger.h"
 #include "DriverBuffer.h"
 #include "DriverUtils.h"
 #include "DriverProcessReader.h"
@@ -90,11 +90,11 @@ class Driver {
 		 *
 		 * @return Driver logger
 		 */
-		Logger& getLog();
+		ILogger& getLog();
 
 	private:
 		/// Logger object
-		std::unique_ptr<Logger> log;
+		std::unique_ptr<ILogger> log;
 };
 
 using DriverPtr = std::shared_ptr<Driver>;

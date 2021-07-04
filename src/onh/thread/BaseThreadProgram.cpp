@@ -27,15 +27,15 @@ BaseThreadProgram::BaseThreadProgram(const GuardDataController<ThreadExitData> &
 									bool printLogMsg):
 	printMsg(printLogMsg),
 	thExitController(gdcTED),
-	log(std::make_unique<Logger>(dirName, fPrefix)) {
+	log(std::make_unique<TextLogger>(dirName, fPrefix)) {
 	// Create info
 	if (printMsg)
-		log->write("Initialize thread logger");
+		log->write(LOG_INFO("Initialize thread logger"));
 }
 
 BaseThreadProgram::~BaseThreadProgram() {
 	if (printMsg)
-		log->write("Closing thread logger");
+		log->write(LOG_INFO("Closing thread logger"));
 }
 
 const GuardDataController<ThreadExitData>& BaseThreadProgram::getExitController() const {
@@ -58,7 +58,7 @@ void BaseThreadProgram::exit(const std::string& info) {
 	thExitController.setData(ex);
 }
 
-Logger& BaseThreadProgram::getLogger() {
+ILogger& BaseThreadProgram::getLogger() {
 	return *log;
 }
 

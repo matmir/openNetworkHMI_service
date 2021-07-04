@@ -24,7 +24,7 @@
 #include "onh/driver/SHM/ShmDriver.h"
 #include "onh/driver/Modbus/ModbusDriver.h"
 #include "onh/thread/ThreadManager.h"
-#include "onh/utils/Logger.h"
+#include "onh/utils/logger/TextLogger.h"
 #include "onh/db/DBManager.h"
 #include "onh/db/Config.h"
 #include "onh/thread/TagLogger/TagLoggerBufferContainer.h"
@@ -84,7 +84,7 @@ class Application {
 		void runThreads();
 
 		/// Main program logger
-		std::unique_ptr<Logger> log;
+		std::unique_ptr<ILogger> log;
 
 		/// Driver manager
 		std::unique_ptr<DriverManager> drvManager;

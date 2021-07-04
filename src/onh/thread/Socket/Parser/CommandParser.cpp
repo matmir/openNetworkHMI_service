@@ -38,7 +38,7 @@ CommandParser::CommandParser(const ProcessReader& pr,
 	// Create logger
 	std::stringstream s;
 	s << "parser_th_" << connDescriptor << "_";
-	log = std::make_unique<Logger>("parser", s.str());
+	log = std::make_unique<TextLogger>("parser", s.str());
 }
 
 CommandParser::~CommandParser() {
@@ -79,7 +79,7 @@ std::string CommandParser::getReply(const std::string& query) {
 		// Parse whole command
 		s = parseCommand(cmd, v[1]);
 	} catch(CommandParserException &e) {
-		log->write(e.what());
+		log->write(LOG_ERROR(e.what()));
 
 		switch (e.getType()) {
 			case CommandParserException::NONE: s = replyError(INTERNAL_ERR); break;
@@ -89,7 +89,7 @@ std::string CommandParser::getReply(const std::string& query) {
 			case CommandParserException::UNKNOWN_COMMAND: s = replyError(UNKNOWN_CMD); break;
 		}
 	} catch (TagException &e) {
-		log->write(e.what());
+		log->write(LOG_ERROR(e.what()));
 
 		switch (e.getType()) {
 			case TagException::NONE: s = replyError(INTERNAL_ERR); break;
@@ -102,7 +102,7 @@ std::string CommandParser::getReply(const std::string& query) {
 			case TagException::NOT_EXIST: s = replyError(NOT_EXIST); break;
 		}
 	} catch (Exception &e) {
-		log->write(e.what());
+		log->write(LOG_ERROR(e.what()));
 
 		s = replyError(INTERNAL_ERR);
 	}

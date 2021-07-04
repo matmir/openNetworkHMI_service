@@ -38,7 +38,7 @@ ProcessUpdaterProg::~ProcessUpdaterProg() {
 
 void ProcessUpdaterProg::operator()() {
 	try {
-		getLogger().write("Start main loop");
+		getLogger() << LOG_INFO("Start main loop");
 
 		if (!prUpdater)
 			throw Exception("No updater object!");
@@ -57,7 +57,7 @@ void ProcessUpdaterProg::operator()() {
 			stopCycleMeasure();
 		}
 	} catch (Exception &e) {
-		getLogger().write(e.what());
+		getLogger() << LOG_ERROR(e.what());
 
 		// Exit application
 		exit("Process Updater");

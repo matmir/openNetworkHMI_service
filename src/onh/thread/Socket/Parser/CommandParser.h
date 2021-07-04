@@ -25,7 +25,7 @@
 #include "../../../driver/ProcessWriter.h"
 #include "../../ThreadCycleControllers.h"
 #include "CommandList.h"
-#include "../../../utils/Logger.h"
+#include "../../../utils/logger/TextLogger.h"
 #include "CommandParserException.h"
 #include "../../../db/ParserDB.h"
 #include "../../../db/DBCredentials.h"
@@ -93,7 +93,7 @@ class CommandParser {
 		std::unique_ptr<ParserDB> db;
 
 		/// Logger object
-		std::unique_ptr<Logger> log;
+		std::unique_ptr<ILogger> log;
 
 		/**
 		 * Get reply from multi command request

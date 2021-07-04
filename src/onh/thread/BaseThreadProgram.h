@@ -22,7 +22,7 @@
 #include <memory>
 #include "ThreadExitData.h"
 #include "../utils/GuardDataController.h"
-#include "../utils/Logger.h"
+#include "../utils/logger/TextLogger.h"
 #include "../utils/CycleTime.h"
 #include "../utils/Delay.h"
 
@@ -74,7 +74,7 @@ class BaseThreadProgram {
 		GuardDataController<ThreadExitData> thExitController;
 
 		/// Logger object
-		std::unique_ptr<Logger> log;
+		std::unique_ptr<ILogger> log;
 
 	protected:
 		/**
@@ -103,7 +103,7 @@ class BaseThreadProgram {
 		 *
 		 * @return Logger instance
 		 */
-		Logger& getLogger();
+		ILogger& getLogger();
 };
 
 }  // namespace onh

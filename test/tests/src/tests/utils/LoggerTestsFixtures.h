@@ -20,7 +20,7 @@
 #define FIXTURES_LOGSTEST_H_
 
 #include <gtest/gtest.h>
-#include <utils/Logger.h>
+#include <utils/logger/TextLogger.h>
 
 class logsTest: public ::testing::Test {
 	protected:
@@ -30,7 +30,7 @@ class logsTest: public ::testing::Test {
 			system("rm -r -f logs");
 
 			// Create logger object
-			log = new onh::Logger("test1", "tst_");
+			log = new onh::TextLogger("test1", "tst_");
 		}
 
 		void TearDown() override {
@@ -43,7 +43,7 @@ class logsTest: public ::testing::Test {
 		}
 
 		// Log
-		onh::Logger *log;
+		onh::TextLogger *log;
 };
 
 #endif /* FIXTURES_LOGSTEST_H_ */

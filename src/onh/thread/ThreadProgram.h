@@ -21,7 +21,6 @@
 
 #include "BaseThreadProgram.h"
 #include "../utils/GuardDataController.h"
-#include "../utils/Logger.h"
 #include "../utils/CycleTime.h"
 #include "../utils/Delay.h"
 

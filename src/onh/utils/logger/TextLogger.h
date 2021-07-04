@@ -16,19 +16,20 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ONH_UTILS_LOGGER_H_
-#define ONH_UTILS_LOGGER_H_
+#ifndef ONH_UTILS_LOGGER_TEXTLOGGER_H_
+#define ONH_UTILS_LOGGER_TEXTLOGGER_H_
 
 #include <string>
 #include <fstream>
-#include "Exception.h"
+#include "ILogger.h"
+#include "../Exception.h"
 
 namespace onh {
 
 /**
- * Logger class
+ * TextLogger class
  */
-class Logger {
+class TextLogger: public ILogger {
 	public:
 		/**
 		 * Default constructor
@@ -36,31 +37,33 @@ class Logger {
 		 * @param dirName Name of the directory where to write log files
 		 * @param fPrefix Log file name prefix
 		 */
-		explicit Logger(const std::string& dirName, const std::string& fPrefix = "");
+		explicit TextLogger(const std::string& dirName, const std::string& fPrefix = "");
 
 		/**
 		 * Copy constructor - inactive
 		 */
-		Logger(const Logger&) = delete;
+		TextLogger(const TextLogger&) = delete;
 
-		virtual ~Logger();
+		virtual ~TextLogger();
 
 		/**
 		 * Assign operator - inactive
 		 */
-		Logger& operator=(const Logger&) = delete;
+		TextLogger& operator=(const TextLogger&) = delete;
 
 		/**
 		 * Write to the log file
 		 *
 		 * @param log String with information to write
 		 */
-		void write(const std::string& log);
+		void write(const std::string& log) override;
 
 		/**
-		 * Clear logs (delete all files and open blank one)
+		 * Write operator (Write to the log file)
+		 *
+		 * @param log String with information to write
 		 */
-		void clear();
+		void operator<<(const std::string& log) override;
 
 		/**
 		 * Get log file path
@@ -68,6 +71,11 @@ class Logger {
 		 * @return Log file path
 		 */
 		std::string getLoggerPath() const;
+
+		/**
+		 * Clear logs (delete all files and open blank one)
+		 */
+		void clear();
 
 	private:
 		/// Logger directory name
@@ -103,4 +111,4 @@ class Logger {
 
 }  // namespace onh
 
-#endif  // ONH_UTILS_LOGGER_H_
+#endif  // ONH_UTILS_LOGGER_TEXTLOGGER_H_

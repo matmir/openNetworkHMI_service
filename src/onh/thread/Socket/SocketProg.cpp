@@ -39,11 +39,11 @@ SocketProgram::SocketProgram(const ProcessReader& pr,
 	sPort(port),
 	sMaxConn(maxConn),
 	sock(std::make_unique<Socket>(port, maxConn)) {
-	getLogger().write("Socket program initialized");
+	getLogger() << LOG_INFO("Socket program initialized");
 }
 
 SocketProgram::~SocketProgram() {
-	getLogger().write("Socket program closed");
+	getLogger() << LOG_INFO("Socket program closed");
 }
 
 void SocketProgram::operator()() {
@@ -66,13 +66,13 @@ void SocketProgram::operator()() {
 	} catch (SocketException &e) {
 		// Log error when socket exception (not caused by shutdown command)
 		if (!isExitFlag()) {
-			getLogger().write(e.what());
+			getLogger() << LOG_ERROR(e.what());
 
 			// Exit application
 			exit("Socket Thread");
 		}
 	} catch (Exception &e) {
-		getLogger().write(e.what());
+		getLogger() << LOG_ERROR(e.what());
 
 		// Exit application
 		exit("Socket Thread");

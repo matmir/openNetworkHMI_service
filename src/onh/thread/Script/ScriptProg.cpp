@@ -53,16 +53,16 @@ ScriptProg::ScriptProg(const ProcessReader& pr,
 		dirReady = true;
 	}
 
-	getLogger().write("Script system initialized");
+	getLogger() << LOG_INFO("Script system initialized");
 }
 
 ScriptProg::~ScriptProg() {
-	getLogger().write("Script system closed");
+	getLogger() << LOG_INFO("Script system closed");
 }
 
 void ScriptProg::operator()() {
 	try {
-		getLogger().write("Start main loop");
+		getLogger() << LOG_INFO("Start main loop");
 
 		if (!prReader)
 			throw Exception("No reader object");
@@ -92,7 +92,7 @@ void ScriptProg::operator()() {
 			stopCycleMeasure();
 		}
 	} catch (Exception &e) {
-		getLogger().write(e.what());
+		getLogger() << LOG_ERROR(e.what());
 
 		// Exit application
 		exit("Script system");
@@ -131,7 +131,7 @@ void ScriptProg::checkScripts() {
 				// Run script
 				system(cmd.c_str());
 
-				getLogger().write("Run script: "+cmd);
+				getLogger() << LOG_INFO("Run script: "+cmd);
 			}
 		}
 
@@ -168,7 +168,7 @@ void ScriptProg::checkScripts() {
 				// Reset lock flag
 				db->clearScriptLock(sc[i]);
 
-				getLogger().write("Script unlocked: "+sc[i].getName());
+				getLogger() << LOG_INFO("Script unlocked: "+sc[i].getName());
 			}
 		}
 	}

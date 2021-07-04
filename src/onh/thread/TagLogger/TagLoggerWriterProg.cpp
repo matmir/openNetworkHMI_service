@@ -28,16 +28,16 @@ TagLoggerWriterProg::TagLoggerWriterProg(const TagLoggerDB& tldb,
 	ThreadProgram(gdcTED, gdcCTD, updateInterval, "taglogger", "tagLogWriter_"),
 	db(std::make_unique<TagLoggerDB>(tldb)),
 	tagLoggerBuffer(std::make_unique<TagLoggerBufferController>(tlbc)) {
-	getLogger().write("Tag logger writer program initialized");
+	getLogger() << LOG_INFO("Tag logger writer program initialized");
 }
 
 TagLoggerWriterProg::~TagLoggerWriterProg() {
-	getLogger().write("Tag logger writer program closed");
+	getLogger() << LOG_INFO("Tag logger writer program closed");
 }
 
 void TagLoggerWriterProg::operator()() {
 	try {
-		getLogger().write("Start main loop");
+		getLogger() << LOG_INFO("Start main loop");
 
 		if (!db)
 			throw Exception("No db object");
@@ -60,7 +60,7 @@ void TagLoggerWriterProg::operator()() {
 			stopCycleMeasure();
 		}
 	} catch (Exception &e) {
-		getLogger().write(e.what());
+		getLogger() << LOG_ERROR(e.what());
 
 		// Exit application
 		exit("Tag logger writer");

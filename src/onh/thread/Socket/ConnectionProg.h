@@ -25,7 +25,6 @@
 #include "../BaseThreadProgram.h"
 #include "../../utils/GuardDataController.h"
 #include "../../db/DBCredentials.h"
-#include "../../utils/Logger.h"
 #include "Parser/CommandParser.h"
 
 namespace onh {

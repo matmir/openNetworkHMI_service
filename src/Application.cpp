@@ -26,7 +26,7 @@
 namespace onh {
 
 Application::Application(bool test):
-	log(std::make_unique<Logger>("mainProg", "main_")),
+	log(std::make_unique<TextLogger>("mainProg", "main_")),
 	drvManager(nullptr),
 	thManager(nullptr),
 	dbManager(nullptr),
@@ -35,16 +35,14 @@ Application::Application(bool test):
 }
 
 Application::~Application() {
-	log->write("Bye");
+	log->write(LOG_INFO("Bye"));
 }
 
 int Application::start() {
 	int ret = 0;
-	std::stringstream appVersion;
-	appVersion << PROJECT_NAME << " (v" << PROJECT_VERSION << ")";
 
 	try {
-		log->write("Application "+appVersion.str()+" is starting...");
+		log->write(LOG_INFO("Application " << PROJECT_NAME << " (v" << PROJECT_VERSION << ")" << " is starting..."));
 
 		// Initialize database connection
 		initDB();
@@ -58,11 +56,11 @@ int Application::start() {
 		// Run all threads
 		runThreads();
 	} catch (std::exception &e) {
-		log->write(e.what());
+		log->write(LOG_ERROR(e.what()));
 
 		ret = EXIT_FAILURE;
 	} catch (...) {
-		log->write("Unknown exception");
+		log->write(LOG_ERROR("Unknown exception"));
 
 		ret = EXIT_FAILURE;
 	}
@@ -71,11 +69,11 @@ int Application::start() {
 }
 
 void Application::runThreads() {
-	log->write("Starting threads...");
+	log->write(LOG_INFO("Starting threads..."));
 	thManager->run();
 
-	log->write("All threads are closed");
-	log->write("Application closed by: "+thManager->getExitInfo());
+	log->write(LOG_INFO("All threads are closed"));
+	log->write(LOG_INFO("Application closed by: " << thManager->getExitInfo()));
 }
 
 void Application::initDB() {
