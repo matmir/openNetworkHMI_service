@@ -50,7 +50,7 @@ class ThreadSocket: public BaseThreadProgram {
 		/**
 		 * Destructor
 		 */
-		virtual ~ThreadSocket();
+		~ThreadSocket() override;
 
 		/**
 		 * Assignment operator - inactive

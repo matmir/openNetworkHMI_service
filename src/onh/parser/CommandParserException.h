@@ -16,10 +16,10 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ONH_THREAD_SOCKET_PARSER_COMMANDPARSEREXCEPTION_H_
-#define ONH_THREAD_SOCKET_PARSER_COMMANDPARSEREXCEPTION_H_
+#ifndef ONH_PARSER_COMMANDPARSEREXCEPTION_H_
+#define ONH_PARSER_COMMANDPARSEREXCEPTION_H_
 
-#include "../../../utils/Exception.h"
+#include "../utils/Exception.h"
 
 namespace onh {
 
@@ -64,4 +64,4 @@ class CommandParserException: public Exception {
 
 }  // namespace onh
 
-#endif  // ONH_THREAD_SOCKET_PARSER_COMMANDPARSEREXCEPTION_H_
+#endif  // ONH_PARSER_COMMANDPARSEREXCEPTION_H_

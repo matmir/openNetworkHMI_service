@@ -54,7 +54,7 @@ class ThreadProgram: public BaseThreadProgram {
 		/**
 		 * Destructor
 		 */
-		virtual ~ThreadProgram();
+		~ThreadProgram() override;
 
 		/**
 		 * Assignment operator - inactive

@@ -56,7 +56,7 @@ class TagLoggerProg: public ThreadProgram {
 		 */
 		TagLoggerProg(const TagLoggerProg&) = delete;
 
-		virtual ~TagLoggerProg();
+		~TagLoggerProg() override;
 
 		/**
 		 * Thread program function

@@ -43,7 +43,7 @@ class Config: public DB {
 		 */
 		Config(const Config &cDB);
 
-		virtual ~Config();
+		~Config() override;
 
 		/**
 		 * Assign operator - inactive

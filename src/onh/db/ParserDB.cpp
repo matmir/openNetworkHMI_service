@@ -18,7 +18,6 @@
 
 #include <mysql.h>
 #include <sstream>
-#include <iostream>
 #include "ParserDB.h"
 
 namespace onh {
@@ -39,8 +38,8 @@ ParserDB::ParserDB(const DBCredentials & dbData):
 							NULL,
 							0)) {
 		std::stringstream s;
-		s << "Can not create connection for Parser DB: " << mysql_error(conn);
-		throw Exception(s.str(), "DBManager::ParserDB::ParserDB");
+		s << "Can not create connection for ParserDB: " << mysql_error(conn);
+		throw Exception(s.str(), "ParserDB::ParserDB");
 	}
 
 	// Create alarming DB

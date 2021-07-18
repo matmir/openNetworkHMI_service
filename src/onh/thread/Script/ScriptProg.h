@@ -58,7 +58,7 @@ class ScriptProg: public ThreadProgram {
 		 */
 		ScriptProg(const ScriptProg&) = delete;
 
-		virtual ~ScriptProg();
+		~ScriptProg() override;
 
 		/**
 		 * Thread program function

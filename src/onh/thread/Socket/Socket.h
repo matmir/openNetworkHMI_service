@@ -23,7 +23,6 @@
 #define MAX_BUFF_SIZE 10000
 
 #include <netinet/in.h>
-#include "Parser/CommandParser.h"
 #include "SocketException.h"
 
 namespace onh {

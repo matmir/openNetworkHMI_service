@@ -26,6 +26,9 @@
 #include "Socket.h"
 #include "../ThreadSocket.h"
 #include "../ThreadCycleControllers.h"
+#include "../../driver/ProcessReader.h"
+#include "../../driver/ProcessWriter.h"
+#include "../../db/DBCredentials.h"
 
 namespace onh {
 
@@ -60,7 +63,7 @@ class SocketProgram: public ThreadSocket {
 		 */
 		SocketProgram(const SocketProgram&) = delete;
 
-		virtual ~SocketProgram();
+		~SocketProgram() override;
 
 		/**
 		 * Thread program function

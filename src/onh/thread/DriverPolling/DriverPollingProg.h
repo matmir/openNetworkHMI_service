@@ -50,7 +50,7 @@ class DriverPollingProg: public ThreadProgram {
 		 */
 		DriverPollingProg(const DriverPollingProg&) = delete;
 
-		virtual ~DriverPollingProg();
+		~DriverPollingProg() override;
 
 		/**
 		 * Thread program function

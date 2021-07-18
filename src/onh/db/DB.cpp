@@ -29,9 +29,6 @@ DB::DB(const DB &rhs):
 	conn(rhs.conn) {
 }
 
-DB::~DB() {
-}
-
 bool DB::checkStringValue(std::string val) {
 	bool ret = true;
 	char c = 0;

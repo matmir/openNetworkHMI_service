@@ -53,7 +53,7 @@ class TagLoggerWriterProg: public ThreadProgram {
 		 */
 		TagLoggerWriterProg(const TagLoggerWriterProg&) = delete;
 
-		virtual ~TagLoggerWriterProg();
+		~TagLoggerWriterProg() override;
 
 		/**
 		 * Thread program function

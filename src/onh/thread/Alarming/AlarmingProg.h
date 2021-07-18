@@ -51,7 +51,7 @@ class AlarmingProg: public ThreadProgram {
 		 */
 		AlarmingProg(const AlarmingProg&) = delete;
 
-		virtual ~AlarmingProg();
+		~AlarmingProg() override;
 
 		/**
 		 * Thread program function

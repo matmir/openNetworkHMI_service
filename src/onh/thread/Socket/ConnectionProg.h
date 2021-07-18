@@ -25,7 +25,7 @@
 #include "../BaseThreadProgram.h"
 #include "../../utils/GuardDataController.h"
 #include "../../db/DBCredentials.h"
-#include "Parser/CommandParser.h"
+#include "../../parser/CommandParser.h"
 
 namespace onh {
 
@@ -61,7 +61,7 @@ class ConnectionProgram: public BaseThreadProgram {
 		/**
 		 * Destructor
 		 */
-		virtual ~ConnectionProgram();
+		~ConnectionProgram() override;
 
 		/**
 		 * Thread program function
@@ -88,9 +88,6 @@ class ConnectionProgram: public BaseThreadProgram {
 
 		/// Cycle controllers
 		ThreadCycleControllers cycleController;
-
-		/// Command parser
-		std::unique_ptr<CommandParser> parser;
 };
 
 }  // namespace onh

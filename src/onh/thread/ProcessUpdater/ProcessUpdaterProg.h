@@ -50,7 +50,7 @@ class ProcessUpdaterProg: public ThreadProgram {
 		 */
 		ProcessUpdaterProg(const ProcessUpdaterProg&) = delete;
 
-		virtual ~ProcessUpdaterProg();
+		~ProcessUpdaterProg() override;
 
 		/**
 		 * Thread program function

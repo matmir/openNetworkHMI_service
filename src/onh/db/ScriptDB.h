@@ -42,7 +42,7 @@ class ScriptDB: public DB {
 		 */
 		ScriptDB(const ScriptDB &sDB);
 
-		virtual ~ScriptDB();
+		~ScriptDB() override;
 
 		/**
 		 * Assign operator - inactive

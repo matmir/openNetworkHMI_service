@@ -35,8 +35,7 @@ ConnectionProgram::ConnectionProgram(int connDescriptor,
 	pReader(std::make_unique<ProcessReader>(pr)),
 	pWriter(std::make_unique<ProcessWriter>(pw)),
 	dbCredentials(db),
-	cycleController(cc),
-	parser(std::make_unique<CommandParser>(pr, pw, db, cc, getExitController(), connDescriptor)) {
+	cycleController(cc) {
 }
 
 ConnectionProgram::ConnectionProgram(const ConnectionProgram& rhs):
@@ -45,13 +44,7 @@ ConnectionProgram::ConnectionProgram(const ConnectionProgram& rhs):
 	pReader(std::make_unique<ProcessReader>(*rhs.pReader)),
 	pWriter(std::make_unique<ProcessWriter>(*rhs.pWriter)),
 	dbCredentials(rhs.dbCredentials),
-	cycleController(rhs.cycleController),
-	parser(std::make_unique<CommandParser>(*rhs.pReader,
-											*rhs.pWriter,
-											dbCredentials,
-											cycleController,
-											getExitController(),
-											connDesc))  {
+	cycleController(rhs.cycleController)  {
 }
 
 ConnectionProgram::~ConnectionProgram() {
@@ -62,6 +55,14 @@ void ConnectionProgram::operator()() {
 	char buffer[MAX_BUFF_SIZE] = {0};
 
 	try {
+		// Parser
+		std::unique_ptr<IParser> parser = std::make_unique<CommandParser>(*pReader,
+																			*pWriter,
+																			dbCredentials,
+																			cycleController,
+																			getExitController(),
+																			connDesc);
+
 		// Read client data
 		if (read(connDesc, buffer, MAX_BUFF_SIZE) == -1) {
 			throw SocketException("Error while socket read data", errno, "ConnectionProgram::operator()");

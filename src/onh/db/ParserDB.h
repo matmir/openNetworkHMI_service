@@ -42,11 +42,11 @@ class ParserDB: public DB {
 		/**
 		 * Copy constructor
 		 *
-		 * @param tDB PArserDB to copy
+		 * @param tDB ParserDB to copy
 		 */
 		ParserDB(const ParserDB &tDB);
 
-		virtual ~ParserDB();
+		~ParserDB() override;
 
 		/**
 		 * Assign operator - inactive

@@ -45,7 +45,7 @@ class DB {
 		 */
 		static bool checkStringValue(std::string val);
 
-		virtual ~DB();
+		virtual ~DB() = default;
 
 		/**
 		 * Assign operator - inactive

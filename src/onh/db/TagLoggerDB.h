@@ -43,7 +43,7 @@ class TagLoggerDB: public DB {
 		 */
 		TagLoggerDB(const TagLoggerDB &tlDB);
 
-		virtual ~TagLoggerDB();
+		~TagLoggerDB() override;
 
 		/**
 		 * Assign operator - inactive

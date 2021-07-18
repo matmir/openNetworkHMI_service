@@ -50,7 +50,7 @@ class AlarmingDB: public DB {
 		 */
 		AlarmingDB(const AlarmingDB &aDB);
 
-		virtual ~AlarmingDB();
+		~AlarmingDB() override;
 
 		/**
 		 * Assign operator - inactive
