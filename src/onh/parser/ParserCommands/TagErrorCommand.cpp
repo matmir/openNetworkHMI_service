@@ -28,7 +28,7 @@ TagErrorCommand::TagErrorCommand(const TagException::ExceptionType& et):
 
 std::string TagErrorCommand::execute() {
 	std::stringstream s;
-	parserReply rp;
+	parserReply rp = INTERNAL_ERR;
 
 	switch (exType) {
 		case TagException::NONE: rp = INTERNAL_ERR; break;

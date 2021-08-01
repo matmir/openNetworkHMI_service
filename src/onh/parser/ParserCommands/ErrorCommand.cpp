@@ -28,7 +28,7 @@ ErrorCommand::ErrorCommand(const CommandParserException::ExceptionType& et):
 
 std::string ErrorCommand::execute() {
 	std::stringstream s;
-	parserReply rp;
+	parserReply rp = INTERNAL_ERR;
 
 	switch (exType) {
 		case CommandParserException::NONE: rp = INTERNAL_ERR; break;
