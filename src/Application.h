@@ -38,10 +38,8 @@ class Application {
 	public:
 		/**
 		 * Application constructor
-		 *
-		 * @param test Test environment flag
 		 */
-		explicit Application(bool test);
+		Application();
 
 		/**
 		 * Copy constructor - inactive
@@ -97,9 +95,6 @@ class Application {
 
 		/// Config DB access
 		std::unique_ptr<Config> cfg;
-
-		/// Test environment flag
-		bool testEnv;
 };
 
 }  // namespace onh

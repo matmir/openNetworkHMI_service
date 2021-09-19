@@ -59,14 +59,21 @@ class ScriptDB: public DB {
 		std::vector<ScriptItem> getScripts(bool enabled = true);
 
 		/**
-		 * Set Script run
+		 * Set Script run and lock flag
 		 *
 		 * @param script Script item object
 		 */
 		void setScriptRun(const ScriptItem& script);
 
 		/**
-		 * Clear script lock
+		 * Clear Script run lag
+		 *
+		 * @param scriptId Script item object identifier
+		 */
+		void clearScriptRun(unsigned int scriptId);
+
+		/**
+		 * Clear script lock flag
 		 *
 		 * @param script Script item object
 		 */

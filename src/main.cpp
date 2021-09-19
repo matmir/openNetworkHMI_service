@@ -22,19 +22,8 @@
 #include "Application.h"
 
 int main(int argc, char *argv[]) {
-	// Test environment flag
-	bool testEnv = false;
-
-	// Check parameters
-	if (argc == 2) {
-		// Check test flag
-		if (strcmp(argv[1], "test") == 0) {
-			testEnv = true;
-		}
-	}
-
 	// Create application
-	onh::Application app(testEnv);
+	onh::Application app;
 
 	return app.start();
 }

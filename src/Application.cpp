@@ -25,13 +25,12 @@
 
 namespace onh {
 
-Application::Application(bool test):
+Application::Application():
 	log(std::make_unique<TextLogger>("mainProg", "main_")),
 	drvManager(nullptr),
 	thManager(nullptr),
 	dbManager(nullptr),
-	cfg(nullptr),
-	testEnv(test) {
+	cfg(nullptr) {
 }
 
 Application::~Application() {
@@ -163,8 +162,7 @@ void Application::initThreadManager() {
 								drvManager->getProcessWriter(),
 								dbManager->getScriptDB(),
 								cfg->getUIntValue("scriptSystemUpdateInterval"),
-								cfg->getStringValue("scriptSystemExecuteScript"),
-								testEnv);
+								cfg->getStringValue("userScriptsPath"));
 
 	// Init socket thread
 	thManager->initSocketThread(drvManager->getProcessReader(),

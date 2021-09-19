@@ -142,6 +142,21 @@ void ScriptDB::setScriptRun(const ScriptItem& script) {
 	}
 }
 
+void ScriptDB::clearScriptRun(unsigned int scriptId) {
+	// Query
+	std::stringstream q;
+
+	// Prepare query
+	q << "UPDATE scripts SET scRun=0 WHERE scid=" << scriptId <<";";
+
+	try {
+		// Query
+		executeSaveQuery(q.str());
+	} catch (Exception &e) {
+		throw Exception(e.what(), "ScriptDB::clearScriptRun");
+	}
+}
+
 void ScriptDB::clearScriptLock(const ScriptItem& script) {
 	// Query
 	std::stringstream q;

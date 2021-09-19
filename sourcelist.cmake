@@ -132,6 +132,8 @@ target_sources(${PROJECT_NAME} PRIVATE
 	"src/onh/thread/ThreadProgram.cpp"
 	"src/onh/thread/Script/ScriptProg.h"
 	"src/onh/thread/Script/ScriptProg.cpp"
+	"src/onh/thread/Script/ScriptRunner.h"
+	"src/onh/thread/Script/ScriptRunner.cpp"
 	"src/onh/thread/Alarming/AlarmingProg.cpp"
 	"src/onh/thread/Alarming/AlarmingProg.h"
 	"src/onh/thread/ProcessUpdater/ProcessUpdaterProg.cpp"

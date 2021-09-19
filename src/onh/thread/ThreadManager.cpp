@@ -136,8 +136,7 @@ void ThreadManager::initScriptThread(const ProcessReader& pr,
 										const ProcessWriter& pw,
 										const ScriptDB& sdb,
 										unsigned int updateInterval,
-										const std::string& executeScript,
-										bool testEnv) {
+										const std::string& scriptDirPath) {
 	std::string nm = "Script";
 
 	if (thProgramData.count(nm) != 0)
@@ -148,8 +147,7 @@ void ThreadManager::initScriptThread(const ProcessReader& pr,
 													pw,
 													sdb,
 													updateInterval,
-													executeScript,
-													testEnv,
+													scriptDirPath,
 													tmExit.getController(false),
 													inserted->second.cycleContainer.getController(false));
 }

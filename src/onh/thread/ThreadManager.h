@@ -122,15 +122,13 @@ class ThreadManager {
 		 * @param pw Process writer
 		 * @param sdb Script DB
 		 * @param updateInterval Thread update interval (milliseconds)
-		 * @param executeScript Full path to the main execute script
-		 * @param testEnv Test environment flag
+		 * @param scriptDirPath Full path to the user script directory
 		 */
 		void initScriptThread(const ProcessReader& pr,
 								const ProcessWriter& pw,
 								const ScriptDB& sdb,
 								unsigned int updateInterval,
-								const std::string& executeScript,
-								bool testEnv);
+								const std::string& scriptDirPath);
 
 		/**
 		 * Initialize Socket thread

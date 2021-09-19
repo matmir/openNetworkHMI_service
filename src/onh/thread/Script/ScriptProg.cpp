@@ -27,20 +27,21 @@
 
 namespace onh {
 
+// Max number running scripts
+const unsigned int RUNNERS_POOL = 5;
+
 ScriptProg::ScriptProg(const ProcessReader& pr,
 						const ProcessWriter& pw,
 						const ScriptDB& sdb,
 						unsigned int updateInterval,
-						const std::string& execScript,
-						bool tstEnv,
+						const std::string& scriptDirPath,
 						const GuardDataController<ThreadExitData> &gdcTED,
 						const GuardDataController<CycleTimeData> &gdcCTD):
 	ThreadProgram(gdcTED, gdcCTD, updateInterval, "script", "scriptLog_"),
 	prReader(std::make_unique<ProcessReader>(pr)),
 	prWriter(std::make_unique<ProcessWriter>(pw)),
 	db(std::make_unique<ScriptDB>(sdb)),
-	executeScript(execScript),
-	testEnv(tstEnv) {
+	scriptDirectoryPath(scriptDirPath) {
 	// Dir flag
 	dirReady = false;
 
@@ -82,8 +83,11 @@ void ScriptProg::operator()() {
 			// Update process reader
 			prReader->updateProcessData();
 
-			// Check scripts tags
-			checkScripts();
+			// Check started scripts
+			checkScriptRunners();
+
+			// Check if new script need to be started
+			checkScriptItems();
 
 			// Wait
 			threadWait();
@@ -99,78 +103,109 @@ void ScriptProg::operator()() {
 	}
 }
 
-void ScriptProg::checkScripts() {
+void ScriptProg::checkScriptItems() {
 	// Get scripts
-	std::vector<ScriptItem> sc = db->getScripts();
+	std::vector<ScriptItem> scripts = db->getScripts();
 
-	std::string cmd;
-
-	for (unsigned int i=0; i < sc.size(); ++i) {
+	for (auto& script : scripts) {
 		// Run script - check flags
-		if (!sc[i].isRunning() && !sc[i].isLocked()) {
+		if (!script.isRunning() && !script.isLocked()) {
 			// Check trigger Tag value - only true triggers script
-			if (prReader->getBitValue(sc[i].getTag())) {
-				// Prepare log file name (script output)
-				std::string logFile = "logs/scriptOutput/";
-				logFile += DateUtils::getTimestampString(false, '-', '_', '_');
-				logFile += "_"+sc[i].getName()+".log";
-
-				// Check environment - if 'test' we need to call script from test environment in Symfony
-				if (testEnv) {
-					cmd = "APP_ENV=test ";
-				} else {
-					cmd = "";
-				}
-
-				// Prepare command (run in background)
-				cmd += executeScript+" "+sc[i].getName()+" > "+logFile+" 2>&1 &";
-
-				// Set run flag
-				db->setScriptRun(sc[i]);
-
-				// Run script
-				system(cmd.c_str());
-
-				getLogger() << LOG_INFO("Run script: "+cmd);
+			if (prReader->getBitValue(script.getTag())) {
+				// Run assigned script
+				startScript(script);
 			}
 		}
 
-		// Set feedback tag
-		if (sc[i].isRunning()) {
-			try {
-				// Set bit informs controller that script is running
-				if (!prReader->getBitValue(sc[i].getFeedbackRunTag()))
-					prWriter->setBit(sc[i].getFeedbackRunTag());
-			} catch (ScriptException &e) {
-				if (e.getType() != ScriptException::ExceptionType::NO_FEEDBACK_RUN_TAG) {
-					// Re-throw exception
-					throw;
-				}
-			}
+		// Update controller script tags
+		updateControllerTags(script);
+	}
+}
 
+void ScriptProg::checkScriptRunners() {
+	// Check running scripts
+	for(auto it = runners.begin(); it != runners.end(); ) {
+        if (it->second.finished()) {
+			// Clear run flag
+			db->clearScriptRun(it->first);
+			// Remove runner
+			it = runners.erase(it);
 		} else {
-			try {
-				// Reset bit informs controller that script is running
-				if (prReader->getBitValue(sc[i].getFeedbackRunTag()))
-					prWriter->resetBit(sc[i].getFeedbackRunTag());
-			} catch (ScriptException &e) {
-				if (e.getType() != ScriptException::ExceptionType::NO_FEEDBACK_RUN_TAG) {
-					// Re-throw exception
-					throw;
-				}
+			++it;
+		}
+    }
+}
+
+void ScriptProg::updateControllerTags(const ScriptItem &sc) {
+	// Set feedback tag
+	if (sc.isRunning()) {
+		try {
+			// Set bit informs controller that script is running
+			if (!prReader->getBitValue(sc.getFeedbackRunTag()))
+				prWriter->setBit(sc.getFeedbackRunTag());
+		} catch (ScriptException &e) {
+			if (e.getType() != ScriptException::ExceptionType::NO_FEEDBACK_RUN_TAG) {
+				// Re-throw exception
+				throw;
 			}
 		}
 
-		// Check lock flag
-		if (sc[i].isLocked() && !sc[i].isRunning()) {
-			// Check trigger tag value
-			if (!prReader->getBitValue(sc[i].getTag())) {
-				// Reset lock flag
-				db->clearScriptLock(sc[i]);
-
-				getLogger() << LOG_INFO("Script unlocked: "+sc[i].getName());
+	} else {
+		try {
+			// Reset bit informs controller that script is running
+			if (prReader->getBitValue(sc.getFeedbackRunTag()))
+				prWriter->resetBit(sc.getFeedbackRunTag());
+		} catch (ScriptException &e) {
+			if (e.getType() != ScriptException::ExceptionType::NO_FEEDBACK_RUN_TAG) {
+				// Re-throw exception
+				throw;
 			}
 		}
+	}
+
+	// Check lock flag
+	if (sc.isLocked() && !sc.isRunning()) {
+		// Check trigger tag value
+		if (!prReader->getBitValue(sc.getTag())) {
+			// Reset lock flag
+			db->clearScriptLock(sc);
+
+			getLogger() << LOG_INFO("Script unlocked: "+sc.getName());
+		}
+	}
+}
+
+void ScriptProg::startScript(const ScriptItem &sc) {
+	// Script path
+	std::string scriptPath = createScriptPath(scriptDirectoryPath, sc.getName());
+
+	// Check runners pool
+	if (runners.size() < RUNNERS_POOL) {
+		// Log file name (script output)
+		std::string logFile = "logs/scriptOutput/";
+		logFile += DateUtils::getTimestampString(false, '-', '_', '_');
+		logFile += "_"+sc.getName()+".log";
+
+		// Set run flag
+		db->setScriptRun(sc);
+
+		getLogger() << LOG_INFO("Run script: "+scriptPath);
+
+		// Run script
+		runners.emplace(std::piecewise_construct,
+			std::forward_as_tuple(sc.getId()),
+			std::forward_as_tuple(scriptPath, logFile));
+	} else {
+		getLogger() << LOG_INFO("No empty runners for script: "+scriptPath);
+	}
+}
+
+std::string ScriptProg::createScriptPath(const std::string &scriptDir, const std::string &scriptName) const {
+	// Check last letter
+	if (scriptDir.back() == '/') {
+		return scriptDir + scriptName;
+	} else {
+		return scriptDir + '/' + scriptName;
 	}
 }
 

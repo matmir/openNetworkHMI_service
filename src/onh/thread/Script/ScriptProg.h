@@ -19,11 +19,13 @@
 #ifndef ONH_THREAD_SCRIPT_SCRIPTPROG_H_
 #define ONH_THREAD_SCRIPT_SCRIPTPROG_H_
 
+#include <unordered_map>
 #include "../../driver/ProcessReader.h"
 #include "../../driver/ProcessWriter.h"
 #include "../../utils/Delay.h"
 #include "../ThreadProgram.h"
 #include "../../db/ScriptDB.h"
+#include "ScriptRunner.h"
 
 namespace onh {
 
@@ -39,8 +41,7 @@ class ScriptProg: public ThreadProgram {
 		 * @param pw Proces writer
 		 * @param sdb Script DB
 		 * @param updateInterval Script system update interval (milliseconds)
-		 * @param execScript Full path to the main execute script
-		 * @param tstEnv Test environment flag
+		 * @param scriptDirPath Full path to the user script directory
 		 * @param gdcTED Thread exit data controller
 		 * @param gdcCTD Thread cycle time controller
 		 */
@@ -48,8 +49,7 @@ class ScriptProg: public ThreadProgram {
 					const ProcessWriter& pw,
 					const ScriptDB& sdb,
 					unsigned int updateInterval,
-					const std::string& execScript,
-					bool tstEnv,
+					const std::string& scriptDirPath,
 					const GuardDataController<ThreadExitData> &gdcTED,
 					const GuardDataController<CycleTimeData> &gdcCTD);
 
@@ -80,17 +80,48 @@ class ScriptProg: public ThreadProgram {
 		/// Script DB access
 		std::unique_ptr<ScriptDB> db;
 
-		/// Full path to the main execute script
-		std::string executeScript;
+		/// Full path to the user script directory
+		const std::string scriptDirectoryPath;
 
 		/// Flag informs that log (redirected script output) directory exist
 		bool dirReady;
 
-		/// Test environment flag
-		bool testEnv;
+		/// Script runners <script item identifier, script runner>
+		std::unordered_map<unsigned int, ScriptRunner> runners;
 
-		/// Check scripts
-		void checkScripts();
+		/**
+		 * Check if script need to be started
+		 */
+		void checkScriptItems();
+
+		/**
+		 * Check if started script finished its work
+		 */
+		void checkScriptRunners();
+
+		/**
+		 * Update controller script tags
+		 *
+		 * @param sc Script item
+		 */
+		void updateControllerTags(const ScriptItem &sc);
+
+		/**
+		 * Run script assigned to the Tag
+		 *
+		 * @param sc Script item
+		 */
+		void startScript(const ScriptItem &sc);
+
+		/**
+		 * Create full script path
+		 *
+		 * @param scriptDir User script directory
+		 * @param scriptName User script name
+		 * 
+		 * @return Full path to the user script
+		 */
+		std::string createScriptPath(const std::string &scriptDir, const std::string &scriptName) const;
 };
 
 }  // namespace onh
