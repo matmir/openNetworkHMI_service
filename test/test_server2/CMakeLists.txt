@@ -37,7 +37,7 @@ add_executable(${PROJECT_NAME} "")
 # source files
 include(${PROJECT_SOURCE_DIR}/sourcelist.cmake)
 
-target_link_libraries(${PROJECT_NAME} Threads::Threads rt modbus)
+target_link_libraries(${PROJECT_NAME} Threads::Threads modbus rt)
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${MODBUS_INCLUDE_DIR}
 )

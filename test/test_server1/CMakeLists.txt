@@ -33,4 +33,4 @@ add_executable(${PROJECT_NAME} "")
 # source files
 include(${PROJECT_SOURCE_DIR}/sourcelist.cmake)
 
-target_link_libraries(${PROJECT_NAME} Threads::Threads rt onhSHMcpp)
+target_link_libraries(${PROJECT_NAME} Threads::Threads onhSHMcpp rt)
