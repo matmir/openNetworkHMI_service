@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2022 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@
 
 #define PROJECT_NAME "openNetworkHMI"
 
-#define PROJECT_VERSION "0.9.7"
+#define PROJECT_VERSION "0.9.8"
 #define PROJECT_VERSION_MAJOR "0"
 #define PROJECT_VERSION_MINOR "9"
-#define PROJECT_VERSION_PATCH "7"
+#define PROJECT_VERSION_PATCH "8"
 
 #endif // APPCONFIG_H
