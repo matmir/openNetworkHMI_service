@@ -27,46 +27,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <iostream>
-#include <fcntl.h>
-#include <sys/shm.h>
-#include <sys/stat.h>
-#include <sys/mman.h>
-#include <unistd.h>
+#ifndef LIBRARY_LIBONHSHMCPP_TEST_SRC_PDTAGIDTESTS_H_
+#define LIBRARY_LIBONHSHMCPP_TEST_SRC_PDTAGIDTESTS_H_
+
 #include <gtest/gtest.h>
-
 #include "pdaTestGlobalData.h"
-#include "pdaByteTests.h"
-#include "pdaBitTests.h"
-#include "pdaWordTests.h"
-#include "pdaDWordTests.h"
-#include "pdaIntTests.h"
-#include "pdaRealTests.h"
-#include "shmServerTests.h"
-#include "PDTagIdTests.h"
-#include "PDTagBitTests.h"
-#include "PDTagByteTests.h"
-#include "PDTagWordTests.h"
-#include "PDTagDWordTests.h"
-#include "PDTagIntTests.h"
-#include "PDTagRealTests.h"
+#include "fixtures/pdaClearTest.h"
+#include <onhSHMcpp/PDTag.h>
 
-using namespace std;
+using namespace onh;
 
-int main(int argc, char **argv) {
+/**
+ * Check Tag ID
+ */
+TEST_F(pdaClearTest, TestTagId1) {
 
-	cout << "\nC++ SHM server tests\n" << endl;
+	PDTag<bool> Tag1({PDA_MEMORY, 0, 4}, *pda);
+	PDTag<bool> Tag2({PDA_MEMORY, 14, 1}, *pda);
+	PDTag<bool> Tag3({PDA_INPUT, 14, 1}, *pda);
+	PDTag<bool> Tag4({PDA_OUTPUT, 14, 1}, *pda);
+	PDTag<bool> Tag5({PDA_OUTPUT, 0, 0}, *pda);
+	PDTag<bool> Tag6({PDA_INPUT, 1060, 0}, *pda);
+	PDTag<BYTE> Tag7({PDA_MEMORY, 1060, 5}, *pda);
+	PDTag<BYTE> Tag8({PDA_MEMORY, 1060, 3}, *pda);
 
-	// Create server
-	shmServer = new onh::ShmServer(SHM_SEGMENT_NAME);
-
-	// Run tests
-	testing::InitGoogleTest(&argc, argv);
-	int tstRes = RUN_ALL_TESTS();
-
-	delete shmServer;
-
-	cout << "\nSHM closed\n" << endl;
-
-	return tstRes;
+	ASSERT_EQ(43, Tag1.getId());
+	ASSERT_EQ(1413, Tag2.getId());
+	ASSERT_EQ(1411, Tag3.getId());
+	ASSERT_EQ(1412, Tag4.getId());
+	ASSERT_EQ(2, Tag5.getId());
+	ASSERT_EQ(106001, Tag6.getId());
+	ASSERT_EQ(106003, Tag7.getId());
+	ASSERT_EQ(106003, Tag8.getId());
 }
+
+#endif /* LIBRARY_LIBONHSHMCPP_TEST_SRC_PDTAGIDTESTS_H_ */

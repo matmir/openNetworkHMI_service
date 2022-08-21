@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Mateusz Mirosławski
+ * Copyright (c) 2022 Mateusz Mirosławski
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,14 +34,14 @@ using namespace onh;
 
 template <class T>
 PDTag<T>::PDTag(const processDataAddress &tagAddr, const processDataAccess &procDT):
-	addr(tagAddr)
+	addr(tagAddr), _id(calculateId())
 {
 	pda = new processDataAccess(procDT);
 }
 
 template <class T>
 PDTag<T>::PDTag(const PDTag &pdt):
-	addr(pdt.addr)
+	addr(pdt.addr), _id(calculateId())
 {
 	pda = new processDataAccess(*pdt.pda);
 }
@@ -565,6 +565,26 @@ T PDTag<T>::operator++(int) {
 	}
 
 	return v;
+}
+
+template <class T>
+TagId PDTag<T>::getId() const {
+	return _id;
+}
+
+template <class T>
+TagId PDTag<T>::calculateId() const {
+
+	TagId id = addr.byteAddr * 100;
+
+	// Check type
+	if (std::is_same<T, bool>::value) {
+		id += (addr.bitAddr * 10);
+	}
+	
+	id += static_cast<unsigned int>(addr.area);
+
+	return id;
 }
 
 template class PDTag<bool>;

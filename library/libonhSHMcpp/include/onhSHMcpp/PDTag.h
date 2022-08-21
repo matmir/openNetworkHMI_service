@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Mateusz Mirosławski
+ * Copyright (c) 2022 Mateusz Mirosławski
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,8 @@
 #include "onhSHMcpp/processDataAccess.h"
 
 namespace onh {
+
+	using TagId = unsigned long long;
 
 	/**
 	 * Process data Tag class
@@ -242,13 +244,29 @@ namespace onh {
 			 */
 			T operator++(int);
 
+			/**
+			 * Get Tag identifier
+			 * 
+			 * @return Tag identifier
+			 */
+			TagId getId() const;
+
 		private:
+			/**
+			 * Calculate tag identifier based on tag address
+			 * 
+			 * @return Tag identifier
+			 */
+			TagId calculateId() const;
 
 			/// Process data access
 			processDataAccess *pda;
 
 			/// Tag process address
 			processDataAddress addr;
+
+			/// Tag identifier
+			TagId _id = 0;
 	};
 
 } /* namespace onh */
