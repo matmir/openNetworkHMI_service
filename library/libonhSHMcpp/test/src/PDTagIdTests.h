@@ -50,15 +50,33 @@ TEST_F(pdaClearTest, TestTagId1) {
 	PDTag<bool> Tag6({PDA_INPUT, 1060, 0}, *pda);
 	PDTag<BYTE> Tag7({PDA_MEMORY, 1060, 5}, *pda);
 	PDTag<BYTE> Tag8({PDA_MEMORY, 1060, 3}, *pda);
+	PDTag<float> Tag9({PDA_MEMORY, 1060, 3}, *pda);
+	PDTag<int> Tag10({PDA_MEMORY, 1060, 3}, *pda);
+	PDTag<WORD> Tag11({PDA_MEMORY, 1060, 3}, *pda);
+	PDTag<DWORD> Tag12({PDA_MEMORY, 1060, 3}, *pda);
 
-	ASSERT_EQ(43, Tag1.getId());
-	ASSERT_EQ(1413, Tag2.getId());
-	ASSERT_EQ(1411, Tag3.getId());
-	ASSERT_EQ(1412, Tag4.getId());
-	ASSERT_EQ(2, Tag5.getId());
-	ASSERT_EQ(106001, Tag6.getId());
-	ASSERT_EQ(106003, Tag7.getId());
-	ASSERT_EQ(106003, Tag8.getId());
+	ASSERT_EQ(431, Tag1.getId());
+	ASSERT_EQ(14131, Tag2.getId());
+	ASSERT_EQ(14111, Tag3.getId());
+	ASSERT_EQ(14121, Tag4.getId());
+	ASSERT_EQ(21, Tag5.getId());
+	ASSERT_EQ(1060011, Tag6.getId());
+	ASSERT_EQ(1060032, Tag7.getId());
+	ASSERT_EQ(1060032, Tag8.getId());
+	ASSERT_EQ(1060036, Tag9.getId());
+	ASSERT_EQ(1060035, Tag10.getId());
+	ASSERT_EQ(1060033, Tag11.getId());
+	ASSERT_EQ(1060034, Tag12.getId());
+}
+
+TEST_F(pdaClearTest, TestTagId2) {
+
+	PDTag<BYTE> Tag8({PDA_MEMORY, 1060, 3}, *pda);
+	PDTag<bool> Tag9({PDA_MEMORY, 1060, 0}, *pda);
+	PDTag<bool> Tag10({PDA_MEMORY, 1060, 3}, *pda);
+
+	ASSERT_FALSE(Tag8.getId()==Tag9.getId());
+	ASSERT_FALSE(Tag8.getId()==Tag10.getId());
 }
 
 #endif /* LIBRARY_LIBONHSHMCPP_TEST_SRC_PDTAGIDTESTS_H_ */

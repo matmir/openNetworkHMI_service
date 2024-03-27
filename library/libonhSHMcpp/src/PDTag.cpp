@@ -575,14 +575,31 @@ TagId PDTag<T>::getId() const {
 template <class T>
 TagId PDTag<T>::calculateId() const {
 
-	TagId id = addr.byteAddr * 100;
+	// Byte
+	TagId id = addr.byteAddr * 1000;
 
-	// Check type
+	// bit
 	if (std::is_same<T, bool>::value) {
-		id += (addr.bitAddr * 10);
+		id += (addr.bitAddr * 100);
 	}
 	
-	id += static_cast<unsigned int>(addr.area);
+	// area
+	id += 10*static_cast<unsigned int>(addr.area);
+
+	// type
+	if (std::is_same<T, bool>::value) {
+		id += 1;
+	} else if (std::is_same<T, BYTE>::value) {
+		id += 2;
+	} else if (std::is_same<T, WORD>::value) {
+		id += 3;
+	} else if (std::is_same<T, DWORD>::value) {
+		id += 4;
+	} else if (std::is_same<T, int>::value) {
+		id += 5;
+	} else if (std::is_same<T, float>::value) {
+		id += 6;
+	}
 
 	return id;
 }

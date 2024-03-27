@@ -21,9 +21,9 @@
 
 #define PROJECT_NAME "openNetworkHMI"
 
-#define PROJECT_VERSION "0.9.8"
+#define PROJECT_VERSION "0.9.9"
 #define PROJECT_VERSION_MAJOR "0"
 #define PROJECT_VERSION_MINOR "9"
-#define PROJECT_VERSION_PATCH "8"
+#define PROJECT_VERSION_PATCH "9"
 
 #endif // APPCONFIG_H
