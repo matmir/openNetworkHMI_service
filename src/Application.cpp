@@ -116,6 +116,9 @@ void Application::initDriver() {
 
 	// Init driver manager
 	drvManager = std::make_unique<DriverManager>(cfg->getDriverConnections());
+
+	// Connect to controllers
+	drvManager->connect();
 }
 
 void Application::initThreadManager() {

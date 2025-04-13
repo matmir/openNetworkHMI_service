@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2021 Mateusz Mirosławski.
+ * Copyright (c) 2025 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,19 @@
  * along with openNetworkHMI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <chrono>
+#include <thread>
 #include "ModbusDriver.h"
 #include "ModbusUpdater.h"
 #include "ModbusUtils.h"
 #include "ModbusProcessReader.h"
 #include "ModbusProcessWriter.h"
 #include "ModbusProcessUpdater.h"
+
+namespace {
+	// Reconnect wait time (seconds)
+	constexpr int MB_RECONNECT_TIME = 10;
+}
 
 namespace onh {
 
@@ -49,9 +56,6 @@ ModbusDriver::ModbusDriver(const modbusM::ModbusCfg& cfg, unsigned int connId):
 	buff = std::make_unique<GuardDataContainer<ModbusProcessData>>(clearProcess);
 
 	getLog() << LOG_INFO("Process registers prepared");
-
-	// Connect to the controller
-	connect();
 }
 
 ModbusDriver::~ModbusDriver() {
@@ -69,14 +73,22 @@ void ModbusDriver::triggerError(const std::string& msg,
 }
 
 void ModbusDriver::connect() {
-	try {
-		// Connect to the controller
-		getLog() << LOG_INFO("Connecting to the controller...");
-		modbus->connect();
-		getLog() << LOG_INFO("Connected");
-	} catch (modbusM::ModbusException &e) {
-		triggerError(e.what(), "ModbusDriver::connect:");
+	bool connected = false;
+
+	while (!connected)
+	{
+		try {
+			// Connect to the controller
+			getLog() << LOG_INFO("Connecting to the controller...");
+			modbus->connect();
+			connected = true;
+		} catch (modbusM::ModbusException &e) {
+			getLog() << LOG_ERROR("Driver not connected - reconnecting");
+			std::this_thread::sleep_for(std::chrono::seconds(MB_RECONNECT_TIME));
+		}
 	}
+
+	getLog() << LOG_INFO("Connected");
 }
 
 DriverBufferPtr ModbusDriver::getBuffer() {

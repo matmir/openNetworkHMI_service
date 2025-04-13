@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2021 Mateusz Mirosławski.
+ * Copyright (c) 2025 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,6 +50,11 @@ class ShmDriver: public Driver {
 		 * Assign operator - inactive
 		 */
 		ShmDriver& operator=(const ShmDriver&) = delete;
+
+		/**
+		 * Connect driver to controller
+		 */
+		void connect() override;
 
 		/**
 		 * Get driver buffer handle

@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2025 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ class shmDriverTests: public ::testing::Test {
 
 			// Create SHM driver instance
 			shmDriver = new onh::ShmDriver(SHM_SEGMENT_NAME, 1);
+			shmDriver->connect();
 
 			// Create reader/writer/updater
 			shmReader = shmDriver->getReader();

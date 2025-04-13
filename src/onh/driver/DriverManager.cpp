@@ -58,8 +58,17 @@ DriverManager::DriverManager(const std::vector<DriverConnection>& dcv) {
 DriverManager::~DriverManager() {
 }
 
-std::vector<ProcessUpdaterData> DriverManager::getProcessUpdaters() {
-	std::vector<ProcessUpdaterData> ret;
+void DriverManager::connect()
+{
+	// Prepare all driver updaters
+	for (const auto& drv : driver) {
+		drv.second->connect();
+	}
+}
+
+std::vector<ProcessUpdaterData> DriverManager::getProcessUpdaters()
+{
+    std::vector<ProcessUpdaterData> ret;
 
 	// Prepare all driver updaters
 	for (const auto& drv : driver) {

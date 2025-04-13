@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2025 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,6 +77,7 @@ void closeModbusServer() {
 
 	// Create Modbus driver instance
 	onh::ModbusDriver *mbDriver = new onh::ModbusDriver(mbc, 666);
+	mbDriver->connect();
 
 	// driver process writer
 	onh::DriverProcessWriterPtr mbWriter = mbDriver->getWriter();
@@ -102,6 +103,7 @@ int main(int argc, char **argv) {
 
 		// Create SHM driver instance
 		onh::ShmDriver sDriver(SHM_SEGMENT_NAME, 666);
+		sDriver.connect();
 		onh::DriverProcessWriterPtr dWriter = sDriver.getWriter();
 		onh::ShmProcessWriter *sWriter = dynamic_cast<onh::ShmProcessWriter*>(dWriter.release());
 

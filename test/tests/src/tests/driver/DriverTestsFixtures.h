@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2020 Mateusz Mirosławski.
+ * Copyright (c) 2025 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ class driverTests: public ::testing::Test {
 
 			// Driver Manager
 			drvM = new onh::DriverManager(dcv);
+			drvM->connect();
 
 			// Process Reader
 			procReader = new onh::ProcessReader(drvM->getProcessReader());

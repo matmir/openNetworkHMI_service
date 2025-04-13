@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2021 Mateusz Mirosławski.
+ * Copyright (c) 2025 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,6 @@ void Application::run() {
 	int rc;
 
 	bool down = true;
-	bool firstLoop = true;
 
 	#ifdef debugMSG
 		std::cout << "before listen\n";
@@ -68,11 +67,6 @@ void Application::run() {
 	#ifdef debugMSG
 		std::cout << "after listen\n";
 	#endif
-	if (firstLoop) {
-		// Create file informs that Modbus is ready
-		system("touch modbusInited");
-		firstLoop = false;
-	}
 
 	while (!exitProg && !(*exitSignal)) {
 		try {
@@ -138,9 +132,6 @@ void Application::run() {
 
 	// Give client app time to close
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-	// Remove init flag
-	system("rm -f modbusInited");
 }
 
 void Application::updateControlFlags() {

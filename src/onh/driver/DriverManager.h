@@ -58,6 +58,11 @@ class DriverManager {
 		DriverManager& operator=(const DriverManager&) = delete;
 
 		/**
+		 * Connect drivers to controllers
+		 */
+		void connect();
+
+		/**
 		 * Get updater objects
 		 *
 		 * @return ProcessUpdater objects

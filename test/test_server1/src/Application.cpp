@@ -1,6 +1,6 @@
 /**
  * This file is part of openNetworkHMI.
- * Copyright (c) 2021 Mateusz Mirosławski.
+ * Copyright (c) 2025 Mateusz Mirosławski.
  *
  * openNetworkHMI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,9 +36,6 @@ Application::~Application() {
 void Application::run() {
 	onh::Delay d(1);
 
-	// Create file informs that SHM is ready
-	system("touch shmInited");
-
 	while (!exitProg && !(*exitSignal)) {
 		try {
 			// Parse client commands
@@ -68,9 +65,6 @@ void Application::run() {
 	// Give client app time to close
 	d.setDelay(1000);
 	d.wait();
-
-	// Remove init flag
-	system("rm -f shmInited");
 }
 
 void Application::checkControlBits() {
